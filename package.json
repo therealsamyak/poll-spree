@@ -1,0 +1,24 @@
+{
+  "name": "poll-spree-2",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "check": "biome check --write .",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F @poll-spree-2/backend dev",
+    "dev:setup": "turbo -F @poll-spree-2/backend setup"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "@biomejs/biome": "^2.0.0"
+  },
+  "packageManager": "bun@1.2.17"
+}
