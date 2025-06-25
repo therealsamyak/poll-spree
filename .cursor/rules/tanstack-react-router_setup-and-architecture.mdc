@@ -5,6 +5,8 @@ alwaysApply: false
 ---
 # Overview
 
+ALWAYS USE BUN OVER NODE WHEN SUPPORTED.
+
 **TanStack Router is a router for building React and Solid applications**. Some of its features include:
 
 - 100% inferred TypeScript support
@@ -45,9 +47,9 @@ It's probably no surprise at this point that picking a router is so important th
 
 **Does this mean that TanStack Router is a framework?**
 
-TanStack Router itself is not a "framework" in the traditional sense, since it doesn't address a few other common full-stack concerns. However TanStack Router has been designed to be upgradable to a full-stack framework when used in conjunction with other tools that address bundling, deployments, and server-side-specific functionality. This is why we are currently developing [TanStack Start](https://tanstack.com/start), a full-stack framework that is built on top of TanStack Router and Vite.
+TanStack Router itself is not a "framework" in the traditional sense, since it doesn't address a few other common full-stack concerns. However TanStack Router has been designed to be upgradable to a full-stack framework when used in conjunction with other tools that address bundling, deployments, and server-side-specific functionality. This is why we are currently developing [TanStack Start](mdc:https:/tanstack.com/start), a full-stack framework that is built on top of TanStack Router and Vite.
 
-For a deeper dive on the history of TanStack Router, feel free to read [TanStack Router's History](../decisions-on-dx.md#tanstack-routers-origin-story).
+For a deeper dive on the history of TanStack Router, feel free to read [TanStack Router's History](mdc:../decisions-on-dx.md#tanstack-routers-origin-story).
 
 ## Why TanStack Router?
 
@@ -153,10 +155,10 @@ TanStack Router's file-based routing approach is uniquely user-facing. Route con
 
 TanStack Router builds on concepts and patterns popularized by many other OSS projects, including:
 
-- [TRPC](https://trpc.io/)
-- [Remix](https://remix.run)
-- [Chicane](https://swan-io.github.io/chicane/)
-- [Next.js](https://nextjs.org)
+- [TRPC](mdc:https:/trpc.io)
+- [Remix](mdc:https:/remix.run)
+- [Chicane](mdc:https:/swan-io.github.io/chicane)
+- [Next.js](mdc:https:/nextjs.org)
 
 We acknowledge the investment, risk and research that went into their development, but are excited to push the bar they have set even higher.
 
@@ -178,7 +180,7 @@ File based route generation (through Vite, and other supported bundlers) is the 
 npx create-tsrouter-app@latest my-app --template file-router
 ```
 
-See [create-tsrouter-app](https://github.com/TanStack/create-tsrouter-app/tree/main/cli/create-tsrouter-app) for more options.
+See [create-tsrouter-app](mdc:https:/github.com/TanStack/create-tsrouter-app/tree/main/cli/create-tsrouter-app) for more options.
 
 ### Manual Setup
 
@@ -225,7 +227,7 @@ export default defineConfig({
 ```
 
 > [!TIP]
-> If you are not using Vite, or any of the supported bundlers, you can check out the [TanStack Router CLI](../routing/installation-with-router-cli.md) guide for more info.
+> If you are not using Vite, or any of the supported bundlers, you can check out the [TanStack Router CLI](mdc:../routing/installation-with-router-cli.md) guide for more info.
 
 Create the following files:
 
@@ -557,7 +559,7 @@ It can then be attached to provided shadow DOM target:
 />
 ```
 
-Click [here](https://tanstack.com/router/latest/docs/framework/react/examples/basic-devtools-panel) to see a live example of this in StackBlitz.
+Click [here](mdc:https:/tanstack.com/router/latest/docs/framework/react/examples/basic-devtools-panel) to see a live example of this in StackBlitz.
 
 ## Embedded Mode
 
@@ -602,7 +604,7 @@ function App() {
 
 **_If your UI is blank, open the console, and you will probably have some errors that read something along the lines of `cannot use 'useNavigate' outside of context` . This means there are React Router api’s that are still imported and referenced that you need to find and remove. The easiest way to make sure you find all React Router imports is to uninstall `react-router-dom` and then you should get typescript errors in your files. Then you will know what to change to a `@tanstack/react-router` import._**
 
-Here is the [example repo](https://github.com/Benanna2019/SickFitsForEveryone/tree/migrate-to-tanstack/router/React-Router)
+Here is the [example repo](mdc:https:/github.com/Benanna2019/SickFitsForEveryone/tree/migrate-to-tanstack/router/React-Router)
 
 - [ ] Install Router - `npm i @tanstack/react-router`
 - [ ] **Optional:** Uninstall React Router to get TypeScript errors on imports.
@@ -632,23 +634,23 @@ Here is the [example repo](https://github.com/Benanna2019/SickFitsForEveryone/tr
 
 # Migration from React Location
 
-Before you begin your journey in migrating from React Location, it's important that you have a good understanding of the [Routing Concepts](../routing/routing-concepts.md) and [Design Decisions](../decisions-on-dx.md) used by TanStack Router.
+Before you begin your journey in migrating from React Location, it's important that you have a good understanding of the [Routing Concepts](mdc:../routing/routing-concepts.md) and [Design Decisions](mdc:../decisions-on-dx.md) used by TanStack Router.
 
 ## Differences between React Location and TanStack Router
 
 React Location and TanStack Router share much of same design decisions concepts, but there are some key differences that you should be aware of.
 
 - React Location uses _generics_ to infer types for routes, while TanStack Router uses _module declaration merging_ to infer types.
-- Route configuration in React Location is done using a single array of route definitions, while in TanStack Router, route configuration is done using a tree of route definitions starting with the [root route](../routing/routing-concepts.md#the-root-route).
-- [File-based routing](../routing/file-based-routing.md) is the recommended way to define routes in TanStack Router, while React Location only allows you to define routes in a single file using a code-based approach.
-  - TanStack Router does support a [code-based approach](../routing/code-based-routing.md) to defining routes, but it is not recommended for most use cases. You can read more about why, over here: [why is file-based routing the preferred way to define routes?](../decisions-on-dx.md#3-why-is-file-based-routing-the-preferred-way-to-define-routes)
+- Route configuration in React Location is done using a single array of route definitions, while in TanStack Router, route configuration is done using a tree of route definitions starting with the [root route](mdc:../routing/routing-concepts.md#the-root-route).
+- [File-based routing](mdc:../routing/file-based-routing.md) is the recommended way to define routes in TanStack Router, while React Location only allows you to define routes in a single file using a code-based approach.
+  - TanStack Router does support a [code-based approach](mdc:../routing/code-based-routing.md) to defining routes, but it is not recommended for most use cases. You can read more about why, over here: [why is file-based routing the preferred way to define routes?](mdc:../decisions-on-dx.md#3-why-is-file-based-routing-the-preferred-way-to-define-routes)
 
 ## Migration guide
 
-In this guide we'll go over the process of migrating the [React Location Basic example](https://github.com/TanStack/router/tree/react-location/examples/basic) over to TanStack Router using file-based routing, with the end goal of having the same functionality as the original example (styling and other non-routing related code will be omitted).
+In this guide we'll go over the process of migrating the [React Location Basic example](mdc:https:/github.com/TanStack/router/tree/react-location/examples/basic) over to TanStack Router using file-based routing, with the end goal of having the same functionality as the original example (styling and other non-routing related code will be omitted).
 
 > [!TIP]
-> To use a code-based approach for defining your routes, you can read the [code-based Routing](../routing/code-based-routing.md) guide.
+> To use a code-based approach for defining your routes, you can read the [code-based Routing](mdc:../routing/code-based-routing.md) guide.
 
 ### Step 1: Swap over to TanStack Router's dependencies
 
@@ -687,7 +689,7 @@ export default defineConfig({
 })
 ```
 
-However, if your application does not use Vite, you use one of our other [supported bundlers](../routing/file-based-routing.md#getting-started-with-file-based-routing), or you can use the `@tanstack/router-cli` package to watch for changes in your routes files and automatically update the routes configuration.
+However, if your application does not use Vite, you use one of our other [supported bundlers](mdc:../routing/file-based-routing.md#getting-started-with-file-based-routing), or you can use the `@tanstack/router-cli` package to watch for changes in your routes files and automatically update the routes configuration.
 
 ### Step 3: Add the file-based configuration file to your project
 
@@ -700,7 +702,7 @@ Create a `tsr.config.json` file in the root of your project with the following c
 }
 ```
 
-You can find the full list of options for the `tsr.config.json` file [here](../routing/file-based-routing.md#options).
+You can find the full list of options for the `tsr.config.json` file [here](mdc:../routing/file-based-routing.md#options).
 
 ### Step 4: Create the routes directory
 
@@ -879,26 +881,26 @@ You should now have successfully migrated your application from React Location t
 
 React Location also has a few more features that you might be using in your application. Here are some guides to help you migrate those features:
 
-- [Search params](../guide/search-params.md)
-- [Data loading](../guide/data-loading.md)
-- [History types](../guide/history-types.md)
-- [Wildcard / Splat / Catch-all routes](../routing/routing-concepts.md#splat--catch-all-routes)
-- [Authenticated routes](../guide/authenticated-routes.md)
+- [Search params](mdc:../guide/search-params.md)
+- [Data loading](mdc:../guide/data-loading.md)
+- [History types](mdc:../guide/history-types.md)
+- [Wildcard / Splat / Catch-all routes](mdc:../routing/routing-concepts.md#splat--catch-all-routes)
+- [Authenticated routes](mdc:../guide/authenticated-routes.md)
 
 TanStack Router also has a few more features that you might want to explore:
 
-- [Router Context](../guide/router-context.md)
-- [Preloading](../guide/preloading.md)
-- [Pathless Layout Routes](../routing/routing-concepts.md#pathless-layout-routes)
-- [Route masking](../guide/route-masking.md)
-- [SSR](../guide/ssr.md)
+- [Router Context](mdc:../guide/router-context.md)
+- [Preloading](mdc:../guide/preloading.md)
+- [Pathless Layout Routes](mdc:../routing/routing-concepts.md#pathless-layout-routes)
+- [Route masking](mdc:../guide/route-masking.md)
+- [SSR](mdc:../guide/ssr.md)
 - ... and more!
 
 If you are facing any issues or have any questions, feel free to ask for help in the TanStack Discord.
 
 # Frequently Asked Questions
 
-Welcome to the TanStack Router FAQ! Here you'll find answers to common questions about the TanStack Router. If you have a question that isn't answered here, please feel free to ask in the [TanStack Discord](https://tlinz.com/discord).
+Welcome to the TanStack Router FAQ! Here you'll find answers to common questions about the TanStack Router. If you have a question that isn't answered here, please feel free to ask in the [TanStack Discord](mdc:https:/tlinz.com/discord).
 
 ## Should I commit my `routeTree.gen.ts` file into git?
 
@@ -910,7 +912,7 @@ You should commit this file into git so that other developers can use it to buil
 
 No, the root route is always rendered as it is the entry point of your application.
 
-If you need to conditionally render a route's component, this usually means that the page content needs to be different based on some condition (e.g. user authentication). For this use case, you should use a [Layout Route](../routing/routing-concepts.md#layout-routes) or a [Pathless Layout Route](../routing/routing-concepts.md#pathless-layout-routes) to conditionally render the content.
+If you need to conditionally render a route's component, this usually means that the page content needs to be different based on some condition (e.g. user authentication). For this use case, you should use a [Layout Route](mdc:../routing/routing-concepts.md#layout-routes) or a [Pathless Layout Route](mdc:../routing/routing-concepts.md#pathless-layout-routes) to conditionally render the content.
 
 You can restrict access to these routes using a conditional check in the `beforeLoad` function of the route.
 

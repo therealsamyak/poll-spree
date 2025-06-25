@@ -1,14 +1,7 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react";
 import { useQuery } from "convex/react";
-import {
-	BarChart3,
-	Github,
-	Heart,
-	Loader2,
-	Plus,
-	Twitter,
-	Users,
-} from "lucide-react";
+import { BarChart3, Heart, Loader2, Plus, Users } from "lucide-react";
+import { SiGithub, SiX } from "react-icons/si";
 import { api } from "../../convex/_generated/api";
 import { CreatePollDialog } from "./create-poll-dialog";
 import { PollCard } from "./poll-card";
@@ -135,7 +128,7 @@ export const PollsList = () => {
 								rel="noopener noreferrer"
 								className="text-muted-foreground transition-colors hover:text-foreground"
 							>
-								<Github className="h-5 w-5" />
+								<SiGithub className="h-5 w-5" />
 							</a>
 							<a
 								href="https://twitter.com"
@@ -143,7 +136,7 @@ export const PollsList = () => {
 								rel="noopener noreferrer"
 								className="text-muted-foreground transition-colors hover:text-foreground"
 							>
-								<Twitter className="h-5 w-5" />
+								<SiX className="h-5 w-5" />
 							</a>
 						</div>
 						<div className="space-y-2">
@@ -152,7 +145,7 @@ export const PollsList = () => {
 								community
 							</p>
 							<p className="text-muted-foreground text-xs">
-								© 2024 Poll Spree. All rights reserved.
+								© 2025 Poll Spree. All rights reserved.
 							</p>
 						</div>
 					</div>
