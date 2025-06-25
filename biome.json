@@ -3,7 +3,7 @@
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false,
@@ -18,7 +18,8 @@
 			"!**/routeTree.gen.ts",
 			"!**/src-tauri",
 			"!**/.nuxt",
-			"!bts.jsonc"
+			"!bts.jsonc",
+			"!**/_generated/**"
 		]
 	},
 	"formatter": {
