@@ -45,9 +45,9 @@ export const Header = () => {
 					<ModeToggle />
 					{isSignedIn ? (
 						<div className="flex items-center space-x-2">
-							<span className="hidden text-muted-foreground text-sm sm:block">
+							{/* <span className="hidden text-muted-foreground text-sm sm:block">
 								Welcome back!
-							</span>
+							</span> */}
 							<UserButton
 								appearance={{
 									elements: {
