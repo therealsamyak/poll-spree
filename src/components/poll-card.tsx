@@ -40,7 +40,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 	const hasVoted =
 		userVote?.optionId !== null && userVote?.optionId !== undefined;
 	const canDelete = currentUser && poll.authorId === userId;
-	const showResults = !isSignedIn || hasVoted;
+	const showResults = isSignedIn && hasVoted;
 
 	const formatDate = (timestamp: number) => {
 		return new Date(timestamp).toLocaleDateString("en-US", {
