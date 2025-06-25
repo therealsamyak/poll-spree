@@ -203,7 +203,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 									variant={isSelected ? "default" : "outline"}
 									className={`h-auto w-full justify-start p-4 transition-all duration-200${
 										isSelected
-											? " bg-gradient-to-r from-primary to-primary/80 shadow-lg ring-2 ring-primary/20 text-foreground dark:text-white hover:text-white"
+											? " bg-gradient-to-r from-primary to-primary/80 text-foreground shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white"
 											: " text-foreground hover:bg-muted/60 hover:text-primary hover:shadow-md"
 									}${
 										isWinning && showResults
