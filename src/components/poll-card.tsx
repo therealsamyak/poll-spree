@@ -238,7 +238,6 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
         {!isSignedIn && (
           <div className="rounded-lg border border-muted-foreground/20 border-dashed bg-gradient-to-r from-muted/30 to-muted/50 py-6 text-center">
-            <Separator className="my-4" />
             <div className="space-y-2">
               <p className="font-medium text-muted-foreground text-sm">
                 Sign in to vote and see results
@@ -252,7 +251,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
         {isSignedIn && !hasVoted && (
           <div className="py-4 text-center">
-            <Separator className="my-4" />
+            <Separator className="my-3" />
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
               <Clock className="h-4 w-4" />
               <p>Vote to see the results</p>
@@ -262,7 +261,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
         {hasVoted && (
           <div className="py-4 text-center">
-            <Separator className="my-4" />
+            <Separator className="my-3" />
             <div className="flex items-center justify-center gap-2 text-green-600 text-sm">
               <CheckCircle2 className="h-4 w-4" />
               <p className="font-medium">You've voted!</p>
