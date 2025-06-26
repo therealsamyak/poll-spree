@@ -102,8 +102,12 @@ const SidebarContent = () => {
           {isSignedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="h-auto w-full bg-primary p-2 hover:bg-accent hover:text-black">
-                  <div className="flex w-full items-center justify-between">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="justify-center md:w-full md:h-auto md:p-2 md:justify-between bg-transparent hover:bg-accent hover:text-black focus:bg-accent focus:text-black active:bg-accent active:text-black dark:hover:bg-accent dark:focus:bg-accent dark:active:bg-accent"
+                >
+                  <div className="flex w-full items-center justify-center md:justify-between">
                     <UserButton
                       appearance={{
                         elements: {
