@@ -105,7 +105,7 @@ const SidebarContent = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="justify-center md:w-full md:h-auto md:p-2 md:justify-between bg-transparent hover:bg-accent hover:text-black focus:bg-accent focus:text-black active:bg-accent active:text-black dark:hover:bg-accent dark:focus:bg-accent dark:active:bg-accent"
+                  className="justify-center bg-transparent hover:bg-accent hover:text-black focus:bg-accent focus:text-black active:bg-accent active:text-black md:h-auto md:w-full md:justify-between md:p-2 dark:active:bg-accent dark:focus:bg-accent dark:hover:bg-accent"
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <UserButton
