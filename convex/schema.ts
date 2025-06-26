@@ -9,7 +9,9 @@ export default defineSchema({
     authorId: v.string(),
     authorUsername: v.string(),
     createdAt: v.number(),
-  }).index("by_createdAt", ["createdAt"]),
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_authorId", ["authorId"]),
 
   pollOptions: defineTable({
     pollId: v.id("polls"),

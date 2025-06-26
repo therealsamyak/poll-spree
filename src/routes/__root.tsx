@@ -1,10 +1,10 @@
 import { createRootRoute, HeadContent, Outlet, useRouterState } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useEffect, useState } from "react"
-import { Header } from "@/components/header"
 import Loader from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
+import { Sidebar } from "@/components/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthState } from "@/lib/clerk"
@@ -53,9 +53,9 @@ function RootComponent() {
     <>
       <HeadContent />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <div className="grid h-svh grid-rows-[auto_1fr]">
-          <Header />
-          {isFetching ? <Loader /> : <Outlet />}
+        <div className="flex h-svh">
+          <Sidebar />
+          <main className="ml-16 flex-1 md:ml-64">{isFetching ? <Loader /> : <Outlet />}</main>
         </div>
         <Toaster richColors />
       </ThemeProvider>

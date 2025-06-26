@@ -283,6 +283,55 @@ export const createUser = mutation({
   },
 })
 
+export const updateUsername = mutation({
+  args: {
+    userId: v.string(),
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, username } = args
+
+    // Check if username is already taken by another user
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", username))
+      .first()
+
+    if (existingUser && existingUser.userId !== userId) {
+      throw new Error("Username already taken")
+    }
+
+    // Get the current user
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first()
+
+    if (!currentUser) {
+      throw new Error("User not found")
+    }
+
+    // Update the username
+    await ctx.db.patch(currentUser._id, {
+      username,
+    })
+
+    // Update all polls by this user to use the new username
+    const userPolls = await ctx.db
+      .query("polls")
+      .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+      .collect()
+
+    for (const poll of userPolls) {
+      await ctx.db.patch(poll._id, {
+        authorUsername: username,
+      })
+    }
+
+    return { success: true }
+  },
+})
+
 export const getUser = query({
   args: {
     userId: v.string(),
