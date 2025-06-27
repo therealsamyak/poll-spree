@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../convex/_generated/api"
 
 export const UsernameSetup = () => {
@@ -20,23 +21,16 @@ export const UsernameSetup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!username.trim()) {
-      toast.error("Please enter a username")
+    // Validate username using comprehensive validation
+    const validation = validateUsername(username)
+    if (!validation.isValid) {
+      toast.error(validation.error)
       return
     }
 
-    if (username.length < 3) {
-      toast.error("Username must be at least 3 characters long")
-      return
-    }
-
-    if (username.length > 20) {
-      toast.error("Username must be less than 20 characters long")
-      return
-    }
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      toast.error("Username can only contain letters, numbers, underscores, and hyphens")
+    // Check for reserved usernames
+    if (isReservedUsername(username)) {
+      toast.error("This username is reserved and cannot be used")
       return
     }
 
@@ -92,7 +86,7 @@ export const UsernameSetup = () => {
                   required
                 />
                 <p className="text-muted-foreground text-xs">
-                  Letters, numbers, underscores, and hyphens only (3-20 characters)
+                  English letters, numbers, underscores, and hyphens only (3-20 characters)
                 </p>
               </div>
 

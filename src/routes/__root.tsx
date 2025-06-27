@@ -10,29 +10,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { useAuthState } from "@/lib/clerk"
 import "../index.css"
 
-export const Route = createRootRoute({
-  component: RootComponent,
-  notFoundComponent: NotFound,
-  head: () => ({
-    meta: [
-      {
-        title: "Poll Spree",
-      },
-      {
-        name: "description",
-        content: "Vote on polls and see what others think!",
-      },
-    ],
-    links: [
-      {
-        rel: "icon",
-        href: "/favicon.ico",
-      },
-    ],
-  }),
-})
-
-function RootComponent() {
+const RootComponent = () => {
   const isFetching = useRouterState({
     select: (s) => s.isLoading,
   })
@@ -63,3 +41,25 @@ function RootComponent() {
     </>
   )
 }
+
+export const Route = createRootRoute({
+  component: RootComponent,
+  notFoundComponent: NotFound,
+  head: () => ({
+    meta: [
+      {
+        title: "Poll Spree",
+      },
+      {
+        name: "description",
+        content: "Vote on polls and see what others think!",
+      },
+    ],
+    links: [
+      {
+        rel: "icon",
+        href: "/favicon.ico",
+      },
+    ],
+  }),
+})

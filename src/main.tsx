@@ -43,7 +43,7 @@ const router = createRouter({
   ),
   context: {},
   // Wrap the app with providers
-  Wrap: function WrapComponent({ children }: { children: React.ReactNode }) {
+  Wrap: ({ children }: { children: React.ReactNode }) => {
     return (
       <ClerkProvider
         publishableKey={publishableKey}
@@ -69,7 +69,7 @@ declare module "@tanstack/react-router" {
   }
 }
 
-function mountApp() {
+const mountApp = () => {
   const rootElement = document.getElementById("app")
 
   if (!rootElement) {
