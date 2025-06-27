@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import type { Id } from "@/convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
 import type { Poll } from "../types"
-import { Avatar } from "./ui/avatar"
+import { Avatar } from "./avatar"
 
 interface PollCardProps {
   poll: Poll
