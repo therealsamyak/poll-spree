@@ -26,7 +26,7 @@ import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../convex/_generated/api"
 import { CustomProfileDialog } from "./custom-profile-dialog"
 import { ModeToggle } from "./mode-toggle"
-import { Avatar } from "./ui/avatar"
+import { Avatar } from "./avatar"
 
 export const Sidebar = () => {
   return (

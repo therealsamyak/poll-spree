@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 import { api } from "../../convex/_generated/api"
-import { Avatar } from "./ui/avatar"
+import { Avatar } from "./avatar"
 
 interface CustomProfileDialogProps {
   isOpen: boolean
