@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Home, LogOut, Settings, TrendingUp, User } from "lucide-react"
 import { useId, useState } from "react"
+import { toast } from "sonner"
+import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../convex/_generated/api"
 import { ModeToggle } from "./mode-toggle"
 import { Button } from "./ui/button"
@@ -44,13 +46,26 @@ const SidebarContent = () => {
   const handleUpdateUsername = async () => {
     if (!newUsername.trim() || !userId) return
 
+    // Validate username using comprehensive validation
+    const validation = validateUsername(newUsername)
+    if (!validation.isValid) {
+      toast.error(validation.error)
+      return
+    }
+
+    // Check for reserved usernames
+    if (isReservedUsername(newUsername)) {
+      toast.error("This username is reserved and cannot be used")
+      return
+    }
+
     try {
       await updateUsername({ userId, username: newUsername.trim() })
       setNewUsername("")
       setIsDialogOpen(false)
+      toast.success("Username updated successfully!")
     } catch (error) {
-      console.error("Failed to update username:", error)
-      // You might want to show a toast notification here
+      toast.error(error instanceof Error ? error.message : "Failed to update username")
     }
   }
 

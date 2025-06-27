@@ -5,7 +5,7 @@ import { api } from "../../convex/_generated/api"
 import { PollsList } from "../components/polls-list"
 import { UsernameSetup } from "../components/username-setup"
 
-function Index() {
+const Index = () => {
   const { userId, isSignedIn } = useAuth()
   const user = useQuery(api.polls.getUser, { userId: userId || "" })
 
