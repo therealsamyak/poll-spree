@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"bun run dev:backend\" \"bun run dev:frontend\"",
     "dev:frontend": "vite build && vite --port=3001",
     "dev:backend": "bun run convex:codegen && bun run convex:dev",
     "build": "concurrently \"bun run build:backend\" \"bun run build:frontend\"",

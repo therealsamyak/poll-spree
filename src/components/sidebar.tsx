@@ -1,13 +1,10 @@
-import { SignInButton, UserButton, useAuth, useClerk } from "@clerk/clerk-react"
+import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Home, LogOut, Settings, TrendingUp, User } from "lucide-react"
 import { useId, useState } from "react"
 import { toast } from "sonner"
-import { isReservedUsername, validateUsername } from "@/lib/utils"
-import { api } from "../../convex/_generated/api"
-import { ModeToggle } from "./mode-toggle"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -15,16 +12,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog"
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
-import { Separator } from "./ui/separator"
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
+import { isReservedUsername, validateUsername } from "@/lib/utils"
+import { api } from "../../convex/_generated/api"
+import { CustomProfileDialog } from "./custom-profile-dialog"
+import { ModeToggle } from "./mode-toggle"
+import { Avatar } from "./ui/avatar"
 
 export const Sidebar = () => {
   return (
@@ -36,11 +38,12 @@ export const Sidebar = () => {
 
 const SidebarContent = () => {
   const { isSignedIn, userId } = useAuth()
-  const { openUserProfile, signOut } = useClerk()
+  const { signOut } = useClerk()
   const user = useQuery(api.polls.getUser, { userId: userId || "" })
   const updateUsername = useMutation(api.polls.updateUsername)
   const [newUsername, setNewUsername] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
   const usernameId = useId()
 
   const handleUpdateUsername = async () => {
@@ -120,16 +123,10 @@ const SidebarContent = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="justify-center bg-transparent hover:bg-accent hover:text-black focus:bg-accent focus:text-black active:bg-accent active:text-black md:h-auto md:w-full md:justify-between md:p-2 dark:active:bg-accent dark:focus:bg-accent dark:hover:bg-accent"
+                  className="justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          userButtonAvatarBox: "h-8 w-8",
-                        },
-                      }}
-                    />
+                    <Avatar size="sm" />
                     <div className="hidden min-w-0 flex-1 md:block">
                       <p className="ml-3 text-left font-medium text-sm">
                         {user?.username || "User"}
@@ -143,7 +140,7 @@ const SidebarContent = () => {
                   <User className="mr-2 h-4 w-4" />
                   <span>Change Username</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => openUserProfile()}>
+                <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
@@ -167,31 +164,36 @@ const SidebarContent = () => {
           <DialogHeader>
             <DialogTitle>Change Username</DialogTitle>
             <DialogDescription>
-              Enter a new username for your account. This will be displayed on all your polls.
+              Enter a new username. It must be 3-20 characters long and contain only letters,
+              numbers, underscores, and hyphens.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor={usernameId} className="text-right">
-                Username
-              </Label>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor={usernameId}>New Username</Label>
               <Input
                 id={usernameId}
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Enter new username"
-                className="col-span-3"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" onClick={handleUpdateUsername} disabled={!newUsername.trim()}>
-              Update Username
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
             </Button>
+            <Button onClick={handleUpdateUsername}>Update Username</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Custom Profile Dialog */}
+      <CustomProfileDialog
+        isOpen={isProfileDialogOpen}
+        onClose={() => setIsProfileDialogOpen(false)}
+      />
     </div>
   )
 }

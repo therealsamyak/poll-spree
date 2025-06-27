@@ -414,9 +414,10 @@ export const createUser = mutation({
   args: {
     userId: v.string(),
     username: v.string(),
+    profileImageUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { userId, username } = args
+    const { userId, username, profileImageUrl } = args
 
     // Validate username
     const validation = validateUsername(username)
@@ -441,6 +442,7 @@ export const createUser = mutation({
     const user = await ctx.db.insert("users", {
       userId,
       username,
+      profileImageUrl,
       createdAt: Date.now(),
     })
 
@@ -506,6 +508,33 @@ export const updateUsername = mutation({
   },
 })
 
+export const updateProfileImage = mutation({
+  args: {
+    userId: v.string(),
+    profileImageUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, profileImageUrl } = args
+
+    // Get the current user
+    const currentUser = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first()
+
+    if (!currentUser) {
+      throw new Error("User not found")
+    }
+
+    // Update the profile image URL
+    await ctx.db.patch(currentUser._id, {
+      profileImageUrl,
+    })
+
+    return { success: true }
+  },
+})
+
 export const getUser = query({
   args: {
     userId: v.string(),
@@ -519,5 +548,56 @@ export const getUser = query({
       .first()
 
     return user
+  },
+})
+
+export const deleteUserData = mutation({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = args
+
+    // Delete all polls created by this user
+    const userPolls = await ctx.db
+      .query("polls")
+      .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+      .collect()
+
+    // Delete all poll options for these polls
+    for (const poll of userPolls) {
+      const pollOptions = await ctx.db
+        .query("pollOptions")
+        .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
+        .collect()
+
+      // Delete all votes for these poll options
+      for (const option of pollOptions) {
+        await ctx.db.delete(option._id)
+      }
+
+      // Delete the poll
+      await ctx.db.delete(poll._id)
+    }
+
+    // Delete all votes cast by this user
+    const allUserVotes = await ctx.db.query("pollUsers").collect()
+    const userVotes = allUserVotes.filter((vote) => vote.userId === userId)
+
+    for (const vote of userVotes) {
+      await ctx.db.delete(vote._id)
+    }
+
+    // Delete the user record
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first()
+
+    if (user) {
+      await ctx.db.delete(user._id)
+    }
+
+    return { success: true }
   },
 })

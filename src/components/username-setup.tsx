@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/clerk-react"
+import { useAuth, useUser } from "@clerk/clerk-react"
 import { useMutation } from "convex/react"
 import { ArrowRight, Sparkles, User } from "lucide-react"
 import { useId, useState } from "react"
@@ -14,6 +14,7 @@ export const UsernameSetup = () => {
   const [username, setUsername] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { userId } = useAuth()
+  const { user } = useUser()
   const usernameId = useId()
 
   const createUser = useMutation(api.polls.createUser)
@@ -44,6 +45,7 @@ export const UsernameSetup = () => {
       await createUser({
         userId,
         username: username.trim(),
+        profileImageUrl: user?.imageUrl,
       })
       toast.success("Username set successfully!")
     } catch (error) {

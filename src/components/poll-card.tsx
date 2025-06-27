@@ -1,6 +1,6 @@
 import { useAuth } from "@clerk/clerk-react"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Calendar, CheckCircle2, Clock, Trash2, TrendingUp, User } from "lucide-react"
+import { BarChart3, Calendar, CheckCircle2, Clock, Trash2, TrendingUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import type { Id } from "@/convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api"
 import type { Poll } from "../types"
+import { Avatar } from "./ui/avatar"
 
 interface PollCardProps {
   poll: Poll
@@ -138,9 +139,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
-                  <User className="h-3 w-3 text-primary" />
-                </div>
+                <Avatar size="sm" />
                 <span className="font-medium">{poll.authorUsername}</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -188,7 +187,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                   className={`h-auto w-full justify-start p-4 transition-all duration-200${
                     isSelected
                       ? " bg-gradient-to-r from-primary to-primary/80 text-foreground shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white"
-                      : " text-foreground hover:bg-muted/60 hover:text-primary hover:shadow-md"
+                      : " border-2 border-border/60 text-foreground hover:bg-muted/70 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
                   }${isWinning && showResults ? " bg-green-500/5 ring-2 ring-green-500/50" : ""}`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting}

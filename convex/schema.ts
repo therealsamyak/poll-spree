@@ -29,6 +29,7 @@ export default defineSchema({
   users: defineTable({
     userId: v.string(),
     username: v.string(),
+    profileImageUrl: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_userId", ["userId"])
