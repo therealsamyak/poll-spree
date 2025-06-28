@@ -3,6 +3,7 @@ import { useAction, useMutation } from "convex/react"
 import { AlertTriangle, Camera, LogOut, Trash2, User } from "lucide-react"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
+import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,8 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { api } from "../../convex/_generated/api"
-import { Avatar } from "./avatar"
+import { api } from "../../../convex/_generated/api"
 
 interface CustomProfileDialogProps {
   isOpen: boolean

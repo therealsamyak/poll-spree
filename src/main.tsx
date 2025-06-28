@@ -4,7 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { ConvexProvider, ConvexReactClient } from "convex/react"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
-import Loader from "./components/loader"
+import { Loader } from "@/components/loader"
 import { routeTree } from "./routeTree.gen"
 
 // Initialize Convex client

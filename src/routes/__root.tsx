@@ -3,7 +3,7 @@ import { createRootRoute, HeadContent, Outlet, useRouterState } from "@tanstack/
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useMutation } from "convex/react"
 import { useEffect, useState } from "react"
-import Loader from "@/components/loader"
+import { Loader } from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
 import { Sidebar } from "@/components/sidebar"

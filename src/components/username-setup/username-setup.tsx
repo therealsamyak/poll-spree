@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
-import { api } from "../../convex/_generated/api"
+import { api } from "../../../convex/_generated/api"
 
 export const UsernameSetup = () => {
   const [username, setUsername] = useState("")

@@ -3,14 +3,14 @@ import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, CheckCircle2, Clock, Trash2, TrendingUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Avatar } from "@/components/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import type { Id } from "@/convex/_generated/dataModel"
-import { api } from "../../convex/_generated/api"
+import { api } from "../../../convex/_generated/api"
 import type { Poll } from "../types"
-import { Avatar } from "./avatar"
 
 interface PollCardProps {
   poll: Poll
