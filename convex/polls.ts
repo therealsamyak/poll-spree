@@ -638,7 +638,7 @@ export const deleteClerkUser = action({
   args: {
     userId: v.string(),
   },
-  handler: async (ctx, args) => {
+  handler: async (_ctx, args) => {
     const { userId } = args
 
     console.log("Starting deleteClerkUser action for userId:", userId)
