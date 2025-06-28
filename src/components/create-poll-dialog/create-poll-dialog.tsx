@@ -1,7 +1,7 @@
 import { useAuth } from "@clerk/clerk-react"
 import { useMutation, useQuery } from "convex/react"
 import { Plus, Sparkles, X } from "lucide-react"
-import { useId, useState } from "react"
+import { useId, useState, useRef } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -30,6 +30,9 @@ export const CreatePollDialog = () => {
   const [isDev, setIsDev] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
 
+  // Use a ref to maintain a unique counter for option IDs
+  const nextIdRef = useRef(3)
+
   const questionId = useId()
   const devId = useId()
 
@@ -39,7 +42,8 @@ export const CreatePollDialog = () => {
 
   const handleAddOption = () => {
     if (options.length < 6) {
-      const newId = (options.length + 1).toString()
+      const newId = nextIdRef.current.toString()
+      nextIdRef.current += 1
       setOptions([...options, { id: newId, text: "" }])
     }
   }
@@ -84,9 +88,12 @@ export const CreatePollDialog = () => {
     // Validate all inputs for inappropriate content
     const inputsToValidate = {
       "poll question": question.trim(),
-      ...validOptions.reduce(
+      ...options.reduce(
         (acc, option, index) => {
-          acc[`poll option ${index + 1}`] = option.text.trim()
+          // Only include options that have text
+          if (option.text.trim()) {
+            acc[`poll option ${index + 1}`] = option.text.trim()
+          }
           return acc
         },
         {} as Record<string, string>,
@@ -117,6 +124,8 @@ export const CreatePollDialog = () => {
         { id: "1", text: "" },
         { id: "2", text: "" },
       ])
+      // Reset the ID counter when the dialog is closed
+      nextIdRef.current = 3
       setIsDev(false)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create poll")
@@ -164,10 +173,10 @@ export const CreatePollDialog = () => {
           <div className="space-y-3">
             <Label className="font-medium text-sm">Options *</Label>
             <div className="space-y-3">
-              {options.map((option) => (
+              {options.map((option, index) => (
                 <div key={option.id} className="flex items-center gap-2">
                   <Input
-                    placeholder={`Option ${option.id}`}
+                    placeholder={`Option ${index + 1}`}
                     value={option.text}
                     onChange={(e) => handleOptionChange(option.id, e.target.value)}
                     className="flex-1"

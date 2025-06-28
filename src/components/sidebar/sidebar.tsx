@@ -141,16 +141,16 @@ const SidebarContent = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
-                  <User className="mr-2 h-4 w-4" />
+                <DropdownMenuItem onClick={() => setIsDialogOpen(true)} className="group">
+                  <User className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-white dark:group-hover:text-black transition-colors" />
                   <span>Change Username</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)}>
-                  <Settings className="mr-2 h-4 w-4" />
+                <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)} className="group">
+                  <Settings className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-white dark:group-hover:text-black transition-colors" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                <DropdownMenuItem onClick={() => signOut()} className="group">
+                  <LogOut className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-white dark:group-hover:text-black transition-colors" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
