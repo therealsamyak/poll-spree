@@ -42,14 +42,19 @@ export const UsernameSetup = () => {
 
     setIsSubmitting(true)
     try {
-      await createUser({
+      const result = await createUser({
         userId,
         username: username.trim(),
         profileImageUrl: user?.imageUrl,
       })
-      toast.success("Username set successfully!")
+
+      if (result.success) {
+        toast.success("Username set successfully!")
+      } else {
+        toast.error(result.error || "Failed to set username")
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to set username")
+      toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
     }

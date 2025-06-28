@@ -63,12 +63,17 @@ const SidebarContent = () => {
     }
 
     try {
-      await updateUsername({ userId, username: newUsername.trim() })
-      setNewUsername("")
-      setIsDialogOpen(false)
-      toast.success("Username updated successfully!")
+      const result = await updateUsername({ userId, username: newUsername.trim() })
+
+      if (result.success) {
+        setNewUsername("")
+        setIsDialogOpen(false)
+        toast.success("Username updated successfully!")
+      } else {
+        toast.error(result.error || "Failed to update username")
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update username")
+      toast.error("An unexpected error occurred. Please try again.")
     }
   }
 
