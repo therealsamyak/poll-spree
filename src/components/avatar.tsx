@@ -3,12 +3,11 @@ import { User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface AvatarProps {
-  userId?: string
   size?: "sm" | "md" | "lg"
   className?: string
 }
 
-export const Avatar = ({ userId, size = "md", className }: AvatarProps) => {
+export const Avatar = ({ size = "md", className }: AvatarProps) => {
   const { user } = useUser()
 
   // Get the profile image URL from Clerk
