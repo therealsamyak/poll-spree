@@ -55,14 +55,19 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
     if (userVote?.optionId === optionId) {
       setIsVoting(true)
       try {
-        await vote({
+        const result = await vote({
           pollId: poll.id as Id<"polls">,
           optionId: optionId as Id<"pollOptions">,
           userId,
         })
-        toast.success("Vote removed!")
+
+        if (result.success) {
+          toast.success("Vote removed!")
+        } else {
+          toast.error(result.error || "Failed to remove vote")
+        }
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to remove vote")
+        toast.error("An unexpected error occurred. Please try again.")
       } finally {
         setIsVoting(false)
       }
@@ -72,14 +77,19 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
     // Otherwise, change vote or vote for the first time
     setIsVoting(true)
     try {
-      await vote({
+      const result = await vote({
         pollId: poll.id as Id<"polls">,
         optionId: optionId as Id<"pollOptions">,
         userId,
       })
-      toast.success("Vote recorded!")
+
+      if (result.success) {
+        toast.success("Vote recorded!")
+      } else {
+        toast.error(result.error || "Failed to vote")
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to vote")
+      toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsVoting(false)
     }
@@ -90,14 +100,19 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
     setIsDeleting(true)
     try {
-      await deletePoll({
+      const result = await deletePoll({
         pollId: poll.id as Id<"polls">,
         authorId: userId,
       })
-      toast.success("Poll deleted successfully!")
-      onPollDeleted?.()
+
+      if (result.success) {
+        toast.success("Poll deleted successfully!")
+        onPollDeleted?.()
+      } else {
+        toast.error(result.error || "Failed to delete poll")
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to delete poll")
+      toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsDeleting(false)
     }

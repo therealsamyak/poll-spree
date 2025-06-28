@@ -211,7 +211,10 @@ export const vote = mutation({
     // Get the poll option
     const option = await ctx.db.get(optionId)
     if (!option) {
-      throw new Error("Poll option not found")
+      return {
+        success: false,
+        error: "Poll option not found",
+      }
     }
 
     // Check if user has already voted on this poll
@@ -390,11 +393,17 @@ export const deletePoll = mutation({
     // Get the poll to check if the user is the author
     const poll = await ctx.db.get(pollId)
     if (!poll) {
-      throw new Error("Poll not found")
+      return {
+        success: false,
+        error: "Poll not found",
+      }
     }
 
     if (poll.authorId !== authorId) {
-      throw new Error("Only the poll author can delete this poll")
+      return {
+        success: false,
+        error: "Only the poll author can delete this poll",
+      }
     }
 
     // Delete all poll options
@@ -436,10 +445,16 @@ export const createUser = mutation({
     // Validate username
     const validation = validateUsername(username)
     if (!validation.isValid) {
-      throw new Error(validation.error || "Invalid username")
+      return {
+        success: false,
+        error: validation.error || "Invalid username",
+      }
     }
     if (isReservedUsername(username)) {
-      throw new Error("This username is reserved and cannot be used")
+      return {
+        success: false,
+        error: "This username is reserved and cannot be used",
+      }
     }
 
     // Check if user already exists by userId
@@ -467,7 +482,7 @@ export const createUser = mutation({
         })
       }
 
-      return { userId: existingUserById._id, updated: true }
+      return { success: true, userId: existingUserById._id, updated: true }
     }
 
     // Check if username is already taken by another user
@@ -477,7 +492,10 @@ export const createUser = mutation({
       .first()
 
     if (existingUserByUsername) {
-      throw new Error("Username already taken")
+      return {
+        success: false,
+        error: "Username already taken",
+      }
     }
 
     // Create the user
@@ -488,7 +506,7 @@ export const createUser = mutation({
       createdAt: Date.now(),
     })
 
-    return { userId: user, updated: false }
+    return { success: true, userId: user, updated: false }
   },
 })
 
@@ -503,10 +521,16 @@ export const updateUsername = mutation({
     // Validate username
     const validation = validateUsername(username)
     if (!validation.isValid) {
-      throw new Error(validation.error || "Invalid username")
+      return {
+        success: false,
+        error: validation.error || "Invalid username",
+      }
     }
     if (isReservedUsername(username)) {
-      throw new Error("This username is reserved and cannot be used")
+      return {
+        success: false,
+        error: "This username is reserved and cannot be used",
+      }
     }
 
     // Check if username is already taken by another user
@@ -516,7 +540,10 @@ export const updateUsername = mutation({
       .first()
 
     if (existingUser && existingUser.userId !== userId) {
-      throw new Error("Username already taken")
+      return {
+        success: false,
+        error: "Username already taken",
+      }
     }
 
     // Get the current user
@@ -526,7 +553,10 @@ export const updateUsername = mutation({
       .first()
 
     if (!currentUser) {
-      throw new Error("User not found")
+      return {
+        success: false,
+        error: "User not found",
+      }
     }
 
     // Update the username
