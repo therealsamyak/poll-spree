@@ -61,7 +61,7 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
 
       // Step 4: Refresh the page to clear any remaining state
       window.location.reload()
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to delete account. Please try again.")
     } finally {
       setIsDeleting(false)
@@ -97,13 +97,13 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
             userId: user.id,
             profileImageUrl: user.imageUrl || "",
           })
-        } catch (error) {
+        } catch (_error) {
           // Don't show error to user as the main operation succeeded
         }
       }, 1000)
 
       toast.success("Profile picture updated successfully!")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to upload profile picture. Please try again.")
     } finally {
       setIsUploading(false)
@@ -130,13 +130,13 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
             userId: user.id,
             profileImageUrl: "",
           })
-        } catch (error) {
+        } catch (_error) {
           // Don't show error to user as the main operation succeeded
         }
       }, 1000)
 
       toast.success("Profile picture removed successfully!")
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to remove profile picture. Please try again.")
     } finally {
       setIsUploading(false)

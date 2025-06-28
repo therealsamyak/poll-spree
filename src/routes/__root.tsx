@@ -1,8 +1,8 @@
+import { useUser } from "@clerk/clerk-react"
 import { createRootRoute, HeadContent, Outlet, useRouterState } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
-import { useEffect, useState } from "react"
-import { useUser } from "@clerk/clerk-react"
 import { useMutation } from "convex/react"
+import { useEffect, useState } from "react"
 import Loader from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
@@ -34,7 +34,7 @@ const RootComponent = () => {
       updateProfileImage({
         userId: user.id,
         profileImageUrl: user.imageUrl || "",
-      }).catch((error) => {
+      }).catch((_error) => {
         // Silently handle profile image sync errors
       })
     }

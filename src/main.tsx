@@ -92,6 +92,6 @@ const mountApp = () => {
 // Mount the app and handle any errors
 try {
   mountApp()
-} catch (error) {
+} catch (_error) {
   // Silently handle mount errors
 }
