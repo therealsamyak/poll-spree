@@ -4,6 +4,9 @@ import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Home, LogOut, Settings, TrendingUp, User } from "lucide-react"
 import { useId, useState } from "react"
 import { toast } from "sonner"
+import { Avatar } from "@/components/avatar"
+import { CustomProfileDialog } from "@/components/custom-profile-dialog"
+import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -23,10 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
-import { api } from "../../convex/_generated/api"
-import { Avatar } from "./avatar"
-import { CustomProfileDialog } from "./custom-profile-dialog"
-import { ModeToggle } from "./mode-toggle"
+import { api } from "../../../convex/_generated/api"
 
 export const Sidebar = () => {
   return (

@@ -4,9 +4,9 @@ import { BarChart3, Heart, Loader2, Plus, Users } from "lucide-react"
 import { SiGithub, SiX } from "react-icons/si"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { PollCard } from "@/components/poll-card"
-import { api } from "../../convex/_generated/api"
-import { Button } from "./ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { api } from "../../../convex/_generated/api"
 
 export const PollsList = () => {
   const polls = useQuery(api.polls.getPolls)

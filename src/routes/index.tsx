@@ -1,9 +1,9 @@
 import { useAuth } from "@clerk/clerk-react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
+import { PollsList } from "@/components/polls-list"
+import { UsernameSetup } from "@/components/username-setup"
 import { api } from "../../convex/_generated/api"
-import { PollsList } from "../components/polls-list"
-import { UsernameSetup } from "../components/username-setup"
 
 const Index = () => {
   const { userId, isSignedIn } = useAuth()
