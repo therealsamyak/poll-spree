@@ -442,13 +442,41 @@ export const createUser = mutation({
       throw new Error("This username is reserved and cannot be used")
     }
 
-    // Check if username is already taken
-    const existingUser = await ctx.db
+    // Check if user already exists by userId
+    const existingUserById = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first()
+
+    if (existingUserById) {
+      // User exists, update their username and profile image
+      await ctx.db.patch(existingUserById._id, {
+        username,
+        profileImageUrl,
+      })
+
+      // Update all polls by this user to use the new username
+      const userPolls = await ctx.db
+        .query("polls")
+        .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+        .collect()
+
+      for (const poll of userPolls) {
+        await ctx.db.patch(poll._id, {
+          authorUsername: username,
+        })
+      }
+
+      return { userId: existingUserById._id, updated: true }
+    }
+
+    // Check if username is already taken by another user
+    const existingUserByUsername = await ctx.db
       .query("users")
       .withIndex("by_username", (q) => q.eq("username", username))
       .first()
 
-    if (existingUser) {
+    if (existingUserByUsername) {
       throw new Error("Username already taken")
     }
 
@@ -460,7 +488,7 @@ export const createUser = mutation({
       createdAt: Date.now(),
     })
 
-    return { userId: user }
+    return { userId: user, updated: false }
   },
 })
 
@@ -537,7 +565,9 @@ export const updateProfileImage = mutation({
       .first()
 
     if (!currentUser) {
-      throw new Error("User not found")
+      // User doesn't exist yet, skip the update
+      // The profile image will be set when the user is created during username setup
+      return { success: true, skipped: true }
     }
 
     // Update the profile image URL in the users table
@@ -549,7 +579,7 @@ export const updateProfileImage = mutation({
     // the users table for the latest profile image URL in getPolls and vote functions.
     // This ensures that profile image changes are immediately reflected in all polls.
 
-    return { success: true }
+    return { success: true, skipped: false }
   },
 })
 
