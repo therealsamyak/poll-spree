@@ -13,8 +13,8 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as healthCheck from "../healthCheck.js";
 import type * as polls from "../polls.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,8 +25,8 @@ import type * as polls from "../polls.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  healthCheck: typeof healthCheck;
   polls: typeof polls;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

@@ -29,9 +29,9 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const deleteUserData = useMutation(api.polls.deleteAccount)
-  const deleteClerkUser = useAction(api.polls.deleteClerkUser)
-  const updateProfileImage = useMutation(api.polls.updateProfileImage)
+  const deleteUserData = useMutation(api.users.deleteAccount)
+  const deleteClerkUser = useAction(api.users.deleteClerkUser)
+  const updateProfileImage = useMutation(api.users.updateProfileImage)
 
   const handleSignOut = async () => {
     try {

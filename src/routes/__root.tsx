@@ -21,7 +21,7 @@ const RootComponent = () => {
   const { isLoaded } = useAuthState()
   const { user } = useUser()
   const [isClient, setIsClient] = useState(false)
-  const updateProfileImage = useMutation(api.polls.updateProfileImage)
+  const updateProfileImage = useMutation(api.users.updateProfileImage)
 
   useEffect(() => {
     setIsClient(true)

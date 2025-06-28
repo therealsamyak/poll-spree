@@ -7,7 +7,7 @@ import { api } from "../../convex/_generated/api"
 
 const Index = () => {
   const { userId, isSignedIn } = useAuth()
-  const user = useQuery(api.polls.getUser, { userId: userId || "" })
+  const user = useQuery(api.users.getUser, { userId: userId || "" })
 
   // Show loading state while checking user
   if (isSignedIn && user === undefined) {
