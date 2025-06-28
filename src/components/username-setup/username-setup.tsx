@@ -17,7 +17,7 @@ export const UsernameSetup = () => {
   const { user } = useUser()
   const usernameId = useId()
 
-  const createUser = useMutation(api.polls.createUser)
+  const createUser = useMutation(api.users.createUser)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

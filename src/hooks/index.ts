@@ -5,5 +5,5 @@ import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 
 export const useUserProfile = (userId: string) => {
-  return useQuery(api.polls.getUser, { userId })
+  return useQuery(api.users.getUser, { userId })
 }

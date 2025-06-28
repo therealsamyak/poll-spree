@@ -33,7 +33,7 @@ export const CreatePollDialog = () => {
   const devId = useId()
 
   const { userId } = useAuth()
-  const user = useQuery(api.polls.getUser, { userId: userId || "" })
+  const user = useQuery(api.users.getUser, { userId: userId || "" })
   const createPoll = useMutation(api.polls.createPoll)
 
   const handleAddOption = () => {
@@ -107,7 +107,7 @@ export const CreatePollDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 hover:bg-primary/40 hover:text-black dark:hover:bg-primary/50 dark:hover:text-white">
           <Plus className="h-4 w-4" />
           Create Poll
         </Button>

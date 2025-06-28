@@ -39,8 +39,8 @@ export const Sidebar = () => {
 const SidebarContent = () => {
   const { isSignedIn, userId } = useAuth()
   const { signOut } = useClerk()
-  const user = useQuery(api.polls.getUser, { userId: userId || "" })
-  const updateUsername = useMutation(api.polls.updateUsername)
+  const user = useQuery(api.users.getUser, { userId: userId || "" })
+  const updateUsername = useMutation(api.users.updateUsername)
   const [newUsername, setNewUsername] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
