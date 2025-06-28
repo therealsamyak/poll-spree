@@ -1,6 +1,8 @@
 import { createRootRoute, HeadContent, Outlet, useRouterState } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useEffect, useState } from "react"
+import { useUser } from "@clerk/clerk-react"
+import { useMutation } from "convex/react"
 import Loader from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
@@ -8,6 +10,7 @@ import { Sidebar } from "@/components/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthState } from "@/lib/clerk"
+import { api } from "../../convex/_generated/api"
 import "../index.css"
 
 const RootComponent = () => {
@@ -16,11 +19,26 @@ const RootComponent = () => {
   })
 
   const { isLoaded } = useAuthState()
+  const { user } = useUser()
   const [isClient, setIsClient] = useState(false)
+  const updateProfileImage = useMutation(api.polls.updateProfileImage)
 
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  // Sync profile image URL with Convex when user changes
+  useEffect(() => {
+    if (user?.id && user?.imageUrl !== undefined) {
+      // Update the profile image URL in our Convex users table
+      updateProfileImage({
+        userId: user.id,
+        profileImageUrl: user.imageUrl || "",
+      }).catch((error) => {
+        // Silently handle profile image sync errors
+      })
+    }
+  }, [user?.id, user?.imageUrl, updateProfileImage])
 
   // Show loading while Clerk is initializing or during SSR
   if (!isLoaded || !isClient) {

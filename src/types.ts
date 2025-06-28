@@ -15,6 +15,7 @@ export interface Poll {
   dev: boolean
   authorId: string
   authorUsername: string
+  authorProfileImageUrl?: string
   createdAt: number
   options: PollOption[]
 }

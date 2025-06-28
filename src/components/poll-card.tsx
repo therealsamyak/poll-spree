@@ -139,7 +139,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
-                <Avatar size="sm" />
+                <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
                 <span className="font-medium">{poll.authorUsername}</span>
               </div>
               <div className="flex items-center gap-1.5">

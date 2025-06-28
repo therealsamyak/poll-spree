@@ -169,6 +169,12 @@ export const getPolls = query({
           .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
           .collect()
 
+        // Get the author's profile image URL
+        const author = await ctx.db
+          .query("users")
+          .withIndex("by_userId", (q) => q.eq("userId", poll.authorId))
+          .first()
+
         return {
           id: poll._id,
           question: poll.question,
@@ -176,6 +182,7 @@ export const getPolls = query({
           dev: poll.dev,
           authorId: poll.authorId,
           authorUsername: poll.authorUsername,
+          authorProfileImageUrl: author?.profileImageUrl,
           createdAt: poll.createdAt,
           options: options.map((option) => ({
             id: option._id,
@@ -286,6 +293,12 @@ export const vote = mutation({
       .withIndex("by_pollId", (q) => q.eq("pollId", pollId))
       .collect()
 
+    // Get the author's profile image URL
+    const author = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", updatedPoll?.authorId || ""))
+      .first()
+
     return {
       success: true,
       poll: {
@@ -295,6 +308,7 @@ export const vote = mutation({
         dev: updatedPoll?.dev,
         authorId: updatedPoll?.authorId,
         authorUsername: updatedPoll?.authorUsername,
+        authorProfileImageUrl: author?.profileImageUrl,
         createdAt: updatedPoll?.createdAt,
         options: updatedOptions.map((option) => ({
           id: option._id,
@@ -526,10 +540,14 @@ export const updateProfileImage = mutation({
       throw new Error("User not found")
     }
 
-    // Update the profile image URL
+    // Update the profile image URL in the users table
     await ctx.db.patch(currentUser._id, {
       profileImageUrl,
     })
+
+    // Note: We don't need to update the polls table because we always query
+    // the users table for the latest profile image URL in getPolls and vote functions.
+    // This ensures that profile image changes are immediately reflected in all polls.
 
     return { success: true }
   },
