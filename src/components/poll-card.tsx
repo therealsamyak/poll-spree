@@ -32,7 +32,8 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
   const hasVoted = userVote?.optionId !== null && userVote?.optionId !== undefined
   const canDelete = currentUser && poll.authorId === userId
-  const showResults = isSignedIn && hasVoted
+  const isAuthor = poll.authorId === userId
+  const showResults = isSignedIn && (hasVoted || isAuthor)
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
@@ -248,7 +249,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
           </div>
         )}
 
-        {isSignedIn && !hasVoted && (
+        {isSignedIn && !hasVoted && !isAuthor && (
           <div className="py-4 text-center">
             <Separator className="my-3" />
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
@@ -264,6 +265,16 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
             <div className="flex items-center justify-center gap-2 text-green-600 text-sm">
               <CheckCircle2 className="h-4 w-4" />
               <p className="font-medium">You've voted!</p>
+            </div>
+          </div>
+        )}
+
+        {isSignedIn && !hasVoted && isAuthor && (
+          <div className="py-4 text-center">
+            <Separator className="my-3" />
+            <div className="flex items-center justify-center gap-2 text-blue-600 text-sm">
+              <BarChart3 className="h-4 w-4" />
+              <p className="font-medium">You can see results as the poll creator</p>
             </div>
           </div>
         )}
