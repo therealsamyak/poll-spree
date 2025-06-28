@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { action, mutation, query } from "./_generated/server"
+import { validateTextContent } from "./badWordsFilter"
 
 /**
  * Comprehensive username validation following security best practices
@@ -174,10 +175,19 @@ export const createUser = mutation({
         error: validation.error || "Invalid username",
       }
     }
+
+    // Check for inappropriate content in username
+    if (!validateTextContent(username)) {
+      return {
+        success: false,
+        error: "Username contains inappropriate content and cannot be used.",
+      }
+    }
+
     if (isReservedUsername(username)) {
       return {
         success: false,
-        error: "This username is reserved and cannot be used",
+        error: "This username is reserved and cannot be used.",
       }
     }
 
@@ -250,10 +260,19 @@ export const updateUsername = mutation({
         error: validation.error || "Invalid username",
       }
     }
+
+    // Check for inappropriate content in username
+    if (!validateTextContent(username)) {
+      return {
+        success: false,
+        error: "Username contains inappropriate content and cannot be used.",
+      }
+    }
+
     if (isReservedUsername(username)) {
       return {
         success: false,
-        error: "This username is reserved and cannot be used",
+        error: "This username is reserved and cannot be used.",
       }
     }
 

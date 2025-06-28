@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { validateMultipleInputs } from "@/lib/badWordsFilter"
 import { api } from "../../../convex/_generated/api"
 
 export const CreatePollDialog = () => {
@@ -77,6 +78,26 @@ export const CreatePollDialog = () => {
 
     if (!user?.username) {
       toast.error("Please set a username before creating a poll")
+      return
+    }
+
+    // Validate all inputs for inappropriate content
+    const inputsToValidate = {
+      "poll question": question.trim(),
+      ...validOptions.reduce(
+        (acc, option, index) => {
+          acc[`poll option ${index + 1}`] = option.text.trim()
+          return acc
+        },
+        {} as Record<string, string>,
+      ),
+    }
+
+    const validation = validateMultipleInputs(inputsToValidate)
+    if (!validation.isValid) {
+      toast.error(
+        `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
+      )
       return
     }
 

@@ -58,7 +58,7 @@ const SidebarContent = () => {
 
     // Check for reserved usernames
     if (isReservedUsername(newUsername)) {
-      toast.error("This username is reserved and cannot be used")
+      toast.error("This username is reserved and cannot be used.")
       return
     }
 

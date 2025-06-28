@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { isTextSafe } from "@/lib/badWordsFilter"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
 
@@ -29,9 +30,15 @@ export const UsernameSetup = () => {
       return
     }
 
+    // Check for inappropriate content in username
+    if (!isTextSafe(username)) {
+      toast.error("Username contains inappropriate content and cannot be used.")
+      return
+    }
+
     // Check for reserved usernames
     if (isReservedUsername(username)) {
-      toast.error("This username is reserved and cannot be used")
+      toast.error("This username is reserved and cannot be used.")
       return
     }
 
