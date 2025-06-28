@@ -53,7 +53,7 @@ export const UsernameSetup = () => {
       } else {
         toast.error(result.error || "Failed to set username")
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)

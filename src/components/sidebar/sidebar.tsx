@@ -72,7 +72,7 @@ const SidebarContent = () => {
       } else {
         toast.error(result.error || "Failed to update username")
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred. Please try again.")
     }
   }

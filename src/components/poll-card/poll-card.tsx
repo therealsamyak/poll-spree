@@ -66,7 +66,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
         } else {
           toast.error(result.error || "Failed to remove vote")
         }
-      } catch (error) {
+      } catch (_error) {
         toast.error("An unexpected error occurred. Please try again.")
       } finally {
         setIsVoting(false)
@@ -88,7 +88,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
       } else {
         toast.error(result.error || "Failed to vote")
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsVoting(false)
@@ -111,7 +111,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
       } else {
         toast.error(result.error || "Failed to delete poll")
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsDeleting(false)
