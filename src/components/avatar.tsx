@@ -5,13 +5,14 @@ import { cn } from "@/lib/utils"
 interface AvatarProps {
   size?: "sm" | "md" | "lg"
   className?: string
+  profileImageUrl?: string
 }
 
-export const Avatar = ({ size = "md", className }: AvatarProps) => {
+export const Avatar = ({ size = "md", className, profileImageUrl }: AvatarProps) => {
   const { user } = useUser()
 
-  // Get the profile image URL from Clerk
-  const profileImageUrl = user?.imageUrl
+  // Use the provided profile image URL or fall back to the current user's image
+  const imageUrl = profileImageUrl || user?.imageUrl
 
   const sizeClasses = {
     sm: "h-6 w-6",
@@ -33,8 +34,8 @@ export const Avatar = ({ size = "md", className }: AvatarProps) => {
         className,
       )}
     >
-      {profileImageUrl ? (
-        <img src={profileImageUrl} alt="Profile" className="h-full w-full object-cover" />
+      {imageUrl ? (
+        <img src={imageUrl} alt="Profile" className="h-full w-full object-cover" />
       ) : (
         <User className={cn("text-primary", iconSizes[size])} />
       )}

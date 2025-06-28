@@ -93,6 +93,5 @@ const mountApp = () => {
 try {
   mountApp()
 } catch (error) {
-  console.error("Failed to mount app:", error)
-  // You could render a fallback UI here if needed
+  // Silently handle mount errors
 }

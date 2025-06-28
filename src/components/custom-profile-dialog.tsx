@@ -31,6 +31,7 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
 
   const deleteUserData = useMutation(api.polls.deleteAccount)
   const deleteClerkUser = useAction(api.polls.deleteClerkUser)
+  const updateProfileImage = useMutation(api.polls.updateProfileImage)
 
   const handleSignOut = async () => {
     try {
@@ -43,37 +44,24 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
   }
 
   const handleDeleteAccount = async () => {
-    if (!user?.id) return
+    if (!user) return
 
     setIsDeleting(true)
-
-    // Store the user ID before any operations
-    const userId = user.id
-    console.log("Starting account deletion for userId:", userId)
-
     try {
-      // Step 1: Delete all user data from Convex FIRST (while authenticated)
-      console.log("Step 1: Deleting Convex data...")
+      const userId = user.id
+
+      // Step 1: Delete user data from Convex
       await deleteUserData({ userId })
-      console.log("Step 1: Convex data deleted successfully")
 
-      // Step 2: Delete the user account from Clerk (while authenticated)
-      console.log("Step 2: Deleting Clerk user...")
+      // Step 2: Delete user from Clerk
       await deleteClerkUser({ userId })
-      console.log("Step 2: Clerk user deleted successfully")
 
-      // Step 3: Sign out the user after all deletions are complete
-      console.log("Step 3: Signing out user...")
+      // Step 3: Sign out the user
       await signOut()
-      console.log("Step 3: User signed out successfully")
 
-      toast.success("Account and all data deleted successfully")
-
-      // Step 4: Refresh the page to ensure clean state
-      console.log("Step 4: Refreshing page...")
+      // Step 4: Refresh the page to clear any remaining state
       window.location.reload()
     } catch (error) {
-      console.error("Error deleting account:", error)
       toast.error("Failed to delete account. Please try again.")
     } finally {
       setIsDeleting(false)
@@ -100,9 +88,22 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
     try {
       // Use Clerk's setProfileImage method
       await user.setProfileImage({ file })
+
+      // Also update our Convex users table with the new profile image URL
+      // We need to wait a moment for Clerk to update the imageUrl
+      setTimeout(async () => {
+        try {
+          await updateProfileImage({
+            userId: user.id,
+            profileImageUrl: user.imageUrl || "",
+          })
+        } catch (error) {
+          // Don't show error to user as the main operation succeeded
+        }
+      }, 1000)
+
       toast.success("Profile picture updated successfully!")
     } catch (error) {
-      console.error("Error uploading profile picture:", error)
       toast.error("Failed to upload profile picture. Please try again.")
     } finally {
       setIsUploading(false)
@@ -120,9 +121,22 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
     try {
       // Use Clerk's setProfileImage method with null to remove
       await user.setProfileImage({ file: null })
+
+      // Also update our Convex users table to remove the profile image URL
+      // We need to wait a moment for Clerk to update the imageUrl
+      setTimeout(async () => {
+        try {
+          await updateProfileImage({
+            userId: user.id,
+            profileImageUrl: "",
+          })
+        } catch (error) {
+          // Don't show error to user as the main operation succeeded
+        }
+      }, 1000)
+
       toast.success("Profile picture removed successfully!")
     } catch (error) {
-      console.error("Error removing profile picture:", error)
       toast.error("Failed to remove profile picture. Please try again.")
     } finally {
       setIsUploading(false)
