@@ -1,5 +1,5 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { action, mutation, query } from "./_generated/server"
 
 /**
  * Comprehensive username validation following security best practices
@@ -551,27 +551,57 @@ export const getUser = query({
   },
 })
 
-export const deleteUserData = mutation({
+export const deleteAccount = mutation({
   args: {
     userId: v.string(),
   },
   handler: async (ctx, args) => {
     const { userId } = args
 
-    // Delete all polls created by this user
+    // Step 1: Get all poll options where this user has voted
+    const allPollOptions = await ctx.db.query("pollOptions").collect()
+    const optionsUserVotedFor = allPollOptions.filter((option) =>
+      option.votedUserIds.includes(userId),
+    )
+
+    // Step 2: Remove user from all poll options they voted for and adjust vote counts
+    for (const option of optionsUserVotedFor) {
+      const updatedVotedUserIds = option.votedUserIds.filter((id) => id !== userId)
+      const newVoteCount = updatedVotedUserIds.length
+
+      await ctx.db.patch(option._id, {
+        votedUserIds: updatedVotedUserIds,
+        votes: newVoteCount,
+      })
+
+      // Update the total votes for the poll this option belongs to
+      const poll = await ctx.db.get(option.pollId)
+      if (poll) {
+        const pollOptions = await ctx.db
+          .query("pollOptions")
+          .withIndex("by_pollId", (q) => q.eq("pollId", option.pollId))
+          .collect()
+
+        const totalVotes = pollOptions.reduce((sum, opt) => sum + opt.votes, 0)
+        await ctx.db.patch(option.pollId, {
+          totalVotes,
+        })
+      }
+    }
+
+    // Step 3: Delete all polls created by this user
     const userPolls = await ctx.db
       .query("polls")
       .withIndex("by_authorId", (q) => q.eq("authorId", userId))
       .collect()
 
-    // Delete all poll options for these polls
     for (const poll of userPolls) {
+      // Delete all poll options for this poll
       const pollOptions = await ctx.db
         .query("pollOptions")
         .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
         .collect()
 
-      // Delete all votes for these poll options
       for (const option of pollOptions) {
         await ctx.db.delete(option._id)
       }
@@ -580,15 +610,17 @@ export const deleteUserData = mutation({
       await ctx.db.delete(poll._id)
     }
 
-    // Delete all votes cast by this user
-    const allUserVotes = await ctx.db.query("pollUsers").collect()
-    const userVotes = allUserVotes.filter((vote) => vote.userId === userId)
+    // Step 4: Delete all pollUsers entries for this user
+    const userVoteEntries = await ctx.db
+      .query("pollUsers")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect()
 
-    for (const vote of userVotes) {
+    for (const vote of userVoteEntries) {
       await ctx.db.delete(vote._id)
     }
 
-    // Delete the user record
+    // Step 5: Delete the user record
     const user = await ctx.db
       .query("users")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -599,5 +631,48 @@ export const deleteUserData = mutation({
     }
 
     return { success: true }
+  },
+})
+
+export const deleteClerkUser = action({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = args
+
+    console.log("Starting deleteClerkUser action for userId:", userId)
+
+    const clerkSecretKey = process.env.CLERK_SECRET_KEY
+    if (!clerkSecretKey) {
+      console.error("CLERK_SECRET_KEY environment variable is not set")
+      throw new Error("CLERK_SECRET_KEY environment variable is not set")
+    }
+
+    console.log("CLERK_SECRET_KEY is set, attempting to delete user from Clerk")
+
+    try {
+      const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${clerkSecretKey}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      console.log("Clerk API response status:", response.status)
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error("Clerk API error:", errorData)
+        throw new Error(`Failed to delete Clerk user: ${errorData.message || response.statusText}`)
+      }
+
+      console.log("Successfully deleted user from Clerk")
+      return { success: true }
+    } catch (error) {
+      console.error("Error deleting user from Clerk:", error)
+      throw new Error("Failed to delete user from Clerk")
+    }
   },
 })

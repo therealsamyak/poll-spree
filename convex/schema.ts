@@ -24,7 +24,9 @@ export default defineSchema({
     pollId: v.id("polls"),
     userId: v.string(),
     optionId: v.optional(v.id("pollOptions")),
-  }).index("by_poll_user", ["pollId", "userId"]),
+  })
+    .index("by_poll_user", ["pollId", "userId"])
+    .index("by_userId", ["userId"]),
 
   users: defineTable({
     userId: v.string(),

@@ -1,5 +1,5 @@
 import { useClerk, useUser } from "@clerk/clerk-react"
-import { useMutation } from "convex/react"
+import { useAction, useMutation } from "convex/react"
 import { AlertTriangle, Camera, LogOut, Trash2, User } from "lucide-react"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
@@ -29,7 +29,8 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const deleteUserData = useMutation(api.polls.deleteUserData)
+  const deleteUserData = useMutation(api.polls.deleteAccount)
+  const deleteClerkUser = useAction(api.polls.deleteClerkUser)
 
   const handleSignOut = async () => {
     try {
@@ -45,21 +46,37 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
     if (!user?.id) return
 
     setIsDeleting(true)
-    try {
-      // First, delete all user data from Convex
-      await deleteUserData({ userId: user.id })
 
-      // Then delete the Clerk account
-      await user.delete()
+    // Store the user ID before any operations
+    const userId = user.id
+    console.log("Starting account deletion for userId:", userId)
+
+    try {
+      // Step 1: Delete all user data from Convex FIRST (while authenticated)
+      console.log("Step 1: Deleting Convex data...")
+      await deleteUserData({ userId })
+      console.log("Step 1: Convex data deleted successfully")
+
+      // Step 2: Delete the user account from Clerk (while authenticated)
+      console.log("Step 2: Deleting Clerk user...")
+      await deleteClerkUser({ userId })
+      console.log("Step 2: Clerk user deleted successfully")
+
+      // Step 3: Sign out the user after all deletions are complete
+      console.log("Step 3: Signing out user...")
+      await signOut()
+      console.log("Step 3: User signed out successfully")
 
       toast.success("Account and all data deleted successfully")
-      onClose()
+
+      // Step 4: Refresh the page to ensure clean state
+      console.log("Step 4: Refreshing page...")
+      window.location.reload()
     } catch (error) {
       console.error("Error deleting account:", error)
       toast.error("Failed to delete account. Please try again.")
     } finally {
       setIsDeleting(false)
-      setShowDeleteConfirmation(false)
     }
   }
 
