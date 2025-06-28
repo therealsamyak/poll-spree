@@ -24,9 +24,9 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../convex/_generated/api"
+import { Avatar } from "./avatar"
 import { CustomProfileDialog } from "./custom-profile-dialog"
 import { ModeToggle } from "./mode-toggle"
-import { Avatar } from "./avatar"
 
 export const Sidebar = () => {
   return (
