@@ -13,6 +13,8 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as badWordsFilter from "../badWordsFilter.js";
+import type * as badWordsList from "../badWordsList.js";
 import type * as polls from "../polls.js";
 import type * as users from "../users.js";
 
@@ -25,6 +27,8 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  badWordsFilter: typeof badWordsFilter;
+  badWordsList: typeof badWordsList;
   polls: typeof polls;
   users: typeof users;
 }>;

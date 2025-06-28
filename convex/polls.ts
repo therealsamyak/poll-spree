@@ -1,5 +1,6 @@
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
+import { validateMultipleTextInputs, validateTextContent } from "./badWordsFilter"
 
 export const getPolls = query({
   args: {},
@@ -199,6 +200,32 @@ export const createPoll = mutation({
   },
   handler: async (ctx, args) => {
     const { question, options, authorId, authorUsername, dev = false } = args
+
+    // Validate question content
+    if (!validateTextContent(question)) {
+      return {
+        success: false,
+        error: "Poll question contains inappropriate content and cannot be used.",
+      }
+    }
+
+    // Validate all poll options
+    const optionsValidation = validateMultipleTextInputs(
+      options.reduce(
+        (acc, option, index) => {
+          acc[`poll option ${index + 1}`] = option
+          return acc
+        },
+        {} as Record<string, string>,
+      ),
+    )
+
+    if (!optionsValidation.isValid) {
+      return {
+        success: false,
+        error: `${optionsValidation.fieldName.charAt(0).toUpperCase() + optionsValidation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
+      }
+    }
 
     // Create the poll
     const pollId = await ctx.db.insert("polls", {

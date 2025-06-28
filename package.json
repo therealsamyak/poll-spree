@@ -21,7 +21,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.0",
     "@tanstack/react-router-devtools": "^1.122.0",
-    "@tanstack/router-plugin": "^1.122.0",
+    "@tanstack/router-plugin": "^1.122.1",
     "@types/bad-words": "^3.0.3",
     "@types/node": "^24.0.7",
     "@types/react": "^19.1.8",
