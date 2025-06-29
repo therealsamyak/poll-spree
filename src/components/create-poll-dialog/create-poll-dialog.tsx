@@ -1,7 +1,7 @@
 import { useAuth } from "@clerk/clerk-react"
 import { useMutation, useQuery } from "convex/react"
 import { Plus, Sparkles, X } from "lucide-react"
-import { useId, useState, useRef } from "react"
+import { useId, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
