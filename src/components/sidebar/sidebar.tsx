@@ -31,7 +31,7 @@ import { api } from "../../../convex/_generated/api"
 
 export const Sidebar = () => {
   return (
-    <aside className="fixed inset-y-0 z-50 flex w-16 flex-col border-r bg-background md:w-64">
+    <aside className="fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r bg-background md:w-64">
       <SidebarContent />
     </aside>
   )
@@ -88,10 +88,13 @@ const SidebarContent = () => {
   }
 
   return (
-    <div className="flex h-full flex-col border-r bg-background">
+    <div className="flex h-full max-h-screen flex-col overflow-hidden border-r bg-background">
       {/* Logo and Brand */}
-      <div className="flex h-16 items-center border-b px-3 md:px-6">
-        <Link to="/" className="flex items-center space-x-3 transition-opacity hover:opacity-80">
+      <div className="flex h-16 min-h-16 items-center justify-center border-b px-0 md:px-6">
+        <Link
+          to="/"
+          className="flex h-16 w-16 items-center justify-center transition-opacity hover:opacity-80 md:h-auto md:w-auto md:space-x-3"
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
             <BarChart3 className="h-5 w-5" />
           </div>
@@ -100,7 +103,7 @@ const SidebarContent = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col items-center gap-2 py-6 md:items-stretch md:gap-2 md:px-4">
+      <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
         <Link
           to="/"
           className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
@@ -108,22 +111,26 @@ const SidebarContent = () => {
           <Home className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Home</span>
         </Link>
-        <Link
+        {/* <Link
           to="/"
           className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
         >
           <TrendingUp className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Trending</span>
-        </Link>
+        </Link> */}
+        <div className="flex h-12 w-12 cursor-not-allowed items-center justify-center rounded-lg font-medium text-muted-foreground/50 text-sm transition-colors md:w-auto md:justify-start md:px-3">
+          <TrendingUp className="h-6 w-6" />
+          <span className="ml-2 hidden md:inline">Trending</span>
+        </div>
       </nav>
 
       {/* Actions */}
-      <div className="border-t p-4 pt-3">
+      <div className="min-h-0 border-t p-4 pt-3">
         <div className="flex flex-col gap-2">
           {isSignedIn && (
             <Button
               onClick={() => setIsCreatePollOpen(true)}
-              className="flex h-10 w-12 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-black md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-white"
+              className="flex size-9 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-black md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-white"
             >
               <Plus className="h-6 w-6" />
               <span className="hidden md:inline">Create Poll</span>
@@ -135,42 +142,58 @@ const SidebarContent = () => {
             <ModeToggle />
           </div>
           <Separator className="hidden md:block" />
-
-          {/* User Section */}
           {isSignedIn ? (
-            <div className="flex items-center gap-3">
-              <Avatar profileImageUrl={user?.profileImageUrl} />
-              <div className="hidden flex-1 md:block">
-                <p className="font-medium text-sm">{user?.username || "Anonymous"}</p>
-                <p className="text-muted-foreground text-xs">@{user?.username || "anonymous"}</p>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="hidden md:flex">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)}>
-                    <User className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Change Username
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
+                >
+                  <div className="flex w-full items-center justify-center md:justify-between">
+                    <Avatar size="sm" />
+                    <div className="hidden min-w-0 flex-1 md:block">
+                      <p className="ml-3 text-center font-medium text-sm">
+                        {`@${user?.username || "User"}`}
+                      </p>
+                    </div>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/users/$username"
+                    params={{ username: user?.username || "" }}
+                    className="group cursor-pointer"
+                  >
+                    <User className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                    <span>View Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setIsDialogOpen(true)}
+                  className="group cursor-pointer"
+                >
+                  <Edit className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                  <span>Change Username</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setIsProfileDialogOpen(true)}
+                  className="group cursor-pointer"
+                >
+                  <Settings className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-accent-foreground" />
+                  <span>Profile Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => signOut()} className="group cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <SignInButton mode="modal">
-              <Button variant="outline" className="w-full">
-                Sign In
-              </Button>
+              <Button className="w-full gap-2 bg-primary shadow-lg hover:bg-accent">Sign In</Button>
             </SignInButton>
           )}
         </div>

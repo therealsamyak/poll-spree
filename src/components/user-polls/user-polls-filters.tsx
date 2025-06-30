@@ -41,7 +41,7 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
   }
 
   return (
-    <div className="flex items-center space-x-6">
+    <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:space-x-6">
       <div className="flex items-center space-x-2">
         <Checkbox
           id={authoredId}
