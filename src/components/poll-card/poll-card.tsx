@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, CheckCircle2, Clock, Trash2, TrendingUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Link } from "@tanstack/react-router"
 import { Avatar } from "@/components/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -166,8 +167,14 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
-                <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
-                <span className="font-medium">{poll.authorUsername}</span>
+                <Link
+                  to="/users/$username"
+                  params={{ username: poll.authorUsername }}
+                  className="flex items-center gap-1.5 hover:opacity-80 hover:underline transition-all"
+                >
+                  <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
+                  <span className="font-medium">{poll.authorUsername}</span>
+                </Link>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/30">

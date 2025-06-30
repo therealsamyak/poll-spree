@@ -1,7 +1,6 @@
 import { Plus, Sparkles, X } from "lucide-react"
 import { useId, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -28,8 +27,8 @@ export const CreatePollDialogContent = ({
     question,
     setQuestion,
     options,
-    isDev,
-    setIsDev,
+    // isDev,
+    // setIsDev,
     isCreating,
     handleCreatePoll,
     addOption,
@@ -40,7 +39,7 @@ export const CreatePollDialogContent = ({
   } = useCreatePoll()
 
   const questionId = useId()
-  const devId = useId()
+  const _devId = useId()
 
   const handleSubmit = async (e: React.FormEvent) => {
     await handleCreatePoll(e, onClose)
@@ -156,7 +155,7 @@ export const CreatePollDialogContent = ({
         </div>
 
         {/* Dev Poll Toggle */}
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <Checkbox
             id={devId}
             checked={isDev}
@@ -168,7 +167,7 @@ export const CreatePollDialogContent = ({
           >
             Mark as developer poll
           </Label>
-        </div>
+        </div> */}
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>

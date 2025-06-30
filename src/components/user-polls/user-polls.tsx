@@ -2,6 +2,7 @@ import { useParams, useSearch } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Users } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useAuth } from "@clerk/clerk-react"
 import { Avatar } from "@/components/avatar"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
@@ -14,6 +15,7 @@ import { UserPollsSort } from "./user-polls-sort"
 export const UserPolls = () => {
   const { username } = useParams({ from: "/users/$username" })
   const search = useSearch({ from: "/users/$username" })
+  const { userId } = useAuth()
 
   // Parse filter and sort from URL params
   const filter = search.filter || "authored,voted"
@@ -35,6 +37,9 @@ export const UserPolls = () => {
 
   // Get user by username
   const user = useQuery(api.users.getUserByUsername, { username })
+
+  // Get current user's information
+  const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
 
   // Get polls by user with pagination
   const pollsResult = useQuery(api.polls.getPollsByUser, {
@@ -76,14 +81,16 @@ export const UserPolls = () => {
   // Handle polls data updates
   useEffect(() => {
     if (pollsResult) {
-      const validPolls = (pollsResult.polls || []).filter((poll): poll is Poll => poll !== null)
+      const validPolls = (pollsResult.polls || []).filter(
+        (poll): poll is NonNullable<typeof poll> => poll !== null,
+      )
 
       if (paginationOpts.cursor === null) {
         // First load - replace all polls
-        setAllPolls(validPolls)
+        setAllPolls(validPolls as Poll[])
       } else {
         // Subsequent loads - append new polls
-        setAllPolls((prev) => [...prev, ...validPolls])
+        setAllPolls((prev) => [...prev, ...(validPolls as Poll[])])
       }
       setIsDone(pollsResult.isDone || false)
       setIsLoadingMore(false)
@@ -96,7 +103,7 @@ export const UserPolls = () => {
     setPaginationOpts({ numItems: 20, cursor: null })
     setIsDone(false)
     setIsLoadingMore(false)
-  }, [includeAuthored, includeVoted])
+  }, [])
 
   // Show loading state while checking user
   if (user === undefined) {
@@ -112,7 +119,13 @@ export const UserPolls = () => {
 
   // Show error if user doesn't exist
   if (!user) {
-    return <UserPollsEmpty type="user-not-found" username={username} />
+    return (
+      <UserPollsEmpty
+        type="user-not-found"
+        username={username}
+        currentUserUsername={currentUser?.username}
+      />
+    )
   }
 
   // Sort polls based on sort option
@@ -189,6 +202,7 @@ export const UserPolls = () => {
               type={filters.length === 0 ? "no-polls" : "no-results"}
               username={username}
               filters={filters}
+              currentUserUsername={currentUser?.username}
             />
           ) : (
             // Show polls
