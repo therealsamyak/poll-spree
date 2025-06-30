@@ -1,9 +1,9 @@
 import { useAuth } from "@clerk/clerk-react"
+import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, CheckCircle2, Clock, Trash2, TrendingUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Link } from "@tanstack/react-router"
 import { Avatar } from "@/components/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -170,7 +170,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                 <Link
                   to="/users/$username"
                   params={{ username: poll.authorUsername }}
-                  className="flex items-center gap-1.5 hover:opacity-80 hover:underline transition-all"
+                  className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
                 >
                   <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
                   <span className="font-medium">{poll.authorUsername}</span>
