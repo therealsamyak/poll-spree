@@ -513,3 +513,15 @@ export const getUserByUsername = query({
     return user
   },
 })
+
+export const getAllUsers = query({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect()
+
+    return users.map((user) => ({
+      username: user.username,
+      createdAt: user.createdAt,
+    }))
+  },
+})
