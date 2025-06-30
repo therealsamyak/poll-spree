@@ -208,13 +208,13 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
             const shouldShowEmptyBar = !isSignedIn || (isSignedIn && !hasVoted && !isAuthor)
 
             return (
-              <div key={option.id} className="space-y-3">
+              <div key={option.id} className="space-y-4">
                 <Button
                   variant={isSelected ? "default" : "outline"}
                   className={`h-auto w-full justify-start p-4 transition-all duration-200${
                     isSelected
                       ? " border border-transparent bg-primary/80 text-slate-100 shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white"
-                      : " border border-2 border-border/60 border-transparent text-foreground hover:bg-muted/70 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
+                      : " border border-transparent bg-primary/10 text-foreground hover:bg-primary/20 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
                   }${isWinning && showResults && !isSelected ? " bg-red-500/5 ring-2 ring-red-500/50 dark:bg-red-500/35" : ""}`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting}

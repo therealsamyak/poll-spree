@@ -290,6 +290,77 @@ export const createPoll = mutation({
   handler: async (ctx, args) => {
     const { question, options, authorId, authorUsername, dev = false } = args
 
+    // Validate question length (280 characters max)
+    if (question.length > 280) {
+      return {
+        success: false,
+        error: "Poll question cannot exceed 280 characters.",
+      }
+    }
+
+    // Validate options count (minimum 2, maximum 10)
+    if (options.length < 2) {
+      return {
+        success: false,
+        error: "Poll must have at least 2 options.",
+      }
+    }
+
+    if (options.length > 10) {
+      return {
+        success: false,
+        error: "Poll cannot have more than 10 options.",
+      }
+    }
+
+    // Validate each option length (280 characters max)
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].length > 280) {
+        return {
+          success: false,
+          error: `Poll option ${i + 1} cannot exceed 280 characters.`,
+        }
+      }
+    }
+
+    // Check for duplicate options within the poll
+    const uniqueOptions = new Set(options.map((option) => option.trim().toLowerCase()))
+    if (uniqueOptions.size !== options.length) {
+      return {
+        success: false,
+        error: "Poll cannot have duplicate options.",
+      }
+    }
+
+    // Check for duplicate polls (exact match of question and options)
+    const normalizedQuestion = question.trim().toLowerCase()
+    const normalizedOptions = options.map((option) => option.trim().toLowerCase()).sort()
+
+    const existingPolls = await ctx.db.query("polls").collect()
+
+    for (const existingPoll of existingPolls) {
+      const existingOptions = await ctx.db
+        .query("pollOptions")
+        .withIndex("by_pollId", (q) => q.eq("pollId", existingPoll._id))
+        .collect()
+
+      const existingNormalizedQuestion = existingPoll.question.trim().toLowerCase()
+      const existingNormalizedOptions = existingOptions
+        .map((option) => option.text.trim().toLowerCase())
+        .sort()
+
+      // Check if question and options match exactly (order doesn't matter for options)
+      if (
+        existingNormalizedQuestion === normalizedQuestion &&
+        JSON.stringify(existingNormalizedOptions) === JSON.stringify(normalizedOptions)
+      ) {
+        return {
+          success: false,
+          error: "A poll with this exact question and options already exists.",
+        }
+      }
+    }
+
     // Validate question content
     if (!validateTextContent(question)) {
       return {
@@ -338,7 +409,10 @@ export const createPoll = mutation({
       ),
     )
 
-    return { pollId, optionIds }
+    return {
+      success: true,
+      error: "",
+    }
   },
 })
 
