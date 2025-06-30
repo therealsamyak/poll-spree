@@ -30,10 +30,13 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
   })
   const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
 
+  // Add loading state check to prevent flash
+  const isUserVoteLoading = userVote === undefined && isSignedIn
+
   const hasVoted = userVote?.optionId !== null && userVote?.optionId !== undefined
   const canDelete = currentUser && poll.authorId === userId
   const isAuthor = poll.authorId === userId
-  const showResults = isSignedIn && (hasVoted || isAuthor)
+  const showResults = !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
 
   const formatDateTime = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -198,7 +201,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
       <CardContent className="space-y-6">
         <div className="space-y-4">
           {poll.options.map((option, _index) => {
-            const isSelected = userVote?.optionId === option.id
+            const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
             const percentage = getVotePercentage(option.votes)
             const isWinning =
               poll.totalVotes > 0 &&
@@ -215,9 +218,11 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                     isSelected
                       ? " border border-transparent bg-primary/80 text-slate-100 shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white"
                       : " border border-transparent bg-primary/10 text-foreground hover:bg-primary/20 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
-                  }${isWinning && showResults && !isSelected ? " bg-red-500/5 ring-2 ring-red-500/50 dark:bg-red-500/35" : ""}`}
+                  }${isWinning && showResults && !isSelected ? " bg-red-500/5 ring-2 ring-red-500/50 dark:bg-red-500/35" : ""}${
+                    isUserVoteLoading ? " animate-pulse" : ""
+                  }`}
                   onClick={() => handleVote(option.id)}
-                  disabled={isVoting}
+                  disabled={isVoting || isUserVoteLoading}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center gap-3">

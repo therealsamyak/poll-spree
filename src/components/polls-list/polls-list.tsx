@@ -1,18 +1,82 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Plus, Users } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import type { Poll } from "@/types"
 import { api } from "../../../convex/_generated/api"
 
 export const PollsList = () => {
-  const polls = useQuery(api.polls.getPolls)
   const { isSignedIn } = useAuth()
+  const [paginationOpts, setPaginationOpts] = useState({
+    numItems: 20,
+    cursor: null as string | null,
+  })
+  const [allPolls, setAllPolls] = useState<Poll[]>([])
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
-  if (polls === undefined) {
+  const pollsResult = useQuery(api.polls.getPolls, { paginationOpts })
+  const stats = useQuery(api.polls.getPollsStats)
+
+  // Update allPolls when new data comes in
+  useEffect(() => {
+    if (pollsResult?.polls) {
+      if (paginationOpts.cursor === null) {
+        // First load - replace all polls
+        setAllPolls(pollsResult.polls)
+      } else {
+        // Subsequent loads - append new polls
+        setAllPolls((prev) => [...prev, ...pollsResult.polls])
+      }
+    }
+  }, [pollsResult?.polls, paginationOpts.cursor])
+
+  // Infinite scroll logic
+  const loadMore = useCallback(() => {
+    if (pollsResult?.continueCursor && !pollsResult?.isDone && !isLoadingMore) {
+      setIsLoadingMore(true)
+      setPaginationOpts((prev) => ({
+        ...prev,
+        cursor: pollsResult.continueCursor,
+      }))
+    }
+  }, [pollsResult?.continueCursor, pollsResult?.isDone, isLoadingMore])
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0]
+        if (target.isIntersecting && pollsResult?.continueCursor && !pollsResult?.isDone) {
+          loadMore()
+        }
+      },
+      {
+        rootMargin: "100px", // Start loading when user is 100px away from the bottom
+        threshold: 0.1,
+      },
+    )
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [loadMore, pollsResult?.continueCursor, pollsResult?.isDone])
+
+  // Reset loading state when new data arrives
+  useEffect(() => {
+    if (pollsResult) {
+      setIsLoadingMore(false)
+    }
+  }, [pollsResult])
+
+  if (pollsResult === undefined) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
@@ -23,7 +87,9 @@ export const PollsList = () => {
     )
   }
 
-  if (polls.length === 0) {
+  const { isDone, continueCursor } = pollsResult
+
+  if (allPolls.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
         <Card className="mx-auto w-full max-w-md border-2 border-muted-foreground/20 border-dashed text-center">
@@ -53,8 +119,8 @@ export const PollsList = () => {
     )
   }
 
-  const totalVotes = polls.reduce((sum, poll) => sum + poll.totalVotes, 0)
-  const totalPolls = polls.length
+  const totalVotes = stats?.totalVotes || 0
+  const totalPolls = stats?.totalPolls || allPolls.length
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
@@ -98,7 +164,7 @@ export const PollsList = () => {
 
         {/* Polls Grid */}
         <div className="space-y-6">
-          {polls.map((poll, index) => (
+          {allPolls.map((poll, index) => (
             <div
               key={poll.id}
               className="slide-in-from-bottom-4 animate-in duration-500"
@@ -108,6 +174,27 @@ export const PollsList = () => {
             </div>
           ))}
         </div>
+
+        {/* Infinite Scroll Trigger */}
+        {!isDone && continueCursor && (
+          <div ref={loadMoreRef} className="mt-8 flex justify-center py-4">
+            {isLoadingMore ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Loading more polls...</span>
+              </div>
+            ) : (
+              <div className="h-4" /> // Invisible trigger element
+            )}
+          </div>
+        )}
+
+        {/* End of content indicator */}
+        {isDone && allPolls.length > 0 && (
+          <div className="mt-8 text-center text-muted-foreground">
+            <p>You've reached the end! 🎉</p>
+          </div>
+        )}
 
         {/* Footer */}
         <Footer />

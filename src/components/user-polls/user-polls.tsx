@@ -1,9 +1,11 @@
 import { useParams, useSearch } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Users } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
+import type { Poll } from "@/types"
 import { api } from "../../../convex/_generated/api"
 import { UserPollsEmpty } from "./user-polls-empty"
 import { UserPollsFilters } from "./user-polls-filters"
@@ -21,15 +23,80 @@ export const UserPolls = () => {
   const includeAuthored = filters.includes("authored")
   const includeVoted = filters.includes("voted")
 
+  // State for infinite scroll
+  const [allPolls, setAllPolls] = useState<Poll[]>([])
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [paginationOpts, setPaginationOpts] = useState({
+    numItems: 20,
+    cursor: null as string | null,
+  })
+  const [isDone, setIsDone] = useState(false)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
   // Get user by username
   const user = useQuery(api.users.getUserByUsername, { username })
 
-  // Get polls by user
-  const polls = useQuery(api.polls.getPollsByUser, {
+  // Get polls by user with pagination
+  const pollsResult = useQuery(api.polls.getPollsByUser, {
     userId: user?.userId || "",
     includeAuthored,
     includeVoted,
+    paginationOpts,
   })
+
+  // Handle infinite scroll loading
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || isDone || !pollsResult?.continueCursor) return
+
+    setIsLoadingMore(true)
+    setPaginationOpts((prev) => ({
+      ...prev,
+      cursor: pollsResult.continueCursor,
+    }))
+  }, [isLoadingMore, isDone, pollsResult?.continueCursor])
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && !isDone) {
+          loadMore()
+        }
+      },
+      { rootMargin: "100px" },
+    )
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [loadMore, isLoadingMore, isDone])
+
+  // Handle polls data updates
+  useEffect(() => {
+    if (pollsResult) {
+      const validPolls = (pollsResult.polls || []).filter((poll): poll is Poll => poll !== null)
+
+      if (paginationOpts.cursor === null) {
+        // First load - replace all polls
+        setAllPolls(validPolls)
+      } else {
+        // Subsequent loads - append new polls
+        setAllPolls((prev) => [...prev, ...validPolls])
+      }
+      setIsDone(pollsResult.isDone || false)
+      setIsLoadingMore(false)
+    }
+  }, [pollsResult, paginationOpts.cursor])
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setAllPolls([])
+    setPaginationOpts({ numItems: 20, cursor: null })
+    setIsDone(false)
+    setIsLoadingMore(false)
+  }, [includeAuthored, includeVoted])
 
   // Show loading state while checking user
   if (user === undefined) {
@@ -49,7 +116,7 @@ export const UserPolls = () => {
   }
 
   // Sort polls based on sort option
-  const sortedPolls = [...(polls || [])]
+  const sortedPolls = [...allPolls]
     .filter((poll): poll is NonNullable<typeof poll> => poll !== null)
     .sort((a, b) => {
       switch (sort) {
@@ -108,8 +175,8 @@ export const UserPolls = () => {
 
         {/* Polls Grid */}
         <div className="space-y-6">
-          {polls === undefined ? (
-            // Show loading state only for polls area
+          {pollsResult === undefined && paginationOpts.cursor === null ? (
+            // Show loading state only for initial polls area
             <div className="flex min-h-[40vh] items-center justify-center">
               <div className="space-y-4 text-center">
                 <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
@@ -125,15 +192,31 @@ export const UserPolls = () => {
             />
           ) : (
             // Show polls
-            sortedPolls.map((poll, index) => (
-              <div
-                key={poll.id}
-                className="slide-in-from-bottom-4 animate-in duration-500"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <PollCard poll={poll} />
-              </div>
-            ))
+            <>
+              {sortedPolls.map((poll, index) => (
+                <div
+                  key={poll.id}
+                  className="slide-in-from-bottom-4 animate-in duration-500"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <PollCard poll={poll} />
+                </div>
+              ))}
+
+              {/* Load more trigger */}
+              {!isDone && (
+                <div ref={loadMoreRef} className="flex justify-center py-4">
+                  {isLoadingMore ? (
+                    <div className="flex items-center space-x-2 text-muted-foreground">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Loading more polls...</span>
+                    </div>
+                  ) : (
+                    <div className="h-4" /> // Invisible trigger element
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
 

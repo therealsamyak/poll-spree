@@ -3,12 +3,25 @@ import { mutation, query } from "./_generated/server"
 import { validateMultipleTextInputs, validateTextContent } from "./badWordsFilter"
 
 export const getPolls = query({
-  args: {},
-  handler: async (ctx) => {
-    const polls = await ctx.db.query("polls").order("desc").collect()
+  args: {
+    paginationOpts: v.optional(
+      v.object({
+        numItems: v.number(),
+        cursor: v.optional(v.union(v.string(), v.null())),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts } = args
+
+    // Use pagination to limit the number of polls fetched
+    const defaultPagination = { numItems: 20, cursor: null }
+    const pagination = paginationOpts || defaultPagination
+
+    const pollsResult = await ctx.db.query("polls").order("desc").paginate(pagination)
 
     const pollsWithOptions = await Promise.all(
-      polls.map(async (poll) => {
+      pollsResult.page.map(async (poll) => {
         const options = await ctx.db
           .query("pollOptions")
           .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
@@ -40,7 +53,25 @@ export const getPolls = query({
       }),
     )
 
-    return pollsWithOptions
+    return {
+      polls: pollsWithOptions,
+      isDone: pollsResult.isDone,
+      continueCursor: pollsResult.continueCursor,
+    }
+  },
+})
+
+// Add a query to get total poll count for stats
+export const getPollsStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const totalPolls = await ctx.db.query("polls").collect()
+    const totalVotes = totalPolls.reduce((sum, poll) => sum + poll.totalVotes, 0)
+
+    return {
+      totalPolls: totalPolls.length,
+      totalVotes,
+    }
   },
 })
 
@@ -195,9 +226,15 @@ export const getPollsByUser = query({
     userId: v.string(),
     includeAuthored: v.boolean(),
     includeVoted: v.boolean(),
+    paginationOpts: v.optional(
+      v.object({
+        numItems: v.number(),
+        cursor: v.optional(v.union(v.string(), v.null())),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
-    const { userId, includeAuthored, includeVoted } = args
+    const { userId, includeAuthored, includeVoted, paginationOpts } = args
 
     const pollIds = new Set<string>()
     const authoredPollIds = new Set<string>()
@@ -232,13 +269,17 @@ export const getPollsByUser = query({
       })
     }
 
-    // If no polls found, return empty array
+    // If no polls found, return empty result
     if (pollIds.size === 0) {
-      return []
+      return {
+        polls: [],
+        isDone: true,
+        continueCursor: null,
+      }
     }
 
     // Get all polls by their IDs
-    const polls = await Promise.all(
+    const allPolls = await Promise.all(
       Array.from(pollIds).map(async (pollId) => {
         const poll = await ctx.db.get(pollId)
         if (!poll) return null
@@ -275,7 +316,30 @@ export const getPollsByUser = query({
     )
 
     // Filter out null values and sort by creation date (newest first)
-    return polls.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt)
+    const sortedPolls = allPolls.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt)
+
+    // Apply pagination
+    const defaultPagination = { numItems: 20, cursor: null }
+    const pagination = paginationOpts || defaultPagination
+
+    let startIndex = 0
+    if (pagination.cursor) {
+      const cursorIndex = sortedPolls.findIndex((poll) => poll.id === pagination.cursor)
+      if (cursorIndex !== -1) {
+        startIndex = cursorIndex + 1
+      }
+    }
+
+    const endIndex = startIndex + pagination.numItems
+    const paginatedPolls = sortedPolls.slice(startIndex, endIndex)
+    const isDone = endIndex >= sortedPolls.length
+    const continueCursor = isDone ? null : paginatedPolls[paginatedPolls.length - 1]?.id || null
+
+    return {
+      polls: paginatedPolls,
+      isDone,
+      continueCursor,
+    }
   },
 })
 
