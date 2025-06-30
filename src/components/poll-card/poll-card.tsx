@@ -128,7 +128,11 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
   }
 
   return (
-    <Card className="group border-0 bg-gradient-to-br from-card to-card/50 shadow-md backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
+    <Card
+      className={
+        "group border border-muted/40 bg-card shadow-md backdrop-blur-sm transition-all duration-300 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50"
+      }
+    >
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-3">
@@ -200,14 +204,17 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
               poll.totalVotes > 0 &&
               percentage === Math.max(...poll.options.map((o) => getVotePercentage(o.votes)))
 
+            // Determine if we should show the real percentage or 0%
+            const shouldShowEmptyBar = !isSignedIn || (isSignedIn && !hasVoted && !isAuthor)
+
             return (
               <div key={option.id} className="space-y-3">
                 <Button
                   variant={isSelected ? "default" : "outline"}
                   className={`h-auto w-full justify-start p-4 transition-all duration-200${
                     isSelected
-                      ? " bg-primary/80 text-slate-100 shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white"
-                      : " border-2 border-border/60 text-foreground hover:bg-muted/70 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
+                      ? " bg-primary/80 text-slate-100 shadow-lg ring-2 ring-primary/20 hover:text-white dark:text-white border border-transparent"
+                      : " border-2 border-border/60 text-foreground hover:bg-muted/70 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40 border border-transparent"
                   }${isWinning && showResults && !isSelected ? " bg-red-500/5 ring-2 ring-red-500/50 dark:bg-red-500/35" : ""}`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting}
@@ -223,33 +230,36 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <span className={`font-bold text-sm${isSelected ? " text-inherit" : ""}`}>
-                            {percentage}%
+                            {shouldShowEmptyBar ? 0 : percentage}%
                           </span>
                           <div
                             className={`text-xs${isSelected ? " text-inherit/90" : " text-muted-foreground"}`}
                           >
-                            {option.votes} votes
+                            {shouldShowEmptyBar ? 0 : option.votes} votes
                           </div>
                         </div>
-                        {isWinning && <TrendingUp className="h-4 w-4 text-green-600" />}
+                        {isWinning && !shouldShowEmptyBar && (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        )}
                       </div>
                     )}
                   </div>
                 </Button>
 
-                {showResults && (
-                  <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className={`h-3 rounded-full transition-all duration-500 ease-out ${
-                        isWinning
-                          ? "bg-gradient-to-r from-green-500 to-green-600"
-                          : "bg-gradient-to-r from-primary to-primary/80"
-                      }`}
-                      style={{ width: `${percentage}%` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                  </div>
-                )}
+                {/* Result Bar: always render, but width is 0 unless showResults and not shouldShowEmptyBar */}
+                <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-500 ease-out ${
+                      isWinning && !shouldShowEmptyBar
+                        ? "bg-gradient-to-r from-green-500 to-green-600"
+                        : "bg-gradient-to-r from-primary to-primary/80"
+                    }`}
+                    style={{
+                      width: showResults ? (shouldShowEmptyBar ? "0%" : `${percentage}%`) : "0%",
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
               </div>
             )
           })}
