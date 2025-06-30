@@ -29,7 +29,7 @@ body {
   --radius: 0.625rem;
   --background: #ffffff;
   --foreground: #111827;
-  --card: #f9fafb;
+  --card: #ececec;
   --card-foreground: #111827;
   --popover: #ffffff;
   --popover-foreground: #111827;
@@ -39,7 +39,7 @@ body {
   --secondary: #4b5563;
   --secondary-hover: #374151;
   --secondary-foreground: #ffffff;
-  --muted: #e5e7eb;
+  --muted: #d1d2d3;
   --muted-foreground: #4b5563;
   --accent: #b45309;
   --accent-hover: #f59e0b;

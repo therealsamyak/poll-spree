@@ -190,6 +190,95 @@ export const getUserVote = query({
   },
 })
 
+export const getPollsByUser = query({
+  args: {
+    userId: v.string(),
+    includeAuthored: v.boolean(),
+    includeVoted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const { userId, includeAuthored, includeVoted } = args
+
+    const pollIds = new Set<string>()
+    const authoredPollIds = new Set<string>()
+
+    // Always get authored polls to know which ones to exclude when only showing voted polls
+    const authoredPolls = await ctx.db
+      .query("polls")
+      .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+      .collect()
+
+    authoredPolls.forEach((poll) => {
+      authoredPollIds.add(poll._id)
+      // Only add to pollIds if we're including authored polls
+      if (includeAuthored) {
+        pollIds.add(poll._id)
+      }
+    })
+
+    // Get voted polls if requested
+    if (includeVoted) {
+      const userVotes = await ctx.db
+        .query("pollUsers")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .collect()
+
+      userVotes.forEach((vote) => {
+        // If we're only showing voted polls (not authored), exclude polls the user authored
+        if (!includeAuthored && authoredPollIds.has(vote.pollId)) {
+          return
+        }
+        pollIds.add(vote.pollId)
+      })
+    }
+
+    // If no polls found, return empty array
+    if (pollIds.size === 0) {
+      return []
+    }
+
+    // Get all polls by their IDs
+    const polls = await Promise.all(
+      Array.from(pollIds).map(async (pollId) => {
+        const poll = await ctx.db.get(pollId)
+        if (!poll) return null
+
+        const options = await ctx.db
+          .query("pollOptions")
+          .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
+          .collect()
+
+        // Get the author's profile image URL
+        const author = await ctx.db
+          .query("users")
+          .withIndex("by_userId", (q) => q.eq("userId", poll.authorId))
+          .first()
+
+        return {
+          id: poll._id,
+          question: poll.question,
+          totalVotes: poll.totalVotes,
+          dev: poll.dev,
+          authorId: poll.authorId,
+          authorUsername: poll.authorUsername,
+          authorProfileImageUrl: author?.profileImageUrl,
+          createdAt: poll.createdAt,
+          options: options.map((option) => ({
+            id: option._id,
+            pollId: option.pollId,
+            text: option.text,
+            votes: option.votes,
+            votedUserIds: option.votedUserIds,
+          })),
+        }
+      }),
+    )
+
+    // Filter out null values and sort by creation date (newest first)
+    return polls.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt)
+  },
+})
+
 export const createPoll = mutation({
   args: {
     question: v.string(),
