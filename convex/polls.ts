@@ -398,7 +398,7 @@ export const createPoll = mutation({
     })
 
     // Create poll options
-    const optionIds = await Promise.all(
+    const _optionIds = await Promise.all(
       options.map((optionText) =>
         ctx.db.insert("pollOptions", {
           pollId,

@@ -76,15 +76,15 @@ export const UserPolls = () => {
         <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02]" />
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="space-y-4 text-center">
-            <div className="flex items-center justify-center space-x-3">
+            <div className="flex w-full flex-col items-center justify-center gap-2 sm:flex-row sm:items-center sm:gap-0 sm:space-x-3">
               <Avatar profileImageUrl={user.profileImageUrl} size="lg" className="h-12 w-12" />
-              <h1 className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-4xl text-transparent sm:text-5xl">
+              <h1 className="w-full min-w-0 whitespace-normal break-words bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-4xl text-transparent sm:w-auto sm:text-5xl">
                 {username}'s Polls
               </h1>
             </div>
 
             {/* Stats */}
-            <div className="flex items-center justify-center space-x-8 pt-4">
+            <div className="flex flex-col items-center justify-center gap-2 pt-4 sm:flex-row sm:gap-0 sm:space-x-8">
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <BarChart3 className="h-5 w-5" />
                 <span className="font-medium">{totalPolls} polls</span>

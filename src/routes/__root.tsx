@@ -49,9 +49,11 @@ const RootComponent = () => {
     <>
       <HeadContent />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <div className="flex h-svh">
+        <div className="flex max-h-screen max-w-screen overflow-hidden">
           <Sidebar />
-          <main className="ml-16 flex-1 md:ml-64">{isFetching ? <Loader /> : <Outlet />}</main>
+          <main className="ml-16 flex-1 overflow-auto md:ml-64">
+            {isFetching ? <Loader /> : <Outlet />}
+          </main>
         </div>
         <Toaster richColors />
       </ThemeProvider>

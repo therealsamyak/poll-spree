@@ -71,7 +71,7 @@ export const PollsList = () => {
             </p>
 
             {/* Stats */}
-            <div className="flex items-center justify-center space-x-8 pt-4">
+            <div className="flex flex-col items-center justify-center gap-2 pt-4 sm:flex-row sm:gap-0 sm:space-x-8">
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <BarChart3 className="h-5 w-5" />
                 <span className="font-medium">{totalPolls} polls</span>
