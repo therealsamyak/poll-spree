@@ -466,3 +466,15 @@ export const deletePoll = mutation({
     return { success: true }
   },
 })
+
+export const getAllPollsForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const polls = await ctx.db.query("polls").collect()
+
+    return polls.map((poll) => ({
+      _id: poll._id,
+      createdAt: poll.createdAt,
+    }))
+  },
+})
