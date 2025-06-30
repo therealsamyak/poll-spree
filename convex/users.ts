@@ -497,3 +497,19 @@ export const deleteClerkUser = action({
     }
   },
 })
+
+export const getUserByUsername = query({
+  args: {
+    username: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { username } = args
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", username))
+      .first()
+
+    return user
+  },
+})
