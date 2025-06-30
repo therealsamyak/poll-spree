@@ -53,7 +53,6 @@ A modern, real-time polling application built with React, TanStack Router, and C
    Follow the prompts to create a new Convex project and connect it to your application.
 
 4. **Set up environment variables**
-
    Create a `.env.local` file in the root directory:
 
    ```env
@@ -70,7 +69,6 @@ A modern, real-time polling application built with React, TanStack Router, and C
    ```
 
 6. **Open your browser**
-
    Navigate to [http://localhost:3001](http://localhost:3001) to see the application.
 
 ## 🏗️ Tech Stack
@@ -84,7 +82,6 @@ A modern, real-time polling application built with React, TanStack Router, and C
 - **shadcn/ui** - Beautiful, accessible UI components
 - **Lucide React** - Beautiful icons
 - **React Hook Form** - Performant forms with validation
-- **Zod** - TypeScript-first schema validation
 
 ### Backend
 
@@ -110,13 +107,14 @@ poll-spree-2/
 ├── convex/                 # Backend functions and schema
 │   ├── _generated/        # Auto-generated Convex types
 │   ├── polls.ts           # Poll-related mutations and queries
+│   ├── users.ts           # User-related functions
 │   ├── schema.ts          # Database schema definition
-│   └── healthCheck.ts     # Health check endpoint
+│   └── badWordsFilter.ts  # Content moderation
 ├── src/
 │   ├── components/        # React components
 │   │   ├── ui/           # Reusable UI components (shadcn/ui)
-│   │   ├── poll-card.tsx # Individual poll display
-│   │   ├── polls-list.tsx # Polls listing
+│   │   ├── poll-card/    # Individual poll display
+│   │   ├── polls-list/   # Polls listing
 │   │   └── ...           # Other components
 │   ├── routes/           # TanStack Router routes
 │   ├── lib/              # Utility functions and configurations
@@ -201,14 +199,6 @@ bun run convex:deploy
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 🙏 Acknowledgments
+## 📄 License
 
-- Built with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Authentication by [Clerk](https://clerk.com/)
-- Backend by [Convex](https://convex.dev/)
-
----
-
-Made with ❤️ using modern web technologies
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
