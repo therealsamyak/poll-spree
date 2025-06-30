@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { validateMultipleInputs } from "@/lib/badWordsFilter"
+import { useCreatePoll } from "@/hooks/useCreatePoll"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
 
@@ -44,18 +44,25 @@ const SidebarContent = () => {
   const { signOut } = useClerk()
   const user = useQuery(api.users.getUser, { userId: userId || "" })
   const updateUsername = useMutation(api.users.updateUsername)
-  const createPoll = useMutation(api.polls.createPoll)
   const [newUsername, setNewUsername] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
   const [isCreatePollOpen, setIsCreatePollOpen] = useState(false)
-  const [question, setQuestion] = useState("")
-  const [options, setOptions] = useState([
-    { id: "1", text: "" },
-    { id: "2", text: "" },
-  ])
-  const [isDev, setIsDev] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
+
+  // Use the shared create poll hook
+  const {
+    question,
+    setQuestion,
+    options,
+    isDev,
+    setIsDev,
+    isCreating,
+    handleCreatePoll,
+    addOption,
+    removeOption,
+    updateOption,
+  } = useCreatePoll()
+
   const usernameId = useId()
   const questionId = useId()
   const devId = useId()
@@ -98,75 +105,8 @@ const SidebarContent = () => {
     }
   }
 
-  const handleCreatePoll = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!userId) {
-      toast.error("Please sign in to create a poll")
-      return
-    }
-
-    if (!question.trim()) {
-      toast.error("Please enter a question")
-      return
-    }
-
-    const validOptions = options.filter((option) => option.text.trim())
-    if (validOptions.length < 2) {
-      toast.error("Please enter at least 2 options")
-      return
-    }
-
-    if (!user?.username) {
-      toast.error("Please set a username before creating a poll")
-      return
-    }
-
-    // Validate all inputs for inappropriate content
-    const inputsToValidate = {
-      "poll question": question.trim(),
-      ...options.reduce(
-        (acc, option, index) => {
-          // Only include options that have text
-          if (option.text.trim()) {
-            acc[`poll option ${index + 1}`] = option.text.trim()
-          }
-          return acc
-        },
-        {} as Record<string, string>,
-      ),
-    }
-
-    const validation = validateMultipleInputs(inputsToValidate)
-    if (!validation.isValid) {
-      toast.error(
-        `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
-      )
-      return
-    }
-
-    setIsCreating(true)
-    try {
-      await createPoll({
-        question: question.trim(),
-        options: validOptions.map((option) => option.text.trim()),
-        authorId: userId,
-        authorUsername: user.username,
-        dev: isDev,
-      })
-      toast.success("Poll created successfully!")
-      setIsCreatePollOpen(false)
-      setQuestion("")
-      setOptions([
-        { id: "1", text: "" },
-        { id: "2", text: "" },
-      ])
-      setIsDev(false)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create poll")
-    } finally {
-      setIsCreating(false)
-    }
+  const handleCreatePollSubmit = async (e: React.FormEvent) => {
+    await handleCreatePoll(e, () => setIsCreatePollOpen(false))
   }
 
   return (
@@ -318,7 +258,7 @@ const SidebarContent = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreatePoll} className="space-y-6">
+          <form onSubmit={handleCreatePollSubmit} className="space-y-6">
             {/* Question */}
             <div className="space-y-2">
               <Label htmlFor={questionId} className="font-medium text-sm">
@@ -343,12 +283,7 @@ const SidebarContent = () => {
                     <Input
                       placeholder={`Option ${index + 1}`}
                       value={option.text}
-                      onChange={(e) => {
-                        const newOptions = options.map((opt) =>
-                          opt.id === option.id ? { ...opt, text: e.target.value } : opt,
-                        )
-                        setOptions(newOptions)
-                      }}
+                      onChange={(e) => updateOption(option.id, e.target.value)}
                       className="flex-1"
                       required
                     />
@@ -359,7 +294,7 @@ const SidebarContent = () => {
                         size="sm"
                         onClick={() => {
                           if (options.length > 2) {
-                            setOptions(options.filter((opt) => opt.id !== option.id))
+                            removeOption(option.id)
                           }
                         }}
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
@@ -377,8 +312,7 @@ const SidebarContent = () => {
                   size="sm"
                   onClick={() => {
                     if (options.length < 6) {
-                      const newId = (options.length + 1).toString()
-                      setOptions([...options, { id: newId, text: "" }])
+                      addOption()
                     }
                   }}
                   className="w-full"

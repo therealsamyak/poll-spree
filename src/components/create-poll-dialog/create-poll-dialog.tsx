@@ -1,8 +1,5 @@
-import { useAuth } from "@clerk/clerk-react"
-import { useMutation, useQuery } from "convex/react"
 import { Plus, Sparkles, X } from "lucide-react"
-import { useId, useRef, useState } from "react"
-import { toast } from "sonner"
+import { useId, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -17,121 +14,30 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { validateMultipleInputs } from "@/lib/badWordsFilter"
-import { api } from "../../../convex/_generated/api"
+import { useCreatePoll } from "@/hooks/useCreatePoll"
 
 export const CreatePollDialog = () => {
   const [open, setOpen] = useState(false)
-  const [question, setQuestion] = useState("")
-  const [options, setOptions] = useState([
-    { id: "1", text: "" },
-    { id: "2", text: "" },
-  ])
-  const [isDev, setIsDev] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-
-  // Use a ref to maintain a unique counter for option IDs
-  const nextIdRef = useRef(3)
+  const {
+    question,
+    setQuestion,
+    options,
+    isDev,
+    setIsDev,
+    isCreating,
+    handleCreatePoll,
+    addOption,
+    removeOption,
+    updateOption,
+    canAddOption,
+    canRemoveOption,
+  } = useCreatePoll()
 
   const questionId = useId()
   const devId = useId()
 
-  const { userId } = useAuth()
-  const user = useQuery(api.users.getUser, { userId: userId || "" })
-  const createPoll = useMutation(api.polls.createPoll)
-
-  const handleAddOption = () => {
-    if (options.length < 6) {
-      const newId = nextIdRef.current.toString()
-      nextIdRef.current += 1
-      setOptions([...options, { id: newId, text: "" }])
-    }
-  }
-
-  const handleRemoveOption = (id: string) => {
-    if (options.length > 2) {
-      setOptions(options.filter((option) => option.id !== id))
-    }
-  }
-
-  const handleOptionChange = (id: string, value: string) => {
-    const newOptions = options.map((option) =>
-      option.id === id ? { ...option, text: value } : option,
-    )
-    setOptions(newOptions)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!userId) {
-      toast.error("Please sign in to create a poll")
-      return
-    }
-
-    if (!question.trim()) {
-      toast.error("Please enter a question")
-      return
-    }
-
-    const validOptions = options.filter((option) => option.text.trim())
-    if (validOptions.length < 2) {
-      toast.error("Please enter at least 2 options")
-      return
-    }
-
-    if (!user?.username) {
-      toast.error("Please set a username before creating a poll")
-      return
-    }
-
-    // Validate all inputs for inappropriate content
-    const inputsToValidate = {
-      "poll question": question.trim(),
-      ...options.reduce(
-        (acc, option, index) => {
-          // Only include options that have text
-          if (option.text.trim()) {
-            acc[`poll option ${index + 1}`] = option.text.trim()
-          }
-          return acc
-        },
-        {} as Record<string, string>,
-      ),
-    }
-
-    const validation = validateMultipleInputs(inputsToValidate)
-    if (!validation.isValid) {
-      toast.error(
-        `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
-      )
-      return
-    }
-
-    setIsCreating(true)
-    try {
-      await createPoll({
-        question: question.trim(),
-        options: validOptions.map((option) => option.text.trim()),
-        authorId: userId,
-        authorUsername: user.username,
-        dev: isDev,
-      })
-      toast.success("Poll created successfully!")
-      setOpen(false)
-      setQuestion("")
-      setOptions([
-        { id: "1", text: "" },
-        { id: "2", text: "" },
-      ])
-      // Reset the ID counter when the dialog is closed
-      nextIdRef.current = 3
-      setIsDev(false)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create poll")
-    } finally {
-      setIsCreating(false)
-    }
+    await handleCreatePoll(e, () => setOpen(false))
   }
 
   return (
@@ -178,16 +84,16 @@ export const CreatePollDialog = () => {
                   <Input
                     placeholder={`Option ${index + 1}`}
                     value={option.text}
-                    onChange={(e) => handleOptionChange(option.id, e.target.value)}
+                    onChange={(e) => updateOption(option.id, e.target.value)}
                     className="flex-1"
                     required
                   />
-                  {options.length > 2 && (
+                  {canRemoveOption && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveOption(option.id)}
+                      onClick={() => removeOption(option.id)}
                       className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
                       <X className="h-4 w-4" />
@@ -196,12 +102,12 @@ export const CreatePollDialog = () => {
                 </div>
               ))}
             </div>
-            {options.length < 6 && (
+            {canAddOption && (
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={handleAddOption}
+                onClick={addOption}
                 className="w-full"
               >
                 <Plus className="mr-2 h-4 w-4" />
