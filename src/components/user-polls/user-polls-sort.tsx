@@ -11,8 +11,8 @@ import {
 type SortOption = "recent" | "oldest" | "most-voted" | "least-voted"
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "recent", label: "Most Recent" },
-  { value: "oldest", label: "Least Recent" },
+  { value: "recent", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
   { value: "most-voted", label: "Most Voted" },
   { value: "least-voted", label: "Least Voted" },
 ]
@@ -26,6 +26,7 @@ export const UserPollsSort = ({ currentSort }: UserPollsSortProps) => {
 
   const handleSortChange = (sort: SortOption) => {
     navigate({
+      from: "/users/$username",
       search: (prev) => ({
         ...prev,
         sort,
