@@ -23,19 +23,9 @@ export const useCreatePoll = () => {
   const [isDev, setIsDev] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
 
-  const resetForm = () => {
-    setQuestion("")
-    setOptions([
-      { id: "1", text: "" },
-      { id: "2", text: "" },
-    ])
-    setIsDev(false)
-  }
-
   const addOption = () => {
-    if (options.length < 6) {
-      const newId = (options.length + 1).toString()
-      setOptions([...options, { id: newId, text: "" }])
+    if (options.length < 10) {
+      setOptions([...options, { id: Date.now().toString(), text: "" }])
     }
   }
 
@@ -45,97 +35,85 @@ export const useCreatePoll = () => {
     }
   }
 
-  const updateOption = (id: string, value: string) => {
-    const newOptions = options.map((option) =>
-      option.id === id ? { ...option, text: value } : option,
-    )
-    setOptions(newOptions)
+  const updateOption = (id: string, text: string) => {
+    setOptions(options.map((option) => (option.id === id ? { ...option, text } : option)))
   }
+
+  const canAddOption = options.length < 10
+  const canRemoveOption = options.length > 2
 
   const handleCreatePoll = async (e: React.FormEvent, onSuccess?: () => void) => {
     e.preventDefault()
-
-    if (!userId) {
-      toast.error("Please sign in to create a poll")
-      return
-    }
-
-    if (!question.trim()) {
-      toast.error("Please enter a question")
-      return
-    }
-
-    const validOptions = options.filter((option) => option.text.trim())
-    if (validOptions.length < 2) {
-      toast.error("Please enter at least 2 options")
-      return
-    }
-
-    if (!user?.username) {
-      toast.error("Please set a username before creating a poll")
-      return
-    }
-
-    // Validate all inputs for inappropriate content
-    const inputsToValidate = {
-      "poll question": question.trim(),
-      ...options.reduce(
-        (acc, option, index) => {
-          // Only include options that have text
-          if (option.text.trim()) {
-            acc[`poll option ${index + 1}`] = option.text.trim()
-          }
-          return acc
-        },
-        {} as Record<string, string>,
-      ),
-    }
-
-    const validation = validateMultipleInputs(inputsToValidate)
-    if (!validation.isValid) {
-      toast.error(
-        `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
-      )
-      return
-    }
+    if (!userId || !user) return
 
     setIsCreating(true)
+
     try {
-      await createPoll({
+      // Filter out empty options
+      const validOptions = options
+        .map((option) => option.text.trim())
+        .filter((text) => text.length > 0)
+
+      // Check for inappropriate content
+      const inputsToValidate: Record<string, string> = {
+        "poll question": question.trim(),
+        ...validOptions.reduce(
+          (acc, option, index) => {
+            acc[`poll option ${index + 1}`] = option
+            return acc
+          },
+          {} as Record<string, string>,
+        ),
+      }
+
+      const validation = validateMultipleInputs(inputsToValidate)
+      if (!validation.isValid) {
+        toast.error(
+          `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
+        )
+        return
+      }
+
+      const result = await createPoll({
         question: question.trim(),
-        options: validOptions.map((option) => option.text.trim()),
+        options: validOptions,
         authorId: userId,
-        authorUsername: user.username,
+        authorUsername: user.username || "Anonymous",
         dev: isDev,
       })
-      toast.success("Poll created successfully!")
-      resetForm()
-      onSuccess?.()
+
+      if (result?.success) {
+        toast.success("Poll created successfully!")
+        setQuestion("")
+        setOptions([
+          { id: "1", text: "" },
+          { id: "2", text: "" },
+        ])
+        setIsDev(false)
+        onSuccess?.()
+      } else {
+        toast.error(result?.error || "Failed to create poll")
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create poll")
+      console.error("Error creating poll:", error)
+      toast.error("An unexpected error occurred")
     } finally {
       setIsCreating(false)
     }
   }
 
   return {
-    // State
     question,
     setQuestion,
     options,
     isDev,
     setIsDev,
     isCreating,
-
-    // Actions
     handleCreatePoll,
     addOption,
     removeOption,
     updateOption,
-    resetForm,
-
-    // Computed
-    canAddOption: options.length < 6,
-    canRemoveOption: options.length > 2,
+    canAddOption,
+    canRemoveOption,
   }
 }

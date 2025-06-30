@@ -1,14 +1,14 @@
 import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User, X } from "lucide-react"
+import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User } from "lucide-react"
 import { useId, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
+import { CreatePollDialogContent } from "@/components/create-poll-dialog"
 import { CustomProfileDialog } from "@/components/custom-profile-dialog"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -26,8 +26,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
-import { useCreatePoll } from "@/hooks/useCreatePoll"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
 
@@ -49,23 +47,7 @@ const SidebarContent = () => {
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
   const [isCreatePollOpen, setIsCreatePollOpen] = useState(false)
 
-  // Use the shared create poll hook
-  const {
-    question,
-    setQuestion,
-    options,
-    isDev,
-    setIsDev,
-    isCreating,
-    handleCreatePoll,
-    addOption,
-    removeOption,
-    updateOption,
-  } = useCreatePoll()
-
   const usernameId = useId()
-  const questionId = useId()
-  const devId = useId()
 
   const handleUpdateUsername = async () => {
     if (!newUsername.trim() || !userId) return
@@ -103,10 +85,6 @@ const SidebarContent = () => {
       e.preventDefault()
       handleUpdateUsername()
     }
-  }
-
-  const handleCreatePollSubmit = async (e: React.FormEvent) => {
-    await handleCreatePoll(e, () => setIsCreatePollOpen(false))
   }
 
   return (
@@ -157,64 +135,48 @@ const SidebarContent = () => {
             <ModeToggle />
           </div>
           <Separator className="hidden md:block" />
+
+          {/* User Section */}
           {isSignedIn ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
-                >
-                  <div className="flex w-full items-center justify-center md:justify-between">
-                    <Avatar size="sm" />
-                    <div className="hidden min-w-0 flex-1 md:block">
-                      <p className="ml-3 text-center font-medium text-sm">
-                        {user?.username || "User"}
-                      </p>
-                    </div>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/users/$username"
-                    params={{ username: user?.username || "" }}
-                    className="group cursor-pointer"
-                  >
-                    <User className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
-                    <span>View Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setIsDialogOpen(true)}
-                  className="group cursor-pointer"
-                >
-                  <Edit className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
-                  <span>Change Username</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setIsProfileDialogOpen(true)}
-                  className="group cursor-pointer"
-                >
-                  <Settings className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-accent-foreground" />
-                  <span>Profile Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()} className="group cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
-                  <span>Sign Out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-3">
+              <Avatar profileImageUrl={user?.profileImageUrl} />
+              <div className="hidden flex-1 md:block">
+                <p className="font-medium text-sm">{user?.username || "Anonymous"}</p>
+                <p className="text-muted-foreground text-xs">@{user?.username || "anonymous"}</p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="hidden md:flex">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Change Username
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
             <SignInButton mode="modal">
-              <Button className="w-full gap-2 bg-primary shadow-lg hover:bg-accent">Sign In</Button>
+              <Button variant="outline" className="w-full">
+                Sign In
+              </Button>
             </SignInButton>
           )}
         </div>
       </div>
 
-      {/* Change Username Dialog */}
+      {/* Username Change Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -247,112 +209,10 @@ const SidebarContent = () => {
 
       {/* Create Poll Dialog */}
       <Dialog open={isCreatePollOpen} onOpenChange={setIsCreatePollOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <Plus className="h-5 w-5 text-primary" />
-              Create New Poll
-            </DialogTitle>
-            <DialogDescription>
-              Start a conversation with your community. Ask a question and let people vote!
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleCreatePollSubmit} className="space-y-6">
-            {/* Question */}
-            <div className="space-y-2">
-              <Label htmlFor={questionId} className="font-medium text-sm">
-                Question *
-              </Label>
-              <Textarea
-                id={questionId}
-                placeholder="What would you like to ask the community?"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                className="min-h-[80px] resize-none"
-                required
-              />
-            </div>
-
-            {/* Options */}
-            <div className="space-y-3">
-              <Label className="font-medium text-sm">Options *</Label>
-              <div className="space-y-3">
-                {options.map((option, index) => (
-                  <div key={option.id} className="flex items-center gap-2">
-                    <Input
-                      placeholder={`Option ${index + 1}`}
-                      value={option.text}
-                      onChange={(e) => updateOption(option.id, e.target.value)}
-                      className="flex-1"
-                      required
-                    />
-                    {options.length > 2 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (options.length > 2) {
-                            removeOption(option.id)
-                          }
-                        }}
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {options.length < 6 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (options.length < 6) {
-                      addOption()
-                    }
-                  }}
-                  className="w-full"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Option
-                </Button>
-              )}
-            </div>
-
-            {/* Dev Poll Toggle */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={devId}
-                checked={isDev}
-                onCheckedChange={(checked) => setIsDev(checked as boolean)}
-              />
-              <Label
-                htmlFor={devId}
-                className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Mark as developer poll
-              </Label>
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsCreatePollOpen(false)}
-                disabled={isCreating}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isCreating}>
-                {isCreating ? "Creating..." : "Create Poll"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
+        <CreatePollDialogContent
+          onClose={() => setIsCreatePollOpen(false)}
+          icon={<Plus className="h-5 w-5 text-primary" />}
+        />
       </Dialog>
 
       {/* Custom Profile Dialog */}
