@@ -1,5 +1,5 @@
 import { Plus, Sparkles, X } from "lucide-react"
-import { useId, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -40,6 +40,19 @@ export const CreatePollDialogContent = ({
 
   const questionId = useId()
   const _devId = useId()
+
+  // --- Focus logic for new option ---
+  const optionRefs = useRef<(HTMLInputElement | null)[]>([])
+  const prevOptionsLength = useRef(options.length)
+
+  useEffect(() => {
+    if (options.length > prevOptionsLength.current) {
+      // Focus the last input
+      optionRefs.current[options.length - 1]?.focus()
+    }
+    prevOptionsLength.current = options.length
+  }, [options.length])
+  // --- End focus logic ---
 
   const handleSubmit = async (e: React.FormEvent) => {
     await handleCreatePoll(e, onClose)
@@ -109,6 +122,9 @@ export const CreatePollDialogContent = ({
               <div key={option.id} className="flex items-center gap-2">
                 <div className="relative flex-1">
                   <Input
+                    ref={(el) => {
+                      optionRefs.current[index] = el
+                    }}
                     placeholder={`Option ${index + 1}`}
                     value={option.text}
                     onChange={(e) => updateOption(option.id, e.target.value)}
