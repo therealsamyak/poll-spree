@@ -1,7 +1,7 @@
 import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Home, LogOut, Plus, Settings, TrendingUp, User, X, Edit } from "lucide-react"
+import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User, X } from "lucide-react"
 import { useId, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
