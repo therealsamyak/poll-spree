@@ -1,7 +1,7 @@
 import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Home, LogOut, Plus, Settings, TrendingUp, User, X } from "lucide-react"
+import { BarChart3, Home, LogOut, Plus, Settings, TrendingUp, User, X, Edit } from "lucide-react"
 import { useId, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
@@ -236,15 +236,31 @@ const SidebarContent = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => setIsDialogOpen(true)} className="group">
-                  <User className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/users/$username"
+                    params={{ username: user?.username || "" }}
+                    className="group cursor-pointer"
+                  >
+                    <User className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                    <span>View Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setIsDialogOpen(true)}
+                  className="group cursor-pointer"
+                >
+                  <Edit className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
                   <span>Change Username</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsProfileDialogOpen(true)} className="group">
+                <DropdownMenuItem
+                  onClick={() => setIsProfileDialogOpen(true)}
+                  className="group cursor-pointer"
+                >
                   <Settings className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-accent-foreground" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()} className="group">
+                <DropdownMenuItem onClick={() => signOut()} className="group cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
