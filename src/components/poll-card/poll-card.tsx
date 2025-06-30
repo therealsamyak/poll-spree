@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import type { Id } from "@/convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import type { Poll } from "../types"
+import type { Id } from "../../../convex/_generated/dataModel"
+import type { Poll } from "../../types"
 
 interface PollCardProps {
   poll: Poll
@@ -35,11 +35,15 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
   const isAuthor = poll.authorId === userId
   const showResults = isSignedIn && (hasVoted || isAuthor)
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
+  const formatDateTime = (timestamp: number) => {
+    const date = new Date(timestamp)
+    return date.toLocaleString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     })
   }
 
@@ -162,7 +166,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-blue-600/30">
                   <Calendar className="h-3 w-3 text-blue-600" />
                 </div>
-                <span>{formatDate(poll.createdAt)}</span>
+                <span>{formatDateTime(poll.createdAt)}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-green-500/20 to-green-600/30">
