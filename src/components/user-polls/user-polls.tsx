@@ -179,15 +179,15 @@ export const UserPolls = () => {
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="w-full px-2 py-8 sm:px-4">
         {/* Filters and Sort */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col items-center justify-center gap-4 text-center sm:flex-row">
           <UserPollsFilters currentFilters={filters} />
           <UserPollsSort currentSort={sort} />
         </div>
 
         {/* Polls Grid */}
-        <div className="space-y-6">
+        <div className="flex w-full flex-wrap justify-center gap-6">
           {pollsResult === undefined && paginationOpts.cursor === null ? (
             // Show loading state only for initial polls area
             <div className="flex min-h-[40vh] items-center justify-center">
@@ -210,7 +210,7 @@ export const UserPolls = () => {
               {sortedPolls.map((poll, index) => (
                 <div
                   key={poll.id}
-                  className="slide-in-from-bottom-4 animate-in duration-500"
+                  className="slide-in-from-bottom-4 w-full min-w-[300px] max-w-[300px] flex-shrink flex-grow basis-[300px] animate-in duration-500"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <PollCard poll={poll} />
@@ -219,7 +219,7 @@ export const UserPolls = () => {
 
               {/* Load more trigger */}
               {!isDone && (
-                <div ref={loadMoreRef} className="flex justify-center py-4">
+                <div ref={loadMoreRef} className="flex w-full justify-center py-4">
                   {isLoadingMore ? (
                     <div className="flex items-center space-x-2 text-muted-foreground">
                       <Loader2 className="h-5 w-5 animate-spin" />
