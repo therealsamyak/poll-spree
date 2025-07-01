@@ -16,11 +16,12 @@ export const validateTextContent = (text: string): boolean => {
 
   // Check for inappropriate content using the custom bad words list
   const normalizedText = trimmed.toLowerCase()
+  const words = normalizedText.split(/\W+/) // Split on non-word characters
   const hasInappropriateContent = BAD_WORDS_LIST.some((badWord) => {
     const normalizedBadWord = badWord.toLowerCase()
 
-    // Check for exact matches
-    if (normalizedText.includes(normalizedBadWord)) {
+    // Check for exact word matches
+    if (words.includes(normalizedBadWord)) {
       return true
     }
 
@@ -50,8 +51,8 @@ export const validateTextContent = (text: string): boolean => {
       variations.push(...newVariations)
     }
 
-    // Check if any variation is found in the text
-    return variations.some((variation) => normalizedText.includes(variation))
+    // Check if any variation is found as a whole word in the text
+    return variations.some((variation) => words.includes(variation))
   })
 
   return !hasInappropriateContent
