@@ -95,7 +95,7 @@ const SidebarContent = () => {
           to="/"
           className="flex h-16 w-16 items-center justify-center transition-opacity hover:opacity-80 md:h-auto md:w-auto md:space-x-3"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
             <BarChart3 className="h-5 w-5" />
           </div>
           <span className="hidden font-bold md:inline">Poll Spree</span>

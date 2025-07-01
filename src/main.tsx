@@ -36,7 +36,7 @@ const router = createRouter({
   defaultPendingComponent: () => <Loader />,
   // Enable client-side error boundaries
   defaultErrorComponent: ({ error }) => (
-    <div className="p-4 text-red-500">
+    <div className="p-4 text-destructive">
       <h1>Error</h1>
       <pre>{error.message}</pre>
     </div>
