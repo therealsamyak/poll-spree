@@ -106,7 +106,7 @@ const SidebarContent = () => {
       <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
         <Link
           to="/"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
         >
           <Home className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Home</span>
@@ -130,7 +130,7 @@ const SidebarContent = () => {
           {isSignedIn && (
             <Button
               onClick={() => setIsCreatePollOpen(true)}
-              className="flex size-9 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-black md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-white"
+              className="flex size-9 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-primary-foreground md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-primary-foreground"
             >
               <Plus className="h-6 w-6" />
               <span className="hidden md:inline">Create Poll</span>

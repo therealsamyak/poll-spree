@@ -221,7 +221,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                   className={`h-auto w-full justify-start p-4 transition-all duration-200${
                     isSelected
                       ? " border border-transparent bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                      : " border border-transparent bg-primary/10 text-foreground hover:bg-primary/20 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-white/20 dark:focus-visible:bg-white/5 dark:hover:border-white/40"
+                      : " border border-transparent bg-primary/10 text-foreground hover:bg-primary/20 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
                   }${isWinning && showResults && !isSelected ? " bg-accent/5 ring-2 ring-accent/50 dark:bg-accent/35" : ""}${
                     isUserVoteLoading ? " animate-pulse" : ""
                   }`}
@@ -267,7 +267,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                       width: showResults ? (shouldShowEmptyBar ? "0%" : `${percentage}%`) : "0%",
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
                 </div>
               </div>
             )

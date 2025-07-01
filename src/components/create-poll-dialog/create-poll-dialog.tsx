@@ -207,7 +207,7 @@ export const CreatePollDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 hover:bg-primary/40 hover:text-black dark:hover:bg-primary/50 dark:hover:text-white">
+        <Button className="gap-2 hover:bg-primary/40 hover:text-primary-foreground dark:hover:bg-primary/50 dark:hover:text-primary-foreground">
           <Plus className="h-4 w-4" />
           Create Poll
         </Button>
