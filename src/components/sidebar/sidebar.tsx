@@ -165,28 +165,25 @@ const SidebarContent = () => {
                   <Link
                     to="/users/$username"
                     params={{ username: user?.username || "" }}
-                    className="group cursor-pointer"
+                    className="cursor-pointer"
                   >
-                    <User className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                    <User className="mr-2 h-4 w-4" />
                     <span>View Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setIsDialogOpen(true)}
-                  className="group cursor-pointer"
-                >
-                  <Edit className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                <DropdownMenuItem onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
+                  <Edit className="mr-2 h-4 w-4" />
                   <span>Change Username</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setIsProfileDialogOpen(true)}
-                  className="group cursor-pointer"
+                  className="cursor-pointer"
                 >
-                  <Settings className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-accent-foreground" />
+                  <Settings className="mr-2 h-4 w-4" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()} className="group cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4 text-muted-foreground transition-colors group-hover:text-white dark:group-hover:text-black" />
+                <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
