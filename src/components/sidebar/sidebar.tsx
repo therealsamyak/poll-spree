@@ -128,15 +128,17 @@ const SidebarContent = () => {
       <div className="min-h-0 border-t p-4 pt-3">
         <div className="flex flex-col gap-2">
           {isSignedIn && (
-            <Button
-              onClick={() => setIsCreatePollOpen(true)}
-              className="flex size-9 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-primary-foreground md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-primary-foreground"
-            >
-              <Plus className="h-6 w-6" />
-              <span className="hidden md:inline">Create Poll</span>
-            </Button>
+            <>
+              <Button
+                onClick={() => setIsCreatePollOpen(true)}
+                className="flex size-9 items-center justify-center rounded-lg hover:bg-primary/40 hover:text-primary-foreground md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-primary-foreground"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="hidden md:inline">Create Poll</span>
+              </Button>
+              <Separator className="hidden md:block" />
+            </>
           )}
-          <Separator className="hidden md:block" />
           <div className="flex items-center justify-between">
             <span className="hidden font-medium text-muted-foreground text-sm md:block">Theme</span>
             <ModeToggle />

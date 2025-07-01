@@ -163,11 +163,11 @@ export const PollsList = () => {
         </div>
 
         {/* Polls Grid */}
-        <div className="space-y-6">
+        <div className="flex w-full flex-col justify-center gap-6 sm:flex-row sm:flex-wrap">
           {allPolls.map((poll, index) => (
             <div
               key={poll.id}
-              className="slide-in-from-bottom-4 animate-in duration-500"
+              className="slide-in-from-bottom-4 min-w-[280px] max-w-[280px] flex-1 animate-in duration-500 sm:basis-1/2 md:basis-1/3"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <PollCard poll={poll} />

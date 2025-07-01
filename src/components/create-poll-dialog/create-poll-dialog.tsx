@@ -98,19 +98,19 @@ export const CreatePollDialogContent = ({
               placeholder="What would you like to ask the community?"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              className={`min-h-[80px] resize-none pr-16 ${getCharacterCountBg(question.length, 280)} ${
-                question.length > 280 ? "border-destructive focus-visible:ring-destructive" : ""
+              className={`min-h-[80px] resize-none pr-16 ${getCharacterCountBg(question.length, 150)} ${
+                question.length > 150 ? "border-destructive focus-visible:ring-destructive" : ""
               }`}
               required
             />
             <div
-              className={`absolute right-3 bottom-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(question.length, 280)}`}
+              className={`absolute right-3 bottom-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(question.length, 150)}`}
             >
-              {question.length}/280
+              {question.length}/150
             </div>
           </div>
-          {question.length > 280 && (
-            <p className="text-destructive text-xs">Question cannot exceed 280 characters</p>
+          {question.length > 150 && (
+            <p className="text-destructive text-xs">Question cannot exceed 150 characters</p>
           )}
         </div>
 
@@ -128,17 +128,17 @@ export const CreatePollDialogContent = ({
                     placeholder={`Option ${index + 1}`}
                     value={option.text}
                     onChange={(e) => updateOption(option.id, e.target.value)}
-                    className={`pr-16 ${getCharacterCountBg(option.text.length, 280)} ${
-                      option.text.length > 280
+                    className={`pr-16 ${getCharacterCountBg(option.text.length, 50)} ${
+                      option.text.length > 50
                         ? "border-destructive focus-visible:ring-destructive"
                         : ""
                     }`}
                     required
                   />
                   <div
-                    className={`-translate-y-1/2 absolute top-1/2 right-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 280)}`}
+                    className={`-translate-y-1/2 absolute top-1/2 right-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 50)}`}
                   >
-                    {option.text.length}/280
+                    {option.text.length}/50
                   </div>
                 </div>
                 {canRemoveOption && (
