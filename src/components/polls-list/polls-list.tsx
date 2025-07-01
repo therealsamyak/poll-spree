@@ -1,6 +1,6 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
-import { BarChart3, Loader2, Plus, Users } from "lucide-react"
+import { BarChart3, Loader2, Plus } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
@@ -119,55 +119,29 @@ export const PollsList = () => {
     )
   }
 
-  const totalVotes = stats?.totalVotes || 0
-  const totalPolls = stats?.totalPolls || allPolls.length
+  const _totalVotes = stats?.totalVotes || 0
+  const _totalPolls = stats?.totalPolls || allPolls.length
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden border-b bg-gradient-to-r from-primary/10 via-primary/5 to-background">
-        <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="space-y-4 text-center">
-            <h1 className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-4xl text-transparent sm:text-5xl">
-              Community Polls
-            </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground text-xl">
-              Vote on polls and see what the community thinks. Your opinion matters!
-            </p>
-
-            {/* Stats */}
-            <div className="flex flex-col items-center justify-center gap-2 pt-4 sm:flex-row sm:gap-0 sm:space-x-8">
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <BarChart3 className="h-5 w-5" />
-                <span className="font-medium">{totalPolls} polls</span>
-              </div>
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Users className="h-5 w-5" />
-                <span className="font-medium">{totalVotes} votes</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Content */}
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header with Create Button */}
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="space-y-1">
-            <h2 className="font-bold text-2xl">Recent Polls</h2>
-            <p className="text-muted-foreground">Join the conversation and make your voice heard</p>
-          </div>
-          {isSignedIn && <CreatePollDialog />}
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header row: Recent Polls + Create Button */}
+        <div className="mb-8 flex w-full items-center justify-center sm:justify-between">
+          <h2 className="font-bold text-2xl">Recent Polls</h2>
+          {isSignedIn && (
+            <div className="hidden sm:block">
+              <CreatePollDialog />
+            </div>
+          )}
         </div>
 
         {/* Polls Grid */}
-        <div className="flex w-full flex-col justify-center gap-6 sm:flex-row sm:flex-wrap">
+        <div className="flex w-full flex-wrap justify-center gap-6">
           {allPolls.map((poll, index) => (
             <div
               key={poll.id}
-              className="slide-in-from-bottom-4 min-w-[280px] max-w-[280px] flex-1 animate-in duration-500 sm:basis-1/2 md:basis-1/3"
+              className="slide-in-from-bottom-4 w-full min-w-[300px] max-w-[300px] flex-shrink flex-grow basis-[300px] animate-in duration-500"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <PollCard poll={poll} />

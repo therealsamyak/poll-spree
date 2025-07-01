@@ -8,6 +8,7 @@ import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import type { Poll } from "../../types"
@@ -243,19 +244,50 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
         <div className="flex flex-1 flex-col gap-3">
           {collapsedOptions.map((option, _index) => {
             const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
-            return (
+            // Truncate if longer than 24 chars (including ...)
+            const maxLen = 24
+            const needsTruncate = option.text.length > maxLen
+            const truncated = needsTruncate ? `${option.text.slice(0, maxLen - 3)}...` : option.text
+            const buttonContent = (
+              <span key={option.id} className="flex items-center gap-2">
+                {isSelected && <CheckCircle2 className="h-5 w-5 text-inherit" />}
+                {truncated}
+              </span>
+            )
+            return needsTruncate ? (
+              <HoverCard key={option.id}>
+                <HoverCardTrigger asChild>
+                  <Button
+                    variant={isSelected ? "default" : "outline"}
+                    className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
+                    onClick={() => {
+                      if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
+                      handleVote(option.id)
+                    }}
+                    style={{ minHeight: 48 }}
+                  >
+                    {buttonContent}
+                    <span className="font-bold text-sm">{option.votes} votes</span>
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <span className="whitespace-pre-line break-words font-medium text-base">
+                    {option.text}
+                  </span>
+                </HoverCardContent>
+              </HoverCard>
+            ) : (
               <Button
                 key={option.id}
                 variant={isSelected ? "default" : "outline"}
-                className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}`}
-                onClick={() => handleVote(option.id)}
-                disabled={isVoting || isUserVoteLoading || hasMoreThanTwo}
+                className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
+                onClick={() => {
+                  if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
+                  handleVote(option.id)
+                }}
                 style={{ minHeight: 48 }}
               >
-                <span className="flex items-center gap-2">
-                  {isSelected && <CheckCircle2 className="h-5 w-5 text-inherit" />}
-                  {option.text}
-                </span>
+                {buttonContent}
                 <span className="font-bold text-sm">{option.votes} votes</span>
               </Button>
             )
@@ -284,16 +316,20 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
           <div className="flex flex-col gap-3">
             {poll.options.map((option, _index) => {
               const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
+              // In expanded mode, show full text, allow wrapping
               return (
                 <Button
                   key={option.id}
                   variant={isSelected ? "default" : "outline"}
-                  className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}`}
-                  onClick={() => handleVote(option.id)}
+                  className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
+                  onClick={() => {
+                    if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
+                    handleVote(option.id)
+                  }}
                   disabled={isVoting || isUserVoteLoading}
-                  style={{ minHeight: 48 }}
+                  style={{ minHeight: 48, whiteSpace: "normal", wordBreak: "break-word" }}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 whitespace-pre-line break-words font-medium text-base">
                     {isSelected && <CheckCircle2 className="h-5 w-5 text-inherit" />}
                     {option.text}
                   </span>

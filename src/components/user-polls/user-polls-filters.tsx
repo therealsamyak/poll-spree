@@ -32,6 +32,7 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
 
     // Update URL params without causing a full page reload
     navigate({
+      from: "/users/$username",
       search: (prev) => ({
         ...prev,
         filter: newFilters.join(","),
@@ -41,7 +42,7 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:space-x-6">
+    <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:space-x-3">
       <div className="flex items-center space-x-2">
         <Checkbox
           id={authoredId}
