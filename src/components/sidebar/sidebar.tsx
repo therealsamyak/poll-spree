@@ -98,7 +98,7 @@ const SidebarContent = () => {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
             <BarChart3 className="h-5 w-5" />
           </div>
-          <span className="hidden font-bold md:inline">Poll Spree</span>
+          <span className="hidden font-bold md:inline">PollSpree</span>
         </Link>
       </div>
 

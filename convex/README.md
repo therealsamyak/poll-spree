@@ -1,6 +1,6 @@
 # Convex Backend
 
-This directory contains the Convex backend functions and schema for Poll Spree.
+This directory contains the Convex backend functions and schema for PollSpree.
 
 ## Files
 

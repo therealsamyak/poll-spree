@@ -1,6 +1,6 @@
 {
-  "name": "Poll Spree",
-  "short_name": "Poll Spree",
+  "name": "PollSpree",
+  "short_name": "PollSpree",
   "description": "Create & Vote on Polls in Real-Time",
   "start_url": "/",
   "display": "standalone",

@@ -1,10 +1,10 @@
-# Poll Spree 🗳️
+# PollSpree 🗳️
 
 A modern, real-time polling application where you can create polls, vote on them, and see results update instantly. Built with cutting-edge web technologies for a seamless user experience.
 
 🌐 **Live Site:** [https://pollspree.com](https://pollspree.com)
 
-![Poll Spree](https://img.shields.io/badge/Poll-Spree-blue?style=for-the-badge&logo=react)
+![PollSpree](https://img.shields.io/badge/Poll-Spree-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Convex](https://img.shields.io/badge/Convex-000000?style=for-the-badge&logo=convex&logoColor=white)

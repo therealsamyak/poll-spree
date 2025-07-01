@@ -68,7 +68,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        title: "Poll Spree",
+        title: "PollSpree",
       },
       {
         name: "description",

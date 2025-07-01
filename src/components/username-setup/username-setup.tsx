@@ -76,7 +76,7 @@ export const UsernameSetup = () => {
               <User className="h-10 w-10 text-primary" />
             </div>
             <CardTitle className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-2xl text-transparent">
-              Welcome to Poll Spree!
+              Welcome to PollSpree!
             </CardTitle>
             <CardDescription className="text-base">
               Choose a username to get started with creating and voting on polls
