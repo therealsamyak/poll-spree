@@ -60,14 +60,14 @@ export const CreatePollDialogContent = ({
 
   // Character count styling functions
   const getCharacterCountColor = (length: number, max: number) => {
-    if (length > max) return "text-red-500"
-    if (length > max * 0.9) return "text-orange-500"
+    if (length > max) return "text-destructive"
+    if (length > max * 0.9) return "text-accent-foreground"
     return "text-muted-foreground"
   }
 
   const getCharacterCountBg = (length: number, max: number) => {
-    if (length > max) return "bg-red-50 dark:bg-red-950/20"
-    if (length > max * 0.9) return "bg-orange-50 dark:bg-orange-950/20"
+    if (length > max) return "bg-destructive/10 dark:bg-destructive/20"
+    if (length > max * 0.9) return "bg-accent/10 dark:bg-accent/20"
     return ""
   }
 
@@ -99,7 +99,7 @@ export const CreatePollDialogContent = ({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               className={`min-h-[80px] resize-none pr-16 ${getCharacterCountBg(question.length, 280)} ${
-                question.length > 280 ? "border-red-500 focus-visible:ring-red-500" : ""
+                question.length > 280 ? "border-destructive focus-visible:ring-destructive" : ""
               }`}
               required
             />
@@ -110,7 +110,7 @@ export const CreatePollDialogContent = ({
             </div>
           </div>
           {question.length > 280 && (
-            <p className="text-red-500 text-xs">Question cannot exceed 280 characters</p>
+            <p className="text-destructive text-xs">Question cannot exceed 280 characters</p>
           )}
         </div>
 
@@ -129,7 +129,9 @@ export const CreatePollDialogContent = ({
                     value={option.text}
                     onChange={(e) => updateOption(option.id, e.target.value)}
                     className={`pr-16 ${getCharacterCountBg(option.text.length, 280)} ${
-                      option.text.length > 280 ? "border-red-500 focus-visible:ring-red-500" : ""
+                      option.text.length > 280
+                        ? "border-destructive focus-visible:ring-destructive"
+                        : ""
                     }`}
                     required
                   />

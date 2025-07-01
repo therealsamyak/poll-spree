@@ -25,7 +25,7 @@ export const Footer = () => {
         </div>
         <div className="space-y-2">
           <p className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-            Made with <Heart className="h-4 w-4 text-red-500" /> for the community
+            Made with <Heart className="h-4 w-4 text-destructive" /> for the community
           </p>
           <p className="text-muted-foreground text-xs">© 2025 Poll Spree. All rights reserved.</p>
         </div>
