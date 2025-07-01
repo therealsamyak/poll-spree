@@ -27,7 +27,7 @@ export const Footer = () => {
           <p className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
             Made with <Heart className="h-4 w-4 text-destructive" /> for the community
           </p>
-          <p className="text-muted-foreground text-xs">© 2025 Poll Spree. All rights reserved.</p>
+          <p className="text-muted-foreground text-xs">© 2025 PollSpree. All rights reserved.</p>
         </div>
       </div>
     </footer>
