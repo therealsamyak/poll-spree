@@ -190,9 +190,9 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-3">
             {/* Fixed-height question container with dynamic font size */}
-            <div className="h-[72px] flex items-center">
+            <div className="flex h-[72px] items-center">
               <CardTitle
-                className={`font-bold text-foreground leading-tight w-full break-words ${getQuestionFontSize(poll.question.length)}`}
+                className={`w-full break-words font-bold text-foreground leading-tight ${getQuestionFontSize(poll.question.length)}`}
                 style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
               >
                 {poll.question}
@@ -260,7 +260,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
               return (
                 <Button
                   variant={"default"}
-                  className="flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200 border border-primary bg-primary/80 shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
+                  className="flex h-auto w-full items-center justify-between rounded-xl border border-primary bg-primary/80 p-4 font-medium text-base shadow-lg ring-2 ring-primary/20 transition-all duration-200 hover:text-primary-foreground"
                   onClick={() => setExpanded(true)}
                   style={{
                     minHeight: 48,
@@ -272,7 +272,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                   data-ps-selected-option
                 >
                   <span
-                    className="flex flex-col items-start gap-1 w-full"
+                    className="flex w-full flex-col items-start gap-1"
                     style={{ color: "var(--foreground)" }}
                   >
                     <span className="flex items-center gap-2">
@@ -281,13 +281,13 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                       </span>
                       <span
                         style={{ color: "var(--foreground)" }}
-                        className="truncate max-w-[10rem] block"
+                        className="block max-w-[10rem] truncate"
                         title={selected.text}
                       >
                         {selected.text}
                       </span>
                     </span>
-                    <span className="text-xs mt-1" style={{ color: "var(--foreground)" }}>
+                    <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
                       {getVotePercentage(selected.votes)}% • {selected.votes} vote
                       {selected.votes === 1 ? "" : "s"}
                     </span>
@@ -313,7 +313,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                 <Button
                   key={option.id}
                   variant={isSelected ? "default" : "outline"}
-                  className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200 border ${isSelected ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
+                  className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 font-medium text-base transition-all duration-200 ${isSelected ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting || isUserVoteLoading}
                   style={{
@@ -326,21 +326,21 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                   data-ps-modal-option
                 >
                   <span
-                    className="flex flex-col items-start gap-1 w-full"
+                    className="flex w-full flex-col items-start gap-1"
                     style={{ color: "var(--foreground)" }}
                   >
-                    <span className="flex items-center w-full">
+                    <span className="flex w-full items-center">
                       {/* Number+dot and option text in a single flex row, no wrap between them */}
-                      <span className="flex-shrink-0 flex-nowrap mr-2">{place}.</span>
+                      <span className="mr-2 flex-shrink-0 flex-nowrap">{place}.</span>
                       <span
-                        className="break-words whitespace-pre-line"
+                        className="whitespace-pre-line break-words"
                         style={{ wordBreak: "break-word" }}
                       >
                         {option.text}
                       </span>
                     </span>
                     {showResults && (
-                      <span className="text-xs mt-1" style={{ color: "var(--foreground)" }}>
+                      <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
                         {getVotePercentage(option.votes)}% • {option.votes} vote
                         {option.votes === 1 ? "" : "s"}
                       </span>

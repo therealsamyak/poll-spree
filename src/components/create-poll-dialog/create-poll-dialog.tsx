@@ -194,7 +194,7 @@ export const CreatePollDialogContent = ({
           <Button
             type="submit"
             disabled={isCreating || !isFormValid}
-            className="text-foreground border border-transparent hover:border-border dark:hover:border-border"
+            className="border border-transparent text-foreground hover:border-border dark:hover:border-border"
           >
             {isCreating ? "Creating..." : "Create Poll"}
           </Button>
@@ -211,7 +211,7 @@ export const CreatePollDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 text-foreground hover:bg-primary/40 hover:text-foreground border border-transparent hover:border-border dark:hover:border-border dark:hover:text-foreground dark:hover:bg-primary/50">
+        <Button className="gap-2 border border-transparent text-foreground hover:border-border hover:bg-primary/40 hover:text-foreground dark:hover:border-border dark:hover:bg-primary/50 dark:hover:text-foreground">
           <Plus className="h-4 w-4" />
           Create Poll
         </Button>

@@ -131,7 +131,7 @@ const SidebarContent = () => {
             <>
               <Button
                 onClick={() => setIsCreatePollOpen(true)}
-                className="flex size-9 items-center justify-center rounded-lg text-foreground border border-transparent hover:border-border hover:bg-primary/40 hover:text-foreground md:w-auto md:justify-start md:px-3 dark:hover:bg-primary/50 dark:hover:text-foreground dark:hover:border-border"
+                className="flex size-9 items-center justify-center rounded-lg border border-transparent text-foreground hover:border-border hover:bg-primary/40 hover:text-foreground md:w-auto md:justify-start md:px-3 dark:hover:border-border dark:hover:bg-primary/50 dark:hover:text-foreground"
               >
                 <Plus className="h-6 w-6" />
                 <span className="hidden md:inline">Create Poll</span>
