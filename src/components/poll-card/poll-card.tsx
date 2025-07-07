@@ -17,6 +17,15 @@ interface PollCardProps {
   onPollDeleted?: () => void
 }
 
+// Helper to determine font size class based on question length
+const getQuestionFontSize = (length: number) => {
+  if (length <= 40) return "text-xl sm:text-xl lg:text-xl" // very short
+  if (length <= 80) return "text-lg sm:text-lg lg:text-lg" // short
+  if (length <= 140) return "text-base sm:text-base lg:text-base" // medium
+  if (length <= 200) return "text-sm sm:text-sm lg:text-base" // long
+  return "text-sm sm:text-xs lg:text-sm" // very long
+}
+
 export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -180,9 +189,15 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-3">
-            <CardTitle className="font-bold text-foreground text-xl leading-tight">
-              {poll.question}
-            </CardTitle>
+            {/* Fixed-height question container with dynamic font size */}
+            <div className="h-[72px] flex items-center">
+              <CardTitle
+                className={`font-bold text-foreground leading-tight w-full break-words ${getQuestionFontSize(poll.question.length)}`}
+                style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
+              >
+                {poll.question}
+              </CardTitle>
+            </div>
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
                 <Link
@@ -314,13 +329,15 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                     className="flex flex-col items-start gap-1 w-full"
                     style={{ color: "var(--foreground)" }}
                   >
-                    <span className="flex items-center gap-2">
-                      {showResults && (
-                        <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
-                          {place}.
-                        </span>
-                      )}
-                      <span style={{ color: "var(--foreground)" }}>{option.text}</span>
+                    <span className="flex items-center w-full">
+                      {/* Number+dot and option text in a single flex row, no wrap between them */}
+                      <span className="flex-shrink-0 flex-nowrap mr-2">{place}.</span>
+                      <span
+                        className="break-words whitespace-pre-line"
+                        style={{ wordBreak: "break-word" }}
+                      >
+                        {option.text}
+                      </span>
                     </span>
                     {showResults && (
                       <span className="text-xs mt-1" style={{ color: "var(--foreground)" }}>
