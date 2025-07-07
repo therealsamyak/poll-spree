@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:frontend": "vite build && vite --port=3001",
-    "dev:backend": "bun run convex:codegen && bun run convex:dev",
+    "dev:f": "vite build && vite --port=3001",
+    "dev:b": "bun run convex:codegen && bun run convex:dev",
     "build": "concurrently \"bun run build:backend\" \"bun run build:frontend\"",
     "build:frontend": "vite build",
     "build:backend": "convex deploy",
