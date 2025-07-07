@@ -1,14 +1,13 @@
 import { useAuth } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Calendar, CheckCircle2, Trash2 } from "lucide-react"
+import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import type { Poll } from "../../types"
@@ -74,8 +73,8 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
     return poll.options
   }
   const sortedOptions = getSortedOptions()
-  const collapsedOptions = sortedOptions.slice(0, 2)
-  const hasMoreThanTwo = poll.options.length > 2
+  const _collapsedOptions = sortedOptions.slice(0, 2)
+  const _hasMoreThanTwo = poll.options.length > 2
 
   const formatDateTime = (timestamp: number) => {
     const date = new Date(timestamp)
@@ -164,41 +163,26 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
     }
   }
 
-  const _getVotePercentage = (votes: number) => {
+  // Helper: get option place (rank, 1-based)
+  const getOptionPlace = (optionId: string) => {
+    const sorted = [...poll.options].sort((a, b) => b.votes - a.votes)
+    return sorted.findIndex((o) => o.id === optionId) + 1
+  }
+
+  // Helper: get vote percentage
+  const getVotePercentage = (votes: number) => {
     if (poll.totalVotes === 0) return 0
     return Math.round((votes / poll.totalVotes) * 100)
   }
 
   return (
-    <Card className="group flex h-full flex-col border border-muted/40 bg-card shadow-md backdrop-blur-sm transition-all duration-300 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50">
+    <Card className="group flex h-full flex-col border border-muted bg-card/50 shadow-md backdrop-blur-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-3">
-            <div className="flex items-center gap-2">
-              {/*
-              // Dev label logic retained for future use (e.g., filters)
-              {poll.dev && (
-                <Badge
-                  variant="secondary"
-                  className="border-accent-foreground/30 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground"
-                >
-                  <TrendingUp className="mr-1 h-3 w-3" />
-                  Dev
-                </Badge>
-              )}
-              */}
-              {/* {poll.totalVotes > 10 && (
-                <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
-                  <CheckCircle2 className="mr-1 h-3 w-3" />
-                  Popular
-                </Badge>
-              )} */}
-            </div>
-
             <CardTitle className="font-bold text-foreground text-xl leading-tight">
               {poll.question}
             </CardTitle>
-
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
                 <Link
@@ -224,7 +208,6 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
               </div>
             </div>
           </div>
-
           {canDelete && (
             <Button
               variant="ghost"
@@ -238,102 +221,114 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
           )}
         </div>
       </CardHeader>
-
-      <CardContent className="flex min-h-[160px] flex-1 flex-col justify-between">
-        {/* Collapsed State - Always show this */}
-        <div className="flex flex-1 flex-col gap-3">
-          {collapsedOptions.map((option, _index) => {
-            const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
-            // Truncate if longer than 24 chars (including ...)
-            const maxLen = 24
-            const needsTruncate = option.text.length > maxLen
-            const truncated = needsTruncate ? `${option.text.slice(0, maxLen - 3)}...` : option.text
-            const buttonContent = (
-              <span key={option.id} className="flex items-center gap-2">
-                {isSelected && <CheckCircle2 className="h-5 w-5 text-inherit" />}
-                {truncated}
-              </span>
-            )
-            return needsTruncate ? (
-              <HoverCard key={option.id}>
-                <HoverCardTrigger asChild>
-                  <Button
-                    variant={isSelected ? "default" : "outline"}
-                    className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
-                    onClick={() => {
-                      if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
-                      handleVote(option.id)
-                    }}
-                    style={{ minHeight: 48 }}
-                  >
-                    {buttonContent}
-                    <span className="font-bold text-sm">{option.votes} votes</span>
-                  </Button>
-                </HoverCardTrigger>
-                <HoverCardContent>
-                  <span className="whitespace-pre-line break-words font-medium text-base">
-                    {option.text}
-                  </span>
-                </HoverCardContent>
-              </HoverCard>
-            ) : (
-              <Button
-                key={option.id}
-                variant={isSelected ? "default" : "outline"}
-                className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
-                onClick={() => {
-                  if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
-                  handleVote(option.id)
-                }}
-                style={{ minHeight: 48 }}
-              >
-                {buttonContent}
-                <span className="font-bold text-sm">{option.votes} votes</span>
-              </Button>
-            )
-          })}
-        </div>
-        {/* Move the Show all options button to the bottom/footer */}
-        {hasMoreThanTwo && (
-          <div className="mt-4 flex justify-center border-muted-foreground/10 border-t pt-2">
+      <CardContent className="flex min-h-[100px] flex-1 flex-col justify-center">
+        {/* Collapsed: Vote or Selected Option Button */}
+        <div className="flex w-full flex-col gap-3">
+          {/* If user has not voted, show Vote button */}
+          {!isUserVoteLoading && !userVote?.optionId && (
             <Button
-              variant="secondary"
-              className="w-full rounded-lg border border-primary/20 text-primary hover:bg-primary/10"
+              variant="outline"
+              className="w-full rounded-xl border border-muted bg-muted p-4 font-medium text-base text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
               onClick={() => setExpanded(true)}
+              style={{ minHeight: 48 }}
             >
-              Show all options
+              Vote
             </Button>
-          </div>
-        )}
+          )}
+          {/* If user has voted, show their selected option as a button with stats */}
+          {!isUserVoteLoading &&
+            userVote?.optionId &&
+            (() => {
+              const selected = poll.options.find((o) => o.id === userVote.optionId)
+              if (!selected) return null
+              const place = getOptionPlace(selected.id)
+              return (
+                <Button
+                  variant={"default"}
+                  className="flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200 border border-primary bg-primary/80 shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
+                  onClick={() => setExpanded(true)}
+                  style={{
+                    minHeight: 48,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    color: "var(--foreground)",
+                    borderColor: "var(--primary)",
+                  }}
+                  data-ps-selected-option
+                >
+                  <span
+                    className="flex flex-col items-start gap-1 w-full"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
+                        {place}.
+                      </span>
+                      <span
+                        style={{ color: "var(--foreground)" }}
+                        className="truncate max-w-[10rem] block"
+                        title={selected.text}
+                      >
+                        {selected.text}
+                      </span>
+                    </span>
+                    <span className="text-xs mt-1" style={{ color: "var(--foreground)" }}>
+                      {getVotePercentage(selected.votes)}% • {selected.votes} vote
+                      {selected.votes === 1 ? "" : "s"}
+                    </span>
+                  </span>
+                </Button>
+              )
+            })()}
+        </div>
       </CardContent>
-
-      {/* Expanded State: Dialog - Render outside of CardContent */}
+      {/* Voting Modal */}
       <Dialog open={expanded} onOpenChange={setExpanded}>
         <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{poll.question}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3">
-            {poll.options.map((option, _index) => {
+            {poll.options.map((option) => {
               const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
-              // In expanded mode, show full text, allow wrapping
+              // After voting, show stats for all options
+              const showResults = !isUserVoteLoading && userVote?.optionId
+              const place = getOptionPlace(option.id)
               return (
                 <Button
                   key={option.id}
                   variant={isSelected ? "default" : "outline"}
-                  className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200${isSelected ? " border border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : " border border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"}${isUserVoteLoading ? " animate-pulse" : ""}${isVoting || isUserVoteLoading || hasMoreThanTwo ? " cursor-not-allowed opacity-70" : ""}`}
-                  onClick={() => {
-                    if (isVoting || isUserVoteLoading || hasMoreThanTwo) return
-                    handleVote(option.id)
-                  }}
+                  className={`flex h-auto w-full items-center justify-between rounded-xl p-4 font-medium text-base transition-all duration-200 border ${isSelected ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
+                  onClick={() => handleVote(option.id)}
                   disabled={isVoting || isUserVoteLoading}
-                  style={{ minHeight: 48, whiteSpace: "normal", wordBreak: "break-word" }}
+                  style={{
+                    minHeight: 48,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    color: "var(--foreground)",
+                    borderColor: isSelected ? "var(--primary)" : undefined,
+                  }}
+                  data-ps-modal-option
                 >
-                  <span className="flex items-center gap-2 whitespace-pre-line break-words font-medium text-base">
-                    {isSelected && <CheckCircle2 className="h-5 w-5 text-inherit" />}
-                    {option.text}
+                  <span
+                    className="flex flex-col items-start gap-1 w-full"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    <span className="flex items-center gap-2">
+                      {showResults && (
+                        <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
+                          {place}.
+                        </span>
+                      )}
+                      <span style={{ color: "var(--foreground)" }}>{option.text}</span>
+                    </span>
+                    {showResults && (
+                      <span className="text-xs mt-1" style={{ color: "var(--foreground)" }}>
+                        {getVotePercentage(option.votes)}% • {option.votes} vote
+                        {option.votes === 1 ? "" : "s"}
+                      </span>
+                    )}
                   </span>
-                  <span className="font-bold text-sm">{option.votes} votes</span>
                 </Button>
               )
             })}
