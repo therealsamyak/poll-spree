@@ -1,4 +1,5 @@
 import { v } from "convex/values"
+import type { Id } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
 import { validateMultipleTextInputs, validateTextContent } from "./badWordsFilter"
 
@@ -16,7 +17,11 @@ export const getPolls = query({
 
     // Use pagination to limit the number of polls fetched
     const defaultPagination = { numItems: 20, cursor: null }
-    const pagination = paginationOpts || defaultPagination
+    const pagination = {
+      numItems: paginationOpts?.numItems ?? defaultPagination.numItems,
+      cursor:
+        paginationOpts?.cursor !== undefined ? paginationOpts.cursor : defaultPagination.cursor,
+    }
 
     const pollsResult = await ctx.db.query("polls").order("desc").paginate(pagination)
 
@@ -281,12 +286,12 @@ export const getPollsByUser = query({
     // Get all polls by their IDs
     const allPolls = await Promise.all(
       Array.from(pollIds).map(async (pollId) => {
-        const poll = await ctx.db.get(pollId)
+        const poll = await ctx.db.get(pollId as Id<"polls">)
         if (!poll) return null
 
         const options = await ctx.db
           .query("pollOptions")
-          .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
+          .withIndex("by_pollId", (q) => q.eq("pollId", poll._id as Id<"polls">))
           .collect()
 
         // Get the author's profile image URL
@@ -316,7 +321,9 @@ export const getPollsByUser = query({
     )
 
     // Filter out null values and sort by creation date (newest first)
-    const sortedPolls = allPolls.filter(Boolean).sort((a, b) => b.createdAt - a.createdAt)
+    const sortedPolls = allPolls
+      .filter((p): p is NonNullable<typeof p> => p !== null)
+      .sort((a, b) => b.createdAt - a.createdAt)
 
     // Apply pagination
     const defaultPagination = { numItems: 20, cursor: null }
