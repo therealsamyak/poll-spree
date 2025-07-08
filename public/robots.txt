@@ -33,4 +33,4 @@ User-agent: WhatsApp
 Disallow: /
 
 # No sitemap needed since we're blocking everything
-# Sitemap: https://poll-spree.com/sitemap.xml 
+# Sitemap: https://pollspree.com/sitemap.xml 
