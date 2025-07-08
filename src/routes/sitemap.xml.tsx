@@ -2,11 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
 
-export const Route = createFileRoute("/sitemap/xml")({
-  component: SitemapXml,
-})
-
-function SitemapXml() {
+export const SitemapXml = () => {
   const sitemap = useQuery(api.sitemap.generateSitemap)
 
   if (!sitemap) {
@@ -34,3 +30,7 @@ export const loader = async () => {
     },
   })
 }
+
+export const Route = createFileRoute("/sitemap/xml")({
+  component: SitemapXml,
+})
