@@ -3,7 +3,7 @@ import { query } from "./_generated/server"
 export const generateSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const baseUrl = "https://poll-spree.com" // Update this with your actual domain
+    const baseUrl = "https://pollspree.com" // Update this with your actual domain
     const currentTime = new Date().toISOString()
 
     // Get all users for dynamic user pages
