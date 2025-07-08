@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-export function cn(...inputs: ClassValue[]) {
+export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs))
 }
 
@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
  * Comprehensive username validation following security best practices
  * Based on recommendations from Stack Overflow and security guidelines
  */
-export function validateUsername(username: string): { isValid: boolean; error?: string } {
+export const validateUsername = (username: string): { isValid: boolean; error?: string } => {
   // Trim whitespace first
   const trimmed = username.trim()
 
@@ -67,14 +67,14 @@ export function validateUsername(username: string): { isValid: boolean; error?: 
 /**
  * Normalize username for consistent storage and comparison
  */
-export function normalizeUsername(username: string): string {
+export const normalizeUsername = (username: string): string => {
   return username.trim().toLowerCase()
 }
 
 /**
  * Check if username is reserved (common reserved usernames)
  */
-export function isReservedUsername(username: string): boolean {
+export const isReservedUsername = (username: string): boolean => {
   const reserved = [
     "admin",
     "administrator",
