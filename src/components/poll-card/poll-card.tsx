@@ -172,16 +172,37 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
     }
   }
 
-  // Helper: get option place (rank, 1-based)
-  const getOptionPlace = (optionId: string) => {
-    const sorted = [...poll.options].sort((a, b) => b.votes - a.votes)
-    return sorted.findIndex((o) => o.id === optionId) + 1
-  }
-
   // Helper: get vote percentage
   const getVotePercentage = (votes: number) => {
     if (poll.totalVotes === 0) return 0
     return Math.round((votes / poll.totalVotes) * 100)
+  }
+
+  // Helper to compute places and sorted options (moved inside component, after hooks)
+  const getOptionsWithPlaces = () => {
+    if (!isSignedIn || !userVote?.optionId) {
+      return poll.options.map((option) => ({ option, place: undefined }))
+    }
+    const groups: Record<number, typeof poll.options> = {}
+    poll.options.forEach((option) => {
+      if (!groups[option.votes]) groups[option.votes] = []
+      groups[option.votes].push(option)
+    })
+    const sortedVoteCounts = Object.keys(groups)
+      .map((v) => Number(v))
+      .sort((a, b) => b - a)
+    let place = 1
+    const result: { option: (typeof poll.options)[0]; place: number }[] = []
+    for (const voteCount of sortedVoteCounts) {
+      const group = groups[voteCount].sort((a, b) =>
+        a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
+      )
+      for (const option of group) {
+        result.push({ option, place })
+      }
+      place += group.length
+    }
+    return result
   }
 
   return (
@@ -256,7 +277,10 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
             (() => {
               const selected = poll.options.find((o) => o.id === userVote.optionId)
               if (!selected) return null
-              const place = getOptionPlace(selected.id)
+              const optionsWithPlaces = getOptionsWithPlaces()
+              const selectedWithPlace = optionsWithPlaces.find(
+                ({ option }) => option.id === selected.id,
+              )
               return (
                 <Button
                   variant={"default"}
@@ -276,9 +300,12 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                     style={{ color: "var(--foreground)" }}
                   >
                     <span className="flex items-center gap-2">
-                      <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
-                        {place}.
-                      </span>
+                      {/* Only show place if user has voted and is signed in */}
+                      {selectedWithPlace?.place !== undefined && (
+                        <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
+                          {selectedWithPlace.place}.
+                        </span>
+                      )}
                       <span
                         style={{ color: "var(--foreground)" }}
                         className="block max-w-[10rem] truncate"
@@ -304,11 +331,9 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
             <DialogTitle>{poll.question}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3">
-            {poll.options.map((option) => {
+            {getOptionsWithPlaces().map(({ option, place }) => {
               const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
-              // After voting, show stats for all options
               const showResults = !isUserVoteLoading && userVote?.optionId
-              const place = getOptionPlace(option.id)
               return (
                 <Button
                   key={option.id}
@@ -330,8 +355,10 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
                     style={{ color: "var(--foreground)" }}
                   >
                     <span className="flex w-full items-center">
-                      {/* Number+dot and option text in a single flex row, no wrap between them */}
-                      <span className="mr-2 flex-shrink-0 flex-nowrap">{place}.</span>
+                      {/* Only show place if user has voted and is signed in */}
+                      {place !== undefined && (
+                        <span className="mr-2 flex-shrink-0 flex-nowrap">{place}.</span>
+                      )}
                       <span
                         className="whitespace-pre-line break-words"
                         style={{ wordBreak: "break-word" }}
