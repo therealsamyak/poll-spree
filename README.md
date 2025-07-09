@@ -1,26 +1,26 @@
-# PollSpree 🗳️
+# PollSpree
 
 A modern, real-time polling application where you can create polls, vote on them, and see results update instantly. Built with cutting-edge web technologies for a seamless user experience.
 
-🌐 **Live Site:** [https://pollspree.com](https://pollspree.com)
+**Live Site:** [https://pollspree.com](https://pollspree.com)
 
 ![PollSpree](https://img.shields.io/badge/Poll-Spree-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Convex](https://img.shields.io/badge/Convex-000000?style=for-the-badge&logo=convex&logoColor=white)
 
-## ✨ Features
+## Features
 
-- **🗳️ Create & Vote on Polls** - Create custom polls with multiple options and vote on them
-- **👀 Real-time Results** - See poll results update instantly as votes come in
-- **🔐 User Authentication** - Secure authentication with Clerk
-- **👤 User Profiles** - Custom usernames and profile images
-- **📱 Responsive Design** - Beautiful UI that works on all devices
-- **🌙 Dark/Light Mode** - Toggle between themes
-- **⚡ Instant Updates** - Real-time data synchronization with Convex
-- **🎨 Modern UI** - Built with shadcn/ui components and Tailwind CSS
+- **Create & Vote on Polls** - Create custom polls with multiple options and vote on them
+- **Real-time Results** - See poll results update instantly as votes come in
+- **User Authentication** - Secure authentication with Clerk
+- **User Profiles** - Custom usernames and profile images
+- **Responsive Design** - Beautiful UI that works on all devices
+- **Dark/Light Mode** - Toggle between themes
+- **Instant Updates** - Real-time data synchronization with Convex
+- **Modern UI** - Built with shadcn/ui components and Tailwind CSS
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 ### Frontend
 
@@ -45,7 +45,7 @@ A modern, real-time polling application where you can create polls, vote on them
 - **Biome** - Fast linter and formatter
 - **Bun** - Fast JavaScript runtime and package manager
 
-## 🗄️ Database Schema
+## Database Schema
 
 The application uses Convex with the following main tables:
 
@@ -54,7 +54,7 @@ The application uses Convex with the following main tables:
 - **`pollUsers`** - Tracks user votes on polls
 - **`users`** - User profiles with usernames and avatars
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 poll-spree/
@@ -81,7 +81,7 @@ poll-spree/
 └── biome.json           # Biome linting/formatting config
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
