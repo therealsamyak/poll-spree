@@ -25,38 +25,55 @@ export const getPolls = query({
 
     const pollsResult = await ctx.db.query("polls").order("desc").paginate(pagination)
 
-    const pollsWithOptions = await Promise.all(
-      pollsResult.page.map(async (poll) => {
-        const options = await ctx.db
-          .query("pollOptions")
-          .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
-          .collect()
+    // Batch fetch all options for all polls
+    const allOptions = await ctx.db.query("pollOptions").collect()
+    const optionsByPollId = new Map<string, typeof allOptions>()
+    allOptions.forEach((option) => {
+      if (!optionsByPollId.has(option.pollId)) {
+        optionsByPollId.set(option.pollId, [])
+      }
+      optionsByPollId.get(option.pollId)!.push(option)
+    })
 
-        // Get the author's profile image URL
-        const author = await ctx.db
+    // Batch fetch all authors for all polls
+    const authorIds = [...new Set(pollsResult.page.map((poll) => poll.authorId))]
+    const authors = await Promise.all(
+      authorIds.map((authorId) =>
+        ctx.db
           .query("users")
-          .withIndex("by_userId", (q) => q.eq("userId", poll.authorId))
-          .first()
-
-        return {
-          id: poll._id,
-          question: poll.question,
-          totalVotes: poll.totalVotes,
-          dev: poll.dev,
-          authorId: poll.authorId,
-          authorUsername: poll.authorUsername,
-          authorProfileImageUrl: author?.profileImageUrl,
-          createdAt: poll.createdAt,
-          options: options.map((option) => ({
-            id: option._id,
-            pollId: option.pollId,
-            text: option.text,
-            votes: option.votes,
-            votedUserIds: option.votedUserIds,
-          })),
-        }
-      }),
+          .withIndex("by_userId", (q) => q.eq("userId", authorId))
+          .first(),
+      ),
     )
+    const authorsById = new Map<string, (typeof authors)[0]>()
+    authors.forEach((author) => {
+      if (author) {
+        authorsById.set(author.userId, author)
+      }
+    })
+
+    const pollsWithOptions = pollsResult.page.map((poll) => {
+      const options = optionsByPollId.get(poll._id) || []
+      const author = authorsById.get(poll.authorId)
+
+      return {
+        id: poll._id,
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        dev: poll.dev,
+        authorId: poll.authorId,
+        authorUsername: poll.authorUsername,
+        authorProfileImageUrl: author?.profileImageUrl,
+        createdAt: poll.createdAt,
+        options: options.map((option) => ({
+          id: option._id,
+          pollId: option.pollId,
+          text: option.text,
+          votes: option.votes,
+          votedUserIds: option.votedUserIds,
+        })),
+      }
+    })
 
     return {
       polls: pollsWithOptions,
@@ -113,11 +130,41 @@ export const getPoll = query({
 export const getPollsStats = query({
   args: {},
   handler: async (ctx) => {
-    const totalPolls = await ctx.db.query("polls").collect()
-    const totalVotes = totalPolls.reduce((sum, poll) => sum + poll.totalVotes, 0)
+    // For now, we still need to load polls to calculate total votes
+    // In a real production system, you might want to add a separate stats table
+    // or use a background job to maintain these counts
+    const polls = await ctx.db.query("polls").collect()
+    
+    // Calculate totals efficiently
+    const totalPolls = polls.length
+    const totalVotes = polls.reduce((sum, poll) => sum + poll.totalVotes, 0)
 
     return {
-      totalPolls: totalPolls.length,
+      totalPolls,
+      totalVotes,
+    }
+  },
+})
+
+// More efficient stats query for specific user
+export const getUserStats = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { userId } = args
+
+    // Get authored polls count
+    const authoredPolls = await ctx.db
+      .query("polls")
+      .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+      .collect()
+
+    // Get total votes from authored polls
+    const totalVotes = authoredPolls.reduce((sum, poll) => sum + poll.totalVotes, 0)
+
+    return {
+      totalPolls: authoredPolls.length,
       totalVotes,
     }
   },
@@ -269,6 +316,50 @@ export const getUserVote = query({
   },
 })
 
+// New optimized query to batch fetch user votes for multiple polls
+export const getUserVotesForPolls = query({
+  args: {
+    pollIds: v.array(v.id("polls")),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { pollIds, userId } = args
+
+    if (pollIds.length === 0) {
+      return {}
+    }
+
+    // Fetch all user votes for the given polls
+    const userVotes = await ctx.db
+      .query("pollUsers")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect()
+
+    // Filter votes for the requested poll IDs and create a map
+    const votesByPollId = new Map<string, string | null>()
+
+    // Initialize all requested poll IDs with null (no vote)
+    pollIds.forEach((pollId) => {
+      votesByPollId.set(pollId, null)
+    })
+
+    // Set actual votes where they exist
+    userVotes.forEach((vote) => {
+      if (pollIds.includes(vote.pollId)) {
+        votesByPollId.set(vote.pollId, vote.optionId || null)
+      }
+    })
+
+    // Convert to object for easier consumption
+    const result: Record<string, string | null> = {}
+    votesByPollId.forEach((optionId, pollId) => {
+      result[pollId] = optionId
+    })
+
+    return result
+  },
+})
+
 export const getPollsByUser = query({
   args: {
     userId: v.string(),
@@ -284,22 +375,23 @@ export const getPollsByUser = query({
   handler: async (ctx, args) => {
     const { userId, includeAuthored, includeVoted, paginationOpts } = args
 
+    const defaultPagination = { numItems: 20, cursor: null }
+    const pagination = paginationOpts || defaultPagination
+
+    // Build a set of poll IDs to fetch
     const pollIds = new Set<string>()
-    const authoredPollIds = new Set<string>()
 
-    // Always get authored polls to know which ones to exclude when only showing voted polls
-    const authoredPolls = await ctx.db
-      .query("polls")
-      .withIndex("by_authorId", (q) => q.eq("authorId", userId))
-      .collect()
+    // Get authored polls if requested
+    if (includeAuthored) {
+      const authoredPolls = await ctx.db
+        .query("polls")
+        .withIndex("by_authorId", (q) => q.eq("authorId", userId))
+        .collect()
 
-    authoredPolls.forEach((poll) => {
-      authoredPollIds.add(poll._id)
-      // Only add to pollIds if we're including authored polls
-      if (includeAuthored) {
+      authoredPolls.forEach((poll) => {
         pollIds.add(poll._id)
-      }
-    })
+      })
+    }
 
     // Get voted polls if requested
     if (includeVoted) {
@@ -310,10 +402,12 @@ export const getPollsByUser = query({
 
       userVotes.forEach((vote) => {
         // If we're only showing voted polls (not authored), exclude polls the user authored
-        if (!includeAuthored && authoredPollIds.has(vote.pollId)) {
-          return
+        if (!includeAuthored) {
+          // We'll filter these out later when we fetch the actual polls
+          pollIds.add(vote.pollId)
+        } else {
+          pollIds.add(vote.pollId)
         }
-        pollIds.add(vote.pollId)
       })
     }
 
@@ -326,40 +420,19 @@ export const getPollsByUser = query({
       }
     }
 
-    // Get all polls by their IDs
+    // Convert to array and fetch polls in batches
+    const pollIdArray = Array.from(pollIds)
     const allPolls = await Promise.all(
-      Array.from(pollIds).map(async (pollId) => {
+      pollIdArray.map(async (pollId) => {
         const poll = await ctx.db.get(pollId as Id<"polls">)
         if (!poll) return null
 
-        const options = await ctx.db
-          .query("pollOptions")
-          .withIndex("by_pollId", (q) => q.eq("pollId", poll._id as Id<"polls">))
-          .collect()
-
-        // Get the author's profile image URL
-        const author = await ctx.db
-          .query("users")
-          .withIndex("by_userId", (q) => q.eq("userId", poll.authorId))
-          .first()
-
-        return {
-          id: poll._id,
-          question: poll.question,
-          totalVotes: poll.totalVotes,
-          dev: poll.dev,
-          authorId: poll.authorId,
-          authorUsername: poll.authorUsername,
-          authorProfileImageUrl: author?.profileImageUrl,
-          createdAt: poll.createdAt,
-          options: options.map((option) => ({
-            id: option._id,
-            pollId: option.pollId,
-            text: option.text,
-            votes: option.votes,
-            votedUserIds: option.votedUserIds,
-          })),
+        // Filter out authored polls if we're only showing voted polls
+        if (!includeAuthored && poll.authorId === userId) {
+          return null
         }
+
+        return poll
       }),
     )
 
@@ -369,12 +442,9 @@ export const getPollsByUser = query({
       .sort((a, b) => b.createdAt - a.createdAt)
 
     // Apply pagination
-    const defaultPagination = { numItems: 20, cursor: null }
-    const pagination = paginationOpts || defaultPagination
-
     let startIndex = 0
     if (pagination.cursor) {
-      const cursorIndex = sortedPolls.findIndex((poll) => poll.id === pagination.cursor)
+      const cursorIndex = sortedPolls.findIndex((poll) => poll._id === pagination.cursor)
       if (cursorIndex !== -1) {
         startIndex = cursorIndex + 1
       }
@@ -383,10 +453,60 @@ export const getPollsByUser = query({
     const endIndex = startIndex + pagination.numItems
     const paginatedPolls = sortedPolls.slice(startIndex, endIndex)
     const isDone = endIndex >= sortedPolls.length
-    const continueCursor = isDone ? null : paginatedPolls[paginatedPolls.length - 1]?.id || null
+    const continueCursor = isDone ? null : paginatedPolls[paginatedPolls.length - 1]?._id || null
+
+    // Batch fetch options and authors for the paginated polls
+    const allOptions = await ctx.db.query("pollOptions").collect()
+    const optionsByPollId = new Map<string, typeof allOptions>()
+    allOptions.forEach((option) => {
+      if (!optionsByPollId.has(option.pollId)) {
+        optionsByPollId.set(option.pollId, [])
+      }
+      optionsByPollId.get(option.pollId)!.push(option)
+    })
+
+    const authorIds = [...new Set(paginatedPolls.map((poll) => poll.authorId))]
+    const authors = await Promise.all(
+      authorIds.map((authorId) =>
+        ctx.db
+          .query("users")
+          .withIndex("by_userId", (q) => q.eq("userId", authorId))
+          .first(),
+      ),
+    )
+    const authorsById = new Map<string, (typeof authors)[0]>()
+    authors.forEach((author) => {
+      if (author) {
+        authorsById.set(author.userId, author)
+      }
+    })
+
+    // Build the final result
+    const pollsWithOptions = paginatedPolls.map((poll) => {
+      const options = optionsByPollId.get(poll._id) || []
+      const author = authorsById.get(poll.authorId)
+
+      return {
+        id: poll._id,
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        dev: poll.dev,
+        authorId: poll.authorId,
+        authorUsername: poll.authorUsername,
+        authorProfileImageUrl: author?.profileImageUrl,
+        createdAt: poll.createdAt,
+        options: options.map((option) => ({
+          id: option._id,
+          pollId: option.pollId,
+          text: option.text,
+          votes: option.votes,
+          votedUserIds: option.votedUserIds,
+        })),
+      }
+    })
 
     return {
-      polls: paginatedPolls,
+      polls: pollsWithOptions,
       isDone,
       continueCursor,
     }
