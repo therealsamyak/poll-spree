@@ -2,14 +2,13 @@ import { useAuth } from "@clerk/clerk-react"
 import { useParams, useSearch } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Users } from "lucide-react"
-import { useCallback, useEffect, useRef, useState, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import type { Poll } from "@/types"
-import type { Id } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
-import { UserPollsEmpty } from "./user-polls-empty"
+import type { Id } from "../../../convex/_generated/dataModel"
 import { UserPollsFilters } from "./user-polls-filters"
 import { UserPollsSort } from "./user-polls-sort"
 
@@ -69,7 +68,7 @@ export const UserPolls = () => {
   useEffect(() => {
     setPaginationOpts({ numItems: 20, cursor: null })
     setAllPolls([])
-  }, [includeAuthored, includeVoted])
+  }, [])
 
   // Infinite scroll logic
   const loadMore = useCallback(() => {
@@ -155,7 +154,7 @@ export const UserPolls = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-background">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
+        <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
@@ -165,8 +164,8 @@ export const UserPolls = () => {
                 className="h-20 w-20 border-4 border-background shadow-lg"
               />
             </div>
-            <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">@{user.username}</h1>
-            <div className="mx-auto mb-8 flex max-w-2xl items-center justify-center gap-8 text-sm text-muted-foreground">
+            <h1 className="mb-4 font-bold text-4xl tracking-tight sm:text-5xl">@{user.username}</h1>
+            <div className="mx-auto mb-8 flex max-w-2xl items-center justify-center gap-8 text-muted-foreground text-sm">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>{userStats?.totalPolls || 0} polls</span>
@@ -195,7 +194,7 @@ export const UserPolls = () => {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                 <BarChart3 className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">No polls found</h3>
+              <h3 className="mb-2 font-semibold text-lg">No polls found</h3>
               <p className="text-muted-foreground">
                 {filters.includes("authored") && filters.includes("voted")
                   ? "This user hasn't created or voted on any polls yet."

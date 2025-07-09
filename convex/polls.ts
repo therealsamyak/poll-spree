@@ -32,7 +32,7 @@ export const getPolls = query({
       if (!optionsByPollId.has(option.pollId)) {
         optionsByPollId.set(option.pollId, [])
       }
-      optionsByPollId.get(option.pollId)!.push(option)
+      optionsByPollId.get(option.pollId)?.push(option)
     })
 
     // Batch fetch all authors for all polls
@@ -134,7 +134,7 @@ export const getPollsStats = query({
     // In a real production system, you might want to add a separate stats table
     // or use a background job to maintain these counts
     const polls = await ctx.db.query("polls").collect()
-    
+
     // Calculate totals efficiently
     const totalPolls = polls.length
     const totalVotes = polls.reduce((sum, poll) => sum + poll.totalVotes, 0)
@@ -462,7 +462,7 @@ export const getPollsByUser = query({
       if (!optionsByPollId.has(option.pollId)) {
         optionsByPollId.set(option.pollId, [])
       }
-      optionsByPollId.get(option.pollId)!.push(option)
+      optionsByPollId.get(option.pollId)?.push(option)
     })
 
     const authorIds = [...new Set(paginatedPolls.map((poll) => poll.authorId))]
