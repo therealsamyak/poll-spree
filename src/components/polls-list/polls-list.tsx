@@ -1,15 +1,15 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Plus } from "lucide-react"
-import { useCallback, useEffect, useRef, useState, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Poll } from "@/types"
-import type { Id } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
+import type { Id } from "../../../convex/_generated/dataModel"
 
 export const PollsList = () => {
   const { isSignedIn, userId } = useAuth()
