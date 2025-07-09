@@ -1,17 +1,18 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Plus } from "lucide-react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, useMemo } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Poll } from "@/types"
+import type { Id } from "../../../convex/_generated/dataModel"
 import { api } from "../../../convex/_generated/api"
 
 export const PollsList = () => {
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, userId } = useAuth()
   const [paginationOpts, setPaginationOpts] = useState({
     numItems: 20,
     cursor: null as string | null,
@@ -22,6 +23,13 @@ export const PollsList = () => {
 
   const pollsResult = useQuery(api.polls.getPolls, { paginationOpts })
   const stats = useQuery(api.polls.getPollsStats)
+
+  // Batch fetch user votes for all visible polls
+  const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
+  const userVotes = useQuery(api.polls.getUserVotesForPolls, {
+    pollIds,
+    userId: userId || "",
+  })
 
   // Update allPolls when new data comes in
   useEffect(() => {
@@ -137,14 +145,14 @@ export const PollsList = () => {
         </div>
 
         {/* Polls Grid */}
-        <div className="flex w-full flex-wrap justify-center gap-6">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {allPolls.map((poll, index) => (
             <div
               key={poll.id}
-              className="slide-in-from-bottom-4 w-full min-w-[300px] max-w-[300px] flex-shrink flex-grow basis-[300px] animate-in duration-500"
+              className="slide-in-from-bottom-4 animate-in duration-500"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <PollCard poll={poll} />
+              <PollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
             </div>
           ))}
         </div>
@@ -166,7 +174,7 @@ export const PollsList = () => {
         {/* End of content indicator */}
         {isDone && allPolls.length > 0 && (
           <div className="mt-8 text-center text-muted-foreground">
-            <p>You've reached the end! 🎉</p>
+            <p>You've reached the end!</p>
           </div>
         )}
 

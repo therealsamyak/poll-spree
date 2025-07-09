@@ -15,6 +15,7 @@ import type { Poll } from "../../types"
 interface PollCardProps {
   poll: Poll
   onPollDeleted?: () => void
+  userVote?: string | null // Optional pre-fetched user vote
 }
 
 // Helper to determine font size class based on question length
@@ -26,7 +27,7 @@ const getQuestionFontSize = (length: number) => {
   return "text-sm sm:text-xs lg:text-sm" // very long
 }
 
-export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
+export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: PollCardProps) => {
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const { userId, isSignedIn } = useAuth()
@@ -36,10 +37,19 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
 
   const vote = useMutation(api.polls.vote)
   const deletePoll = useMutation(api.polls.deletePoll)
-  const userVote = useQuery(api.polls.getUserVote, {
+
+  // Use pre-fetched user vote if available, otherwise fetch it
+  const fetchedUserVote = useQuery(api.polls.getUserVote, {
     pollId: poll.id as Id<"polls">,
     userId: userId || "",
   })
+
+  // Use pre-fetched vote if available, otherwise use fetched vote
+  const userVote =
+    preFetchedUserVote !== undefined
+      ? { pollId: poll.id, optionId: preFetchedUserVote }
+      : fetchedUserVote
+
   const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
 
   // Add loading state check to prevent flash
@@ -252,7 +262,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
               size="sm"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive dark:hover:bg-destructive/20 dark:hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
