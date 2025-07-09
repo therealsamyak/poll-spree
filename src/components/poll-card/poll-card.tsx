@@ -214,7 +214,7 @@ export const PollCard = ({ poll, onPollDeleted }: PollCardProps) => {
             <div className="flex h-[72px] items-center">
               <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
                 <CardTitle
-                  className={`w-full break-words font-bold text-foreground leading-tight hover:text-primary transition-colors cursor-pointer ${getQuestionFontSize(poll.question.length)}`}
+                  className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(poll.question.length)}`}
                   style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
                 >
                   {poll.question}
