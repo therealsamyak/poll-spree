@@ -1,12 +1,11 @@
 import { useAuth } from "@clerk/clerk-react"
-import { createFileRoute, notFound } from "@tanstack/react-router"
+import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
-import { Link } from "@tanstack/react-router"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
@@ -176,7 +175,7 @@ const PollPage = () => {
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-4">
             {/* Question */}
-            <h1 className="text-3xl font-bold text-foreground leading-tight break-words">
+            <h1 className="break-words font-bold text-3xl text-foreground leading-tight">
               {poll.question}
             </h1>
 
@@ -223,7 +222,7 @@ const PollPage = () => {
 
         {/* Voting Options */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="font-semibold text-foreground text-xl">
             {!isSignedIn
               ? "Vote on this poll:"
               : !isUserVoteLoading && !hasVoted && !isAuthor
@@ -261,7 +260,7 @@ const PollPage = () => {
                     <span className="flex w-full items-center">
                       {/* Show place if user has voted and is signed in */}
                       {place !== undefined && (
-                        <span className="mr-3 flex-shrink-0 flex-nowrap text-xl font-bold">
+                        <span className="mr-3 flex-shrink-0 flex-nowrap font-bold text-xl">
                           {place}.
                         </span>
                       )}
