@@ -66,6 +66,49 @@ export const getPolls = query({
   },
 })
 
+export const getPoll = query({
+  args: {
+    pollId: v.id("polls"),
+  },
+  handler: async (ctx, args) => {
+    const { pollId } = args
+
+    const poll = await ctx.db.get(pollId)
+    if (!poll) {
+      return null
+    }
+
+    const options = await ctx.db
+      .query("pollOptions")
+      .withIndex("by_pollId", (q) => q.eq("pollId", poll._id))
+      .collect()
+
+    // Get the author's profile image URL
+    const author = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", poll.authorId))
+      .first()
+
+    return {
+      id: poll._id,
+      question: poll.question,
+      totalVotes: poll.totalVotes,
+      dev: poll.dev,
+      authorId: poll.authorId,
+      authorUsername: poll.authorUsername,
+      authorProfileImageUrl: author?.profileImageUrl,
+      createdAt: poll.createdAt,
+      options: options.map((option) => ({
+        id: option._id,
+        pollId: option.pollId,
+        text: option.text,
+        votes: option.votes,
+        votedUserIds: option.votedUserIds,
+      })),
+    }
+  },
+})
+
 // Add a query to get total poll count for stats
 export const getPollsStats = query({
   args: {},

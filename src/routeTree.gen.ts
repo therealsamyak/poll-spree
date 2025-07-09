@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersUsernameRouteImport } from './routes/users.$username'
 import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
+import { Route as PollsPollIdRouteImport } from './routes/polls.$pollId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,33 +29,42 @@ const SitemapXmlRoute = SitemapXmlRouteImport.update({
   path: '/sitemap/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PollsPollIdRoute = PollsPollIdRouteImport.update({
+  id: '/polls/$pollId',
+  path: '/polls/$pollId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap/xml' | '/users/$username'
+  fullPaths: '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap/xml' | '/users/$username'
-  id: '__root__' | '/' | '/sitemap/xml' | '/users/$username'
+  to: '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
+  id: '__root__' | '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PollsPollIdRoute: typeof PollsPollIdRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
   UsersUsernameRoute: typeof UsersUsernameRoute
 }
@@ -82,11 +92,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/polls/$pollId': {
+      id: '/polls/$pollId'
+      path: '/polls/$pollId'
+      fullPath: '/polls/$pollId'
+      preLoaderRoute: typeof PollsPollIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PollsPollIdRoute: PollsPollIdRoute,
   SitemapXmlRoute: SitemapXmlRoute,
   UsersUsernameRoute: UsersUsernameRoute,
 }
