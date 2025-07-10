@@ -16,7 +16,6 @@ import type {
 import type * as badWordsFilter from "../badWordsFilter.js";
 import type * as badWordsList from "../badWordsList.js";
 import type * as polls from "../polls.js";
-import type * as sitemap from "../sitemap.js";
 import type * as users from "../users.js";
 
 /**
@@ -31,7 +30,6 @@ declare const fullApi: ApiFromModules<{
   badWordsFilter: typeof badWordsFilter;
   badWordsList: typeof badWordsList;
   polls: typeof polls;
-  sitemap: typeof sitemap;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

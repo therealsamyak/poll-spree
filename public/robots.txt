@@ -1,34 +1,19 @@
-# Allow all search engines
 User-agent: *
-Disallow:
+Allow: /
 
-# Block major AI crawlers
-User-agent: GPTBot
-Disallow: /
+# Sitemap
+Sitemap: https://pollspree.com/sitemap/xml
 
-User-agent: Google-Extended
-Disallow: /
+# Disallow admin or private areas (if any)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
 
-User-agent: Anthropic-ai
-Disallow: /
+# Allow important pages
+Allow: /
+Allow: /polls/
+Allow: /users/
 
-User-agent: Claude-Web
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: PerplexityBot
-Disallow: /
-
-User-agent: cohere-ai
-Disallow: /
-
-User-agent: YouBot
-Disallow: /
-
-User-agent: Amazonbot
-Disallow: /
-
-# Sitemap location
-Sitemap: https://pollspree.com/sitemap.xml 
+# Crawl delay (optional)
+Crawl-delay: 1 
