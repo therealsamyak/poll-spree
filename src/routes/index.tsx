@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/clerk-react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { PollsList } from "@/components/polls-list"
+import { SEOHead } from "@/components/seo"
 import { UsernameSetup } from "@/components/username-setup"
 import { api } from "../../convex/_generated/api"
 
@@ -27,7 +28,20 @@ const Index = () => {
   }
 
   // Show polls list for users with usernames or non-signed-in users
-  return <PollsList />
+  return (
+    <>
+      <SEOHead
+        title="PollSpree - Vote on polls and see what others think!"
+        description="Join PollSpree to create and vote on polls. Discover what others think about trending topics and share your opinion with the community."
+        keywords="polls, voting, surveys, community, opinions, trending topics, social media polls"
+        canonical="https://pollspree.com"
+        structuredData={{
+          type: "WebSite",
+        }}
+      />
+      <PollsList />
+    </>
+  )
 }
 
 export const Route = createFileRoute("/")({

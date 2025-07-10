@@ -5,7 +5,9 @@ import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
+import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
+import { generatePollSEOConfig } from "@/lib/seo"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
@@ -168,139 +170,153 @@ const PollPage = () => {
     return result
   }
 
-  return (
-    <div className="container mx-auto max-w-4xl p-6">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex-1 space-y-4">
-            {/* Question */}
-            <h1 className="break-words font-bold text-3xl text-foreground leading-tight">
-              {poll.question}
-            </h1>
+  const seoConfig = generatePollSEOConfig(poll)
 
-            {/* Metadata */}
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
-              <div className="flex items-center gap-1.5">
-                <Link
-                  to="/users/$username"
-                  params={{ username: poll.authorUsername }}
-                  className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
-                >
-                  <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
-                  <span className="font-medium">{poll.authorUsername}</span>
-                </Link>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
-                  <Calendar className="h-3 w-3 text-primary" />
+  return (
+    <>
+      <SEOHead
+        title={seoConfig.title}
+        description={seoConfig.description}
+        keywords={seoConfig.keywords}
+        canonical={seoConfig.canonical}
+        structuredData={{
+          type: "Poll",
+          pollData: seoConfig.pollData,
+        }}
+      />
+      <div className="container mx-auto max-w-4xl p-6">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1 space-y-4">
+              {/* Question */}
+              <h1 className="break-words font-bold text-3xl text-foreground leading-tight">
+                {poll.question}
+              </h1>
+
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
+                <div className="flex items-center gap-1.5">
+                  <Link
+                    to="/users/$username"
+                    params={{ username: poll.authorUsername }}
+                    className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
+                  >
+                    <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
+                    <span className="font-medium">{poll.authorUsername}</span>
+                  </Link>
                 </div>
-                <span>{formatDateTime(poll.createdAt)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/30">
-                  <BarChart3 className="h-3 w-3 text-accent-foreground" />
+                <div className="flex items-center gap-1.5">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
+                    <Calendar className="h-3 w-3 text-primary" />
+                  </div>
+                  <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
-                <span className="font-medium">{poll.totalVotes} votes</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/30">
+                    <BarChart3 className="h-3 w-3 text-accent-foreground" />
+                  </div>
+                  <span className="font-medium">{poll.totalVotes} votes</span>
+                </div>
               </div>
+            </div>
+
+            {/* Delete button */}
+            {canDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {/* Voting Options */}
+          <div className="space-y-4">
+            <h2 className="font-semibold text-foreground text-xl">
+              {!isSignedIn
+                ? "Vote on this poll:"
+                : !isUserVoteLoading && !hasVoted && !isAuthor
+                  ? "Cast your vote to see results:"
+                  : "Cast your vote:"}
+            </h2>
+
+            <div className="grid gap-4">
+              {getOptionsWithPlaces().map(({ option, place }) => {
+                const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
+
+                return (
+                  <Button
+                    key={option.id}
+                    variant={isSelected ? "default" : "outline"}
+                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
+                      isSelected
+                        ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
+                        : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
+                    } hover:border-[var(--primary)]`}
+                    onClick={() => handleVote(option.id)}
+                    disabled={isVoting || isUserVoteLoading}
+                    style={{
+                      minHeight: 64,
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      color: "var(--foreground)",
+                      borderColor: isSelected ? "var(--primary)" : undefined,
+                    }}
+                  >
+                    <span
+                      className="flex w-full flex-col items-start gap-2"
+                      style={{ color: "var(--foreground)" }}
+                    >
+                      <span className="flex w-full items-center">
+                        {/* Show place if user has voted and is signed in */}
+                        {place !== undefined && (
+                          <span className="mr-3 flex-shrink-0 flex-nowrap font-bold text-xl">
+                            {place}.
+                          </span>
+                        )}
+                        <span
+                          className="whitespace-pre-line break-words text-lg"
+                          style={{ wordBreak: "break-word" }}
+                        >
+                          {option.text}
+                        </span>
+                      </span>
+                      {showResults && (
+                        <span className="mt-2 text-sm" style={{ color: "var(--foreground)" }}>
+                          {getVotePercentage(option.votes)}% • {option.votes} vote
+                          {option.votes === 1 ? "" : "s"}
+                        </span>
+                      )}
+                    </span>
+                  </Button>
+                )
+              })}
             </div>
           </div>
 
-          {/* Delete button */}
-          {canDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          {/* Sign in prompt for non-signed in users */}
+          {!isSignedIn && (
+            <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
+              <p className="text-muted-foreground">
+                Sign in to vote on this poll and see real-time results!
+              </p>
+            </div>
+          )}
+
+          {/* Results hidden message for signed in users who haven't voted */}
+          {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
+            <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
+              <p className="text-muted-foreground">Vote to see the current results!</p>
+            </div>
           )}
         </div>
-
-        {/* Voting Options */}
-        <div className="space-y-4">
-          <h2 className="font-semibold text-foreground text-xl">
-            {!isSignedIn
-              ? "Vote on this poll:"
-              : !isUserVoteLoading && !hasVoted && !isAuthor
-                ? "Cast your vote to see results:"
-                : "Cast your vote:"}
-          </h2>
-
-          <div className="grid gap-4">
-            {getOptionsWithPlaces().map(({ option, place }) => {
-              const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
-
-              return (
-                <Button
-                  key={option.id}
-                  variant={isSelected ? "default" : "outline"}
-                  className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
-                    isSelected
-                      ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                      : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
-                  } hover:border-[var(--primary)]`}
-                  onClick={() => handleVote(option.id)}
-                  disabled={isVoting || isUserVoteLoading}
-                  style={{
-                    minHeight: 64,
-                    whiteSpace: "normal",
-                    wordBreak: "break-word",
-                    color: "var(--foreground)",
-                    borderColor: isSelected ? "var(--primary)" : undefined,
-                  }}
-                >
-                  <span
-                    className="flex w-full flex-col items-start gap-2"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    <span className="flex w-full items-center">
-                      {/* Show place if user has voted and is signed in */}
-                      {place !== undefined && (
-                        <span className="mr-3 flex-shrink-0 flex-nowrap font-bold text-xl">
-                          {place}.
-                        </span>
-                      )}
-                      <span
-                        className="whitespace-pre-line break-words text-lg"
-                        style={{ wordBreak: "break-word" }}
-                      >
-                        {option.text}
-                      </span>
-                    </span>
-                    {showResults && (
-                      <span className="mt-2 text-sm" style={{ color: "var(--foreground)" }}>
-                        {getVotePercentage(option.votes)}% • {option.votes} vote
-                        {option.votes === 1 ? "" : "s"}
-                      </span>
-                    )}
-                  </span>
-                </Button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Sign in prompt for non-signed in users */}
-        {!isSignedIn && (
-          <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
-            <p className="text-muted-foreground">
-              Sign in to vote on this poll and see real-time results!
-            </p>
-          </div>
-        )}
-
-        {/* Results hidden message for signed in users who haven't voted */}
-        {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
-          <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
-            <p className="text-muted-foreground">Vote to see the current results!</p>
-          </div>
-        )}
       </div>
-    </div>
+    </>
   )
 }
 

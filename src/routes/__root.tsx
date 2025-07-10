@@ -1,11 +1,12 @@
 import { useUser } from "@clerk/clerk-react"
-import { createRootRoute, HeadContent, Outlet, useRouterState } from "@tanstack/react-router"
+import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useMutation } from "convex/react"
 import { useEffect, useState } from "react"
 import { Loader } from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
+import { SEOHead } from "@/components/seo"
 import { Sidebar } from "@/components/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
@@ -47,7 +48,7 @@ const RootComponent = () => {
 
   return (
     <>
-      <HeadContent />
+      <SEOHead />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <div className="flex max-h-screen max-w-screen overflow-hidden">
           <Sidebar />
@@ -65,21 +66,4 @@ const RootComponent = () => {
 export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: NotFound,
-  head: () => ({
-    meta: [
-      {
-        title: "PollSpree",
-      },
-      {
-        name: "description",
-        content: "Vote on polls and see what others think!",
-      },
-    ],
-    links: [
-      {
-        rel: "icon",
-        href: "/favicon.ico",
-      },
-    ],
-  }),
 })
