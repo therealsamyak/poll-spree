@@ -20,17 +20,17 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
-    "@tanstack/react-router-devtools": "^1.125.6",
-    "@tanstack/router-plugin": "^1.125.6",
+    "@tanstack/react-router-devtools": "^1.127.0",
+    "@tanstack/router-plugin": "^1.127.0",
     "@types/bad-words": "^3.0.3",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.13",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "concurrently": "^9.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
-    "vite": "^7.0.3"
+    "vite": "^7.0.4"
   },
   "dependencies": {
     "@clerk/clerk-js": "^5.71.0",
@@ -47,7 +47,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-form": "^1.14.1",
     "@tanstack/react-query": "^5.82.0",
-    "@tanstack/react-router": "^1.125.6",
+    "@tanstack/react-router": "^1.127.0",
     "@types/react-window": "^1.8.8",
     "@types/react-window-infinite-loader": "^1.0.9",
     "bad-words": "^4.0.0",
