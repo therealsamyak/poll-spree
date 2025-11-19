@@ -2,7 +2,7 @@ import { ClerkProvider } from "@clerk/clerk-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { ConvexProvider, ConvexReactClient } from "convex/react"
-import { StrictMode, useEffect, useState } from "react"
+import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { Loader } from "@/components/loader"
 import { NotificationProvider } from "@/components/ui/notification"
@@ -45,16 +45,6 @@ const router = createRouter({
   context: {},
   // Wrap the app with providers
   Wrap: ({ children }: { children: React.ReactNode }) => {
-    const [redirectUrl, setRedirectUrl] = useState("/")
-
-    useEffect(() => {
-      if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search)
-        const redirect = params.get("redirect_url")
-        setRedirectUrl(redirect || "/")
-      }
-    }, [])
-
     return (
       <ClerkProvider
         publishableKey={publishableKey}
@@ -64,8 +54,6 @@ const router = createRouter({
             card: "shadow-none",
           },
         }}
-        signInForceRedirectUrl={redirectUrl}
-        signUpForceRedirectUrl={redirectUrl}
       >
         <QueryClientProvider client={queryClient}>
           <ConvexProvider client={convex}>
