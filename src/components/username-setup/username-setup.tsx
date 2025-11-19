@@ -54,11 +54,8 @@ export const UsernameSetup = () => {
         message: "Please sign in to continue",
         onSignIn: () => {
           sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const clerkFrontendUrl =
-            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
-            "https://willing-python-74.clerk.accounts.dev"
-          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
-          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+          const redirectUrl = encodeURIComponent(window.location.pathname)
+          window.location.href = `/sign-in?redirect_url=${redirectUrl}`
         },
       })
       return
