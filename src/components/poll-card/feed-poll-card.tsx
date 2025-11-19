@@ -256,30 +256,30 @@ export const FeedPollCard = ({
 
             return (
               <Button
-                 key={option.id}
-                 variant={isSelected ? "default" : "outline"}
-                 className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
-                   isSelected
-                     ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                     : "border-muted bg-card/50 text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20"
-                 } hover:border-primary`}
-                 onClick={() => handleVote(option.id)}
-                 disabled={isVoting || isUserVoteLoading}
-                 style={{
-                   minHeight: 64,
-                   whiteSpace: "normal",
-                   wordBreak: "break-word",
-                   borderColor: isSelected ? "var(--primary)" : undefined,
-                 }}
-               >
-                 <span className="min-w-0 flex-1 break-words text-left">{option.text}</span>
-                 {showResults && (
-                   <span className="mt-2 text-sm opacity-90">
-                     {getVotePercentage(option.votes)}% • {option.votes} vote
-                     {option.votes === 1 ? "" : "s"}
-                   </span>
-                 )}
-               </Button>
+                key={option.id}
+                variant={isSelected ? "default" : "outline"}
+                className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
+                  isSelected
+                    ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
+                    : "border-muted bg-card/50 text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20"
+                } hover:border-primary`}
+                onClick={() => handleVote(option.id)}
+                disabled={isVoting || isUserVoteLoading}
+                style={{
+                  minHeight: 64,
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
+                  borderColor: isSelected ? "var(--primary)" : undefined,
+                }}
+              >
+                <span className="min-w-0 flex-1 break-words text-left">{option.text}</span>
+                {showResults && (
+                  <span className="mt-2 text-sm opacity-90">
+                    {getVotePercentage(option.votes)}% • {option.votes} vote
+                    {option.votes === 1 ? "" : "s"}
+                  </span>
+                )}
+              </Button>
             )
           })}
         </div>

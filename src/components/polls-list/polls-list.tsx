@@ -235,7 +235,7 @@ export const PollsList = () => {
         {allPolls.map((poll, _index) => (
           <div
             key={poll.id}
-            className="flex w-full shrink-0 snap-start items-start justify-center overflow-y-auto p-4 md:p-8 pt-8 md:pt-12"
+            className="flex w-full shrink-0 snap-start items-start justify-center overflow-y-auto p-4 pt-8 md:p-8 md:pt-12"
           >
             <div className="w-full max-w-3xl">
               <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />

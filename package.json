@@ -9,7 +9,7 @@
     "build:frontend": "vite build",
     "build:backend": "convex deploy",
     "preview": "vite preview",
-    "check": "biome check --write --unsafe .",
+    "check": "biome check --write .",
     "check-types": "tsc --noEmit",
     "convex:codegen": "convex codegen",
     "convex:dev": "convex dev",

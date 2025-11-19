@@ -4,4 +4,4 @@ pre-commit:
     check:
       glob: "*.{ts,tsx,js,jsx,json,yml,yaml,md,html,css}"
       run: bun run check
-      stage_fix: true
+      stage_fixed: true

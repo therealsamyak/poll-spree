@@ -129,7 +129,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       return
     }
 
-      if (!userId) return
+    if (!userId) return
 
     // If user clicks the same option, unvote
     if (userVote?.optionId === optionId) {
@@ -227,8 +227,8 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
     }
     if (!userId) return
 
-          // Optimistic update
-          setIsLiked(!isLiked)
+    // Optimistic update
+    setIsLiked(!isLiked)
 
     try {
       await toggleLike({ pollId: poll.id as Id<"polls">, userId })
@@ -334,7 +334,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
               const selected = poll.options.find((o) => o.id === userVote.optionId)
               if (!selected) return null
               const optionsWithPlaces = getOptionsWithPlaces()
-              const selectedWithPlace = optionsWithPlaces.find(
+              const _selectedWithPlace = optionsWithPlaces.find(
                 ({ option }) => option.id === selected.id,
               )
               return (
@@ -379,7 +379,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
             <DialogTitle>{poll.question}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-3">
-            {getOptionsWithPlaces().map(({ option, place }) => {
+            {getOptionsWithPlaces().map(({ option }) => {
               const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
               const showResults = !isUserVoteLoading && userVote?.optionId
               return (

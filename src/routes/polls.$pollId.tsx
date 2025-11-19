@@ -278,8 +278,8 @@ const PollPage = () => {
                         ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
                         : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
                     } hover:border-primary`}
-                     onClick={() => handleVote(option.id)}
-                     disabled={isVoting || isUserVoteLoading}
+                    onClick={() => handleVote(option.id)}
+                    disabled={isVoting || isUserVoteLoading}
                     style={{
                       minHeight: 64,
                       whiteSpace: "normal",
@@ -300,11 +300,11 @@ const PollPage = () => {
                           </span>
                         )}
                         <span
-                           className="whitespace-pre-line wrap-break-word text-lg"
-                           style={{ wordBreak: "break-word" }}
-                         >
-                           {option.text}
-                         </span>
+                          className="wrap-break-word whitespace-pre-line text-lg"
+                          style={{ wordBreak: "break-word" }}
+                        >
+                          {option.text}
+                        </span>
                       </span>
                       {showResults && (
                         <span className="mt-2 text-sm" style={{ color: "var(--foreground)" }}>
