@@ -267,14 +267,20 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           <div className="flex-1 space-y-3">
             {/* Fixed-height question container with dynamic font size */}
             <div className="flex h-[72px] items-center">
-              <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
-                <CardTitle
-                  className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(poll.question.length)}`}
-                  style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
-                >
-                  {poll.question}
-                </CardTitle>
-              </Link>
+             <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
+               {(() => {
+                 const displayText = poll.question.length > 75 ? `${poll.question.slice(0, 75)}...` : poll.question
+                 return (
+                   <CardTitle
+                     className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
+                     style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
+                     title={poll.question}
+                   >
+                     {displayText}
+                   </CardTitle>
+                 )
+               })()}
+             </Link>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
