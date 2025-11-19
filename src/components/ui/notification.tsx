@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle, Info, LogIn, X, XCircle } from "lucide-react"
+import { useSignIn } from "@clerk/clerk-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
@@ -11,7 +12,6 @@ interface NotificationProps {
 
 interface SignInNotificationProps {
   message: string
-  onSignIn?: () => void
   duration?: number
 }
 
@@ -78,8 +78,9 @@ const Notification = ({ message, variant, onClose, duration = 3000 }: Notificati
   )
 }
 
-const SignInNotification = ({ message, onSignIn, duration = 8000 }: SignInNotificationProps) => {
+const SignInNotification = ({ message, duration = 8000 }: SignInNotificationProps) => {
   const [isVisible, setIsVisible] = React.useState(true)
+  const { openSignIn } = useSignIn()
 
   React.useEffect(() => {
     if (duration > 0) {
@@ -109,18 +110,16 @@ const SignInNotification = ({ message, onSignIn, duration = 8000 }: SignInNotifi
             <p className="font-medium text-blue-800 text-sm leading-relaxed dark:text-blue-200">
               {message}
             </p>
-            {onSignIn && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsVisible(false)
-                  onSignIn()
-                }}
-                className="mt-2 w-full rounded-md bg-blue-600 px-3 py-1.5 font-medium text-white text-xs transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-              >
-                Sign In
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                setIsVisible(false)
+                openSignIn()
+              }}
+              className="mt-2 w-full rounded-md bg-blue-600 px-3 py-1.5 font-medium text-white text-xs transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            >
+              Sign In
+            </button>
           </div>
           <button
             type="button"

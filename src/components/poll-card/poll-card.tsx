@@ -124,15 +124,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
       showSignInNotification({
-         message: "Please sign in to vote",
-         onSignIn: () => {
-           sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-           const redirectUrl = encodeURIComponent(window.location.pathname)
-           window.location.href = `/sign-in?redirect_url=${redirectUrl}`
-         },
-       })
-       return
-      }
+        message: "Please sign in to vote",
+      })
+      return
+    }
 
       if (!userId) return
 
@@ -227,15 +222,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
     if (!isSignedIn) {
       showSignInNotification({
         message: "Please sign in to like polls",
-        onSignIn: () => {
-          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const redirectUrl = encodeURIComponent(window.location.pathname)
-          window.location.href = `/sign-in?redirect_url=${redirectUrl}`
-          },
-          })
-          return
-          }
-          if (!userId) return
+      })
+      return
+    }
+    if (!userId) return
 
           // Optimistic update
           setIsLiked(!isLiked)
@@ -327,11 +317,6 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                 if (!isSignedIn) {
                   showSignInNotification({
                     message: "Please sign in to vote",
-                    onSignIn: () => {
-                       sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-                       const redirectUrl = encodeURIComponent(window.location.pathname)
-                       window.location.href = `/sign-in?redirect_url=${redirectUrl}`
-                     },
                   })
                   return
                 }

@@ -80,12 +80,6 @@ export const FeedPollCard = ({
     if (!isSignedIn) {
       showSignInNotification({
         message: "Please sign in to vote",
-        onSignIn: () => {
-          // Store current poll URL for redirect after sign-in
-          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          // Trigger Clerk sign-in modal
-          window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname)}`
-        },
       })
       return
     }
@@ -183,11 +177,6 @@ export const FeedPollCard = ({
     if (!isSignedIn) {
       showSignInNotification({
         message: "Please sign in to like polls",
-        onSignIn: () => {
-          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const redirectUrl = encodeURIComponent(window.location.pathname)
-          window.location.href = `/sign-in?redirect_url=${redirectUrl}`
-        },
       })
       return
     }
