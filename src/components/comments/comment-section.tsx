@@ -7,6 +7,7 @@ import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/components/ui/notification"
 import { Textarea } from "@/components/ui/textarea"
+import { isTextSafe } from "@/lib/badWordsFilter"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -28,6 +29,12 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!text.trim() || !user) return
+
+    // Validate comment for inappropriate content
+    if (!isTextSafe(text)) {
+      showNotification({ message: "Comment contains inappropriate content", variant: "error" })
+      return
+    }
 
     setIsSubmitting(true)
     try {
