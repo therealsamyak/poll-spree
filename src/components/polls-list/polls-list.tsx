@@ -52,7 +52,7 @@ export const PollsList = () => {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, [scrollLeft, scrollRight])
 
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
@@ -159,12 +159,12 @@ export const PollsList = () => {
   }
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] md:h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 md:h-screen">
       {/* Navigation Buttons */}
       <button
         type="button"
         onClick={scrollLeft}
-        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-40 h-12 w-12 items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border/50 text-foreground/70 hover:bg-background hover:text-foreground hover:scale-110 transition-all shadow-lg"
+        className="-translate-y-1/2 absolute top-1/2 left-4 z-40 hidden h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/50 text-foreground/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-background hover:text-foreground md:flex"
         aria-label="Previous poll"
       >
         <ChevronLeft className="h-8 w-8" />
@@ -173,7 +173,7 @@ export const PollsList = () => {
       <button
         type="button"
         onClick={scrollRight}
-        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-40 h-12 w-12 items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border/50 text-foreground/70 hover:bg-background hover:text-foreground hover:scale-110 transition-all shadow-lg"
+        className="-translate-y-1/2 absolute top-1/2 right-4 z-40 hidden h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/50 text-foreground/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-background hover:text-foreground md:flex"
         aria-label="Next poll"
       >
         <ChevronRight className="h-8 w-8" />
@@ -181,14 +181,14 @@ export const PollsList = () => {
 
       <div
         ref={scrollContainerRef}
-        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
+        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden"
       >
         {allPolls.map((poll, _index) => (
           <div
             key={poll.id}
             className="flex h-full w-full shrink-0 snap-start items-center justify-center p-4 md:p-8"
           >
-            <div className="w-full max-w-3xl h-full flex items-center justify-center">
+            <div className="flex h-full w-full max-w-3xl items-center justify-center">
               <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
             </div>
           </div>
@@ -202,17 +202,17 @@ export const PollsList = () => {
           {!isDone && (
             <div className="flex flex-col items-center gap-4 text-muted-foreground">
               <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="text-lg font-medium">Loading more polls...</span>
+              <span className="font-medium text-lg">Loading more polls...</span>
             </div>
           )}
           {isDone && allPolls.length > 0 && (
-            <div className="flex flex-col items-center justify-center gap-6 text-center p-8">
+            <div className="flex flex-col items-center justify-center gap-6 p-8 text-center">
               <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted/50">
                 <BarChart3 className="h-12 w-12 text-muted-foreground" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-3xl font-bold">You're all caught up!</h3>
-                <p className="text-muted-foreground max-w-md text-lg">
+                <h3 className="font-bold text-3xl">You're all caught up!</h3>
+                <p className="max-w-md text-lg text-muted-foreground">
                   You've seen all the polls. Why not create your own?
                 </p>
               </div>

@@ -201,31 +201,25 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
     return Math.round((votes / poll.totalVotes) * 100)
   }
 
-  // Helper to compute places and sorted options (moved inside component, after hooks)
+  // Helper to compute places while maintaining original order
   const getOptionsWithPlaces = () => {
     if (!isSignedIn || !userVote?.optionId) {
       return poll.options.map((option) => ({ option, place: undefined }))
     }
-    const groups: Record<number, typeof poll.options> = {}
-    poll.options.forEach((option) => {
-      if (!groups[option.votes]) groups[option.votes] = []
-      groups[option.votes].push(option)
+
+    // Create a map of vote counts to places
+    const voteCounts = poll.options.map((option) => option.votes)
+    const uniqueSortedCounts = [...new Set(voteCounts)].sort((a, b) => b - a)
+    const countToPlace = new Map()
+    uniqueSortedCounts.forEach((count, index) => {
+      countToPlace.set(count, index + 1)
     })
-    const sortedVoteCounts = Object.keys(groups)
-      .map((v) => Number(v))
-      .sort((a, b) => b - a)
-    let place = 1
-    const result: { option: (typeof poll.options)[0]; place: number }[] = []
-    for (const voteCount of sortedVoteCounts) {
-      const group = groups[voteCount].sort((a, b) =>
-        a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
-      )
-      for (const option of group) {
-        result.push({ option, place })
-      }
-      place += group.length
-    }
-    return result
+
+    // Return options in original order with their places
+    return poll.options.map((option) => ({
+      option,
+      place: countToPlace.get(option.votes),
+    }))
   }
 
   const handleLike = async () => {
