@@ -215,7 +215,7 @@ const PollPage = () => {
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-4">
               {/* Question */}
-              <h1 className="break-words font-bold text-3xl text-foreground leading-tight">
+              <h1 className="wrap-break-word font-bold text-3xl text-foreground leading-tight">
                 {poll.question}
               </h1>
 
@@ -232,13 +232,13 @@ const PollPage = () => {
                   </Link>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-primary/20 to-primary/30">
                     <Calendar className="h-3 w-3 text-primary" />
                   </div>
                   <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/30">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-accent/20 to-accent/30">
                     <BarChart3 className="h-3 w-3 text-accent-foreground" />
                   </div>
                   <span className="font-medium">{poll.totalVotes} votes</span>
@@ -282,9 +282,9 @@ const PollPage = () => {
                       isSelected
                         ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
                         : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
-                    } hover:border-[var(--primary)]`}
-                    onClick={() => handleVote(option.id)}
-                    disabled={isVoting || isUserVoteLoading}
+                    } hover:border-primary`}
+                     onClick={() => handleVote(option.id)}
+                     disabled={isVoting || isUserVoteLoading}
                     style={{
                       minHeight: 64,
                       whiteSpace: "normal",
@@ -300,16 +300,16 @@ const PollPage = () => {
                       <span className="flex w-full items-center">
                         {/* Show place if user has voted and is signed in */}
                         {place !== undefined && (
-                          <span className="mr-3 flex-shrink-0 flex-nowrap font-bold text-xl">
+                          <span className="mr-3 shrink-0 flex-nowrap font-bold text-xl">
                             {place}.
                           </span>
                         )}
                         <span
-                          className="whitespace-pre-line break-words text-lg"
-                          style={{ wordBreak: "break-word" }}
-                        >
-                          {option.text}
-                        </span>
+                           className="whitespace-pre-line wrap-break-word text-lg"
+                           style={{ wordBreak: "break-word" }}
+                         >
+                           {option.text}
+                         </span>
                       </span>
                       {showResults && (
                         <span className="mt-2 text-sm" style={{ color: "var(--foreground)" }}>
