@@ -40,36 +40,6 @@ export const PollsList = () => {
     }
   }, [])
 
-  // Keyboard and wheel navigation (desktop only)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        scrollLeft()
-      } else if (e.key === "ArrowRight") {
-        scrollRight()
-      }
-    }
-
-    const handleWheel = (e: WheelEvent) => {
-      // Only handle wheel events on desktop (when scroll container exists and is visible)
-      if (scrollContainerRef.current && window.innerWidth >= 768) {
-        e.preventDefault()
-        const scrollAmount = e.deltaY > 0 ? 100 : -100
-        scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-
-    // Add wheel listener to document for desktop scroll handling
-    document.addEventListener("wheel", handleWheel, { passive: false })
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      document.removeEventListener("wheel", handleWheel)
-    }
-  }, [scrollLeft, scrollRight])
-
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
   const userVotes = useQuery(api.polls.getUserVotesForPolls, {
@@ -130,6 +100,23 @@ export const PollsList = () => {
       setIsLoadingMore(false)
     }
   }, [pollsResult])
+
+  // Keyboard navigation (desktop only)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        scrollLeft()
+      } else if (e.key === "ArrowRight") {
+        scrollRight()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [scrollLeft, scrollRight])
 
   if (pollsResult === undefined) {
     return (
@@ -248,9 +235,9 @@ export const PollsList = () => {
         {allPolls.map((poll, _index) => (
           <div
             key={poll.id}
-            className="flex h-full w-full shrink-0 snap-start items-center justify-center p-4 md:p-8"
+            className="flex h-full w-full shrink-0 snap-start justify-center overflow-y-auto p-4 md:p-8"
           >
-            <div className="flex h-full w-full max-w-3xl items-center justify-center">
+            <div className="mt-8 w-full max-w-3xl">
               <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
             </div>
           </div>
