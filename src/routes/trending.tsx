@@ -29,7 +29,7 @@ const Trending = () => {
 
   if (pollsResult === undefined) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading trending polls...</p>
@@ -76,9 +76,9 @@ const Trending = () => {
         keywords="trending polls, popular votes, viral surveys, top opinions"
         canonical="https://pollspree.com/trending"
       />
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background to-muted/20 md:h-screen">
         {/* Content */}
-        <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+        <div className="h-full w-full overflow-y-auto px-4 py-8 pb-20 sm:px-6 lg:px-8">
           {/* Header row: Trending Polls + Create Button */}
           <div className="mb-8 flex w-full items-center justify-center sm:justify-between">
             <h2 className="flex items-center gap-2 font-bold text-2xl">

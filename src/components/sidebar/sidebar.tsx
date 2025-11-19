@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User } from "lucide-react"
 import { useId, useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { CreatePollDialogContent } from "@/components/create-poll-dialog"
 import { CustomProfileDialog } from "@/components/custom-profile-dialog"
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useNotification } from "@/components/ui/notification"
 import { Separator } from "@/components/ui/separator"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
@@ -46,6 +46,7 @@ const SidebarContent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
   const [isCreatePollOpen, setIsCreatePollOpen] = useState(false)
+  const { showNotification } = useNotification()
 
   const usernameId = useId()
 
@@ -55,13 +56,16 @@ const SidebarContent = () => {
     // Validate username using comprehensive validation
     const validation = validateUsername(newUsername)
     if (!validation.isValid) {
-      toast.error(validation.error)
+      showNotification({ message: validation.error || "Invalid username", variant: "error" })
       return
     }
 
     // Check for reserved usernames
     if (isReservedUsername(newUsername)) {
-      toast.error("This username is reserved and cannot be used.")
+      showNotification({
+        message: "This username is reserved and cannot be used.",
+        variant: "error",
+      })
       return
     }
 
@@ -71,12 +75,15 @@ const SidebarContent = () => {
       if (result.success) {
         setNewUsername("")
         setIsDialogOpen(false)
-        toast.success("Username updated successfully!")
+        showNotification({ message: "Username updated successfully!", variant: "success" })
       } else {
-        toast.error(result.error || "Failed to update username")
+        showNotification({ message: result.error || "Failed to update username", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     }
   }
 

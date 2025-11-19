@@ -2,11 +2,11 @@ import { useAuth, useUser } from "@clerk/clerk-react"
 import { useMutation } from "convex/react"
 import { ArrowRight, Sparkles, User } from "lucide-react"
 import { useId, useState } from "react"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useNotification } from "@/components/ui/notification"
 import { isTextSafe } from "@/lib/badWordsFilter"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
@@ -17,6 +17,7 @@ export const UsernameSetup = () => {
   const { userId } = useAuth()
   const { user } = useUser()
   const usernameId = useId()
+  const { showNotification, showSignInNotification } = useNotification()
 
   const createUser = useMutation(api.users.createUser)
 
@@ -26,24 +27,40 @@ export const UsernameSetup = () => {
     // Validate username using comprehensive validation
     const validation = validateUsername(username)
     if (!validation.isValid) {
-      toast.error(validation.error)
+      showNotification({ message: validation.error || "Invalid username", variant: "error" })
       return
     }
 
     // Check for inappropriate content in username
     if (!isTextSafe(username)) {
-      toast.error("Username contains inappropriate content and cannot be used.")
+      showNotification({
+        message: "Username contains inappropriate content and cannot be used.",
+        variant: "error",
+      })
       return
     }
 
     // Check for reserved usernames
     if (isReservedUsername(username)) {
-      toast.error("This username is reserved and cannot be used.")
+      showNotification({
+        message: "This username is reserved and cannot be used.",
+        variant: "error",
+      })
       return
     }
 
     if (!userId) {
-      toast.error("Please sign in to continue")
+      showSignInNotification({
+        message: "Please sign in to continue",
+        onSignIn: () => {
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          const clerkFrontendUrl =
+            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+            "https://willing-python-74.clerk.accounts.dev"
+          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
+          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+        },
+      })
       return
     }
 
@@ -56,12 +73,15 @@ export const UsernameSetup = () => {
       })
 
       if (result.success) {
-        toast.success("Username set successfully!")
+        showNotification({ message: "Username set successfully!", variant: "success" })
       } else {
-        toast.error(result.error || "Failed to set username")
+        showNotification({ message: result.error || "Failed to set username", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsSubmitting(false)
     }

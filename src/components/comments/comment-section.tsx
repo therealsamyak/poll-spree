@@ -3,9 +3,9 @@ import { useMutation, useQuery } from "convex/react"
 import { formatDistanceToNow } from "date-fns"
 import { Send, Trash2 } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
+import { useNotification } from "@/components/ui/notification"
 import { Textarea } from "@/components/ui/textarea"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -18,6 +18,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   const { userId, isSignedIn } = useAuth()
   const [text, setText] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { showNotification } = useNotification()
 
   const comments = useQuery(api.comments.list, { pollId: pollId as Id<"polls"> })
   const createComment = useMutation(api.comments.create)
@@ -37,9 +38,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
         username: user.username,
       })
       setText("")
-      toast.success("Comment posted!")
+      showNotification({ message: "Comment posted!", variant: "success" })
     } catch (_error) {
-      toast.error("Failed to post comment")
+      showNotification({ message: "Failed to post comment", variant: "error" })
     } finally {
       setIsSubmitting(false)
     }
@@ -48,9 +49,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   const handleDelete = async (commentId: Id<"comments">) => {
     try {
       await deleteComment({ commentId, userId: userId || "" })
-      toast.success("Comment deleted")
+      showNotification({ message: "Comment deleted", variant: "success" })
     } catch (_error) {
-      toast.error("Failed to delete comment")
+      showNotification({ message: "Failed to delete comment", variant: "error" })
     }
   }
 
