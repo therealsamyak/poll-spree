@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrendingRouteImport } from './routes/trending'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersUsernameRouteImport } from './routes/users.$username'
 import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as PollsPollIdRouteImport } from './routes/polls.$pollId'
 
+const TrendingRoute = TrendingRouteImport.update({
+  id: '/trending',
+  path: '/trending',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const PollsPollIdRoute = PollsPollIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
@@ -50,20 +58,33 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
+  fullPaths:
+    | '/'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
-  id: '__root__' | '/' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
+  to: '/' | '/trending' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
+  id:
+    | '__root__'
+    | '/'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TrendingRoute: typeof TrendingRoute
   PollsPollIdRoute: typeof PollsPollIdRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
   UsersUsernameRoute: typeof UsersUsernameRoute
@@ -71,6 +92,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trending': {
+      id: '/trending'
+      path: '/trending'
+      fullPath: '/trending'
+      preLoaderRoute: typeof TrendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +132,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TrendingRoute: TrendingRoute,
   PollsPollIdRoute: PollsPollIdRoute,
   SitemapXmlRoute: SitemapXmlRoute,
   UsersUsernameRoute: UsersUsernameRoute,

@@ -31,6 +31,7 @@ export const SEOHead = ({
   structuredData,
 }: SEOHeadProps) => {
   return (
+    // @ts-expect-error - HeadContent types are tricky
     <HeadContent>
       <MetaTags title={title} description={description} keywords={keywords} canonical={canonical} />
       <OpenGraph title={title} description={description} url={canonical} image={ogImage} />

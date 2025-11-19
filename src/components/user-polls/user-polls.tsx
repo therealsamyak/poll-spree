@@ -41,6 +41,7 @@ export const UserPolls = () => {
     userId: user?.userId || "",
     includeAuthored,
     includeVoted,
+    sort,
     paginationOpts,
   })
 

@@ -118,10 +118,14 @@ const SidebarContent = () => {
           <TrendingUp className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Trending</span>
         </Link> */}
-        <div className="flex h-12 w-12 cursor-not-allowed items-center justify-center rounded-lg font-medium text-muted-foreground/50 text-sm transition-colors md:w-auto md:justify-start md:px-3">
+        <Link
+          to="/trending"
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+          activeProps={{ className: "bg-accent text-accent-foreground" }}
+        >
           <TrendingUp className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Trending</span>
-        </div>
+        </Link>
       </nav>
 
       {/* Actions */}

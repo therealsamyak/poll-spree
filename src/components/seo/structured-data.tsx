@@ -1,4 +1,3 @@
-import { HeadContent } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 
 interface StructuredDataProps {
@@ -78,9 +77,5 @@ export const StructuredData = ({
     }
   }, [type, name, description, url, logo, image, author, datePublished, dateModified, pollData])
 
-  return (
-    <HeadContent>
-      <script ref={scriptRef} type="application/ld+json" />
-    </HeadContent>
-  )
+  return <script ref={scriptRef} type="application/ld+json" />
 }
