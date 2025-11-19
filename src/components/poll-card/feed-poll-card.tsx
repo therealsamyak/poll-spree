@@ -3,10 +3,10 @@ import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Eye, Heart, MessageCircle, Share2, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useNotification } from "@/components/ui/notification"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import type { Poll } from "../../types"
@@ -25,6 +25,7 @@ export const FeedPollCard = ({
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const { userId, isSignedIn } = useAuth()
+  const { showNotification, showSignInNotification } = useNotification()
   const vote = useMutation(api.polls.vote)
   const deletePoll = useMutation(api.polls.deletePoll)
   const toggleLike = useMutation(api.polls.toggleLike)
@@ -77,7 +78,15 @@ export const FeedPollCard = ({
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      toast.error("Please sign in to vote")
+      showSignInNotification({
+        message: "Please sign in to vote",
+        onSignIn: () => {
+          // Store current poll URL for redirect after sign-in
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          // Trigger Clerk sign-in modal
+          window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname)}`
+        },
+      })
       return
     }
 
@@ -96,10 +105,13 @@ export const FeedPollCard = ({
         if (result.success) {
           // Vote removed successfully
         } else {
-          toast.error(result.error || "Failed to remove vote")
+          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
         }
       } catch (_error) {
-        toast.error("An unexpected error occurred. Please try again.")
+        showNotification({
+          message: "An unexpected error occurred. Please try again.",
+          variant: "error",
+        })
       } finally {
         setIsVoting(false)
       }
@@ -118,10 +130,13 @@ export const FeedPollCard = ({
       if (result.success) {
         // Vote recorded successfully
       } else {
-        toast.error(result.error || "Failed to vote")
+        showNotification({ message: result.error || "Failed to vote", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsVoting(false)
     }
@@ -138,13 +153,16 @@ export const FeedPollCard = ({
       })
 
       if (result.success) {
-        toast.success("Poll deleted successfully!")
+        showNotification({ message: "Poll deleted successfully!", variant: "success" })
         onPollDeleted?.()
       } else {
-        toast.error(result.error || "Failed to delete poll")
+        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsDeleting(false)
     }
@@ -185,7 +203,17 @@ export const FeedPollCard = ({
 
   const handleLike = async () => {
     if (!isSignedIn) {
-      toast.error("Please sign in to like")
+      showSignInNotification({
+        message: "Please sign in to like polls",
+        onSignIn: () => {
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          const clerkFrontendUrl =
+            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+            "https://willing-python-74.clerk.accounts.dev"
+          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
+          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+        },
+      })
       return
     }
     if (!userId) return
@@ -197,14 +225,14 @@ export const FeedPollCard = ({
       await toggleLike({ pollId: poll.id as Id<"polls">, userId })
     } catch (_error) {
       setIsLiked(!isLiked) // Revert
-      toast.error("Failed to like poll")
+      showNotification({ message: "Failed to like poll", variant: "error" })
     }
   }
 
   const handleShare = () => {
     const url = `${window.location.origin}/polls/${poll.id}`
     navigator.clipboard.writeText(url)
-    toast.success("Link copied to clipboard!")
+    showNotification({ message: "Link copied to clipboard!", variant: "success" })
   }
 
   return (

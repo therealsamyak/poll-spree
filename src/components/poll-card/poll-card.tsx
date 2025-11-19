@@ -3,11 +3,11 @@ import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Eye, Heart, MessageCircle, Share2, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useNotification } from "@/components/ui/notification"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import type { Poll } from "../../types"
@@ -34,6 +34,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
   const [expanded, setExpanded] = useState(false)
   const [shouldMoveToTop, setShouldMoveToTop] = useState(false)
   const prevExpanded = useRef(expanded)
+  const { showNotification, showSignInNotification } = useNotification()
 
   const vote = useMutation(api.polls.vote)
   const deletePoll = useMutation(api.polls.deletePoll)
@@ -122,7 +123,17 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      toast.error("Please sign in to vote")
+      showSignInNotification({
+        message: "Please sign in to vote",
+        onSignIn: () => {
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          const clerkFrontendUrl =
+            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+            "https://willing-python-74.clerk.accounts.dev"
+          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
+          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+        },
+      })
       return
     }
 
@@ -139,12 +150,15 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
         })
 
         if (result.success) {
-          toast.success("Vote removed!")
+          showNotification({ message: "Vote removed!", variant: "success" })
         } else {
-          toast.error(result.error || "Failed to remove vote")
+          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
         }
-      } catch (_error) {
-        toast.error("An unexpected error occurred. Please try again.")
+      } catch {
+        showNotification({
+          message: "An unexpected error occurred. Please try again.",
+          variant: "error",
+        })
       } finally {
         setIsVoting(false)
       }
@@ -161,12 +175,15 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       })
 
       if (result.success) {
-        toast.success("Vote recorded!")
+        showNotification({ message: "Vote recorded!", variant: "success" })
       } else {
-        toast.error(result.error || "Failed to vote")
+        showNotification({ message: result.error || "Failed to vote", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsVoting(false)
     }
@@ -183,13 +200,16 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       })
 
       if (result.success) {
-        toast.success("Poll deleted successfully!")
+        showNotification({ message: "Poll deleted successfully!", variant: "success" })
         onPollDeleted?.()
       } else {
-        toast.error(result.error || "Failed to delete poll")
+        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsDeleting(false)
     }
@@ -224,7 +244,17 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
 
   const handleLike = async () => {
     if (!isSignedIn) {
-      toast.error("Please sign in to like")
+      showSignInNotification({
+        message: "Please sign in to like polls",
+        onSignIn: () => {
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          const clerkFrontendUrl =
+            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+            "https://willing-python-74.clerk.accounts.dev"
+          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
+          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+        },
+      })
       return
     }
     if (!userId) return
@@ -236,14 +266,14 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       await toggleLike({ pollId: poll.id as Id<"polls">, userId })
     } catch (_error) {
       setIsLiked(!isLiked) // Revert
-      toast.error("Failed to like poll")
+      showNotification({ message: "Failed to like poll", variant: "error" })
     }
   }
 
   const handleShare = () => {
     const url = `${window.location.origin}/polls/${poll.id}`
     navigator.clipboard.writeText(url)
-    toast.success("Link copied to clipboard!")
+    showNotification({ message: "Link copied to clipboard!", variant: "success" })
   }
 
   return (

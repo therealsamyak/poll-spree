@@ -2,7 +2,6 @@ import { useClerk, useUser } from "@clerk/clerk-react"
 import { useAction, useMutation } from "convex/react"
 import { AlertTriangle, Camera, LogOut, Trash2, User } from "lucide-react"
 import { useRef, useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useNotification } from "@/components/ui/notification"
 import { Separator } from "@/components/ui/separator"
 import { api } from "../../../convex/_generated/api"
 
@@ -28,6 +28,7 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { showNotification } = useNotification()
 
   const deleteUserData = useMutation(api.users.deleteAccount)
   const deleteClerkUser = useAction(api.users.deleteClerkUser)
@@ -37,9 +38,9 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
     try {
       await signOut()
       onClose()
-      toast.success("Signed out successfully")
+      showNotification({ message: "Signed out successfully", variant: "success" })
     } catch (_error) {
-      toast.error("Failed to sign out")
+      showNotification({ message: "Failed to sign out", variant: "error" })
     }
   }
 
@@ -62,7 +63,7 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
       // Step 4: Refresh the page to clear any remaining state
       window.location.reload()
     } catch (_error) {
-      toast.error("Failed to delete account. Please try again.")
+      showNotification({ message: "Failed to delete account. Please try again.", variant: "error" })
     } finally {
       setIsDeleting(false)
     }
@@ -74,13 +75,13 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file")
+      showNotification({ message: "Please select an image file", variant: "error" })
       return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size must be less than 5MB")
+      showNotification({ message: "Image size must be less than 5MB", variant: "error" })
       return
     }
 
@@ -102,9 +103,12 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
         }
       }, 1000)
 
-      toast.success("Profile picture updated successfully!")
+      showNotification({ message: "Profile picture updated successfully!", variant: "success" })
     } catch (_error) {
-      toast.error("Failed to upload profile picture. Please try again.")
+      showNotification({
+        message: "Failed to upload profile picture. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsUploading(false)
       // Reset the file input
@@ -135,9 +139,12 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
         }
       }, 1000)
 
-      toast.success("Profile picture removed successfully!")
+      showNotification({ message: "Profile picture removed successfully!", variant: "success" })
     } catch (_error) {
-      toast.error("Failed to remove profile picture. Please try again.")
+      showNotification({
+        message: "Failed to remove profile picture. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsUploading(false)
     }

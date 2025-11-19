@@ -26,21 +26,21 @@ export const PollsList = () => {
   const _stats = useQuery(api.polls.getPollsStats)
 
   // Scroll handlers
-  const scrollLeft = () => {
+  const scrollLeft = useCallback(() => {
     if (scrollContainerRef.current) {
       const width = scrollContainerRef.current.clientWidth
       scrollContainerRef.current.scrollBy({ left: -width, behavior: "smooth" })
     }
-  }
+  }, [])
 
-  const scrollRight = () => {
+  const scrollRight = useCallback(() => {
     if (scrollContainerRef.current) {
       const width = scrollContainerRef.current.clientWidth
       scrollContainerRef.current.scrollBy({ left: width, behavior: "smooth" })
     }
-  }
+  }, [])
 
-  // Keyboard navigation
+  // Keyboard and wheel navigation (desktop only)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
@@ -50,8 +50,24 @@ export const PollsList = () => {
       }
     }
 
+    const handleWheel = (e: WheelEvent) => {
+      // Only handle wheel events on desktop (when scroll container exists and is visible)
+      if (scrollContainerRef.current && window.innerWidth >= 768) {
+        e.preventDefault()
+        const scrollAmount = e.deltaY > 0 ? 100 : -100
+        scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
+      }
+    }
+
     window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+
+    // Add wheel listener to document for desktop scroll handling
+    document.addEventListener("wheel", handleWheel, { passive: false })
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      document.removeEventListener("wheel", handleWheel)
+    }
   }, [scrollLeft, scrollRight])
 
   // Batch fetch user votes for all visible polls
@@ -126,7 +142,7 @@ export const PollsList = () => {
     )
   }
 
-  const { isDone, continueCursor } = pollsResult
+  const { isDone } = pollsResult
 
   if (allPolls.length === 0) {
     return (
@@ -159,8 +175,8 @@ export const PollsList = () => {
   }
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 md:h-screen">
-      {/* Navigation Buttons */}
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20 md:h-screen md:overflow-hidden">
+      {/* Desktop Navigation Buttons */}
       <button
         type="button"
         onClick={scrollLeft}
@@ -179,9 +195,55 @@ export const PollsList = () => {
         <ChevronRight className="h-8 w-8" />
       </button>
 
+      {/* Mobile: Vertical Layout */}
+      <div className="flex flex-col gap-6 p-4 pb-24 md:hidden">
+        {allPolls.map((poll, _index) => (
+          <div key={poll.id} className="w-full">
+            <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
+          </div>
+        ))}
+
+        {/* Mobile Infinite Scroll Trigger / Loading State */}
+        <div ref={loadMoreRef} className="w-full">
+          {!isDone && (
+            <div className="flex flex-col items-center gap-4 py-8 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="font-medium text-lg">Loading more polls...</span>
+            </div>
+          )}
+          {isDone && allPolls.length > 0 && (
+            <div className="flex flex-col items-center justify-center gap-6 p-8 text-center">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted/50">
+                <BarChart3 className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-3xl">You're all caught up!</h3>
+                <p className="max-w-md text-lg text-muted-foreground">
+                  You've seen all the polls. Why not create your own?
+                </p>
+              </div>
+              {isSignedIn ? (
+                <CreatePollDialog />
+              ) : (
+                <SignInButton mode="modal">
+                  <Button className="gap-2 bg-primary shadow-lg hover:bg-primary/90">
+                    <Plus className="h-5 w-5" />
+                    Sign in to create polls
+                  </Button>
+                </SignInButton>
+              )}
+              <div className="mt-8">
+                <Footer />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop: Horizontal Layout */}
       <div
         ref={scrollContainerRef}
-        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden"
+        className="hidden h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] md:flex [&::-webkit-scrollbar]:hidden"
       >
         {allPolls.map((poll, _index) => (
           <div
@@ -194,7 +256,7 @@ export const PollsList = () => {
           </div>
         ))}
 
-        {/* Infinite Scroll Trigger / Loading State */}
+        {/* Desktop Infinite Scroll Trigger / Loading State */}
         <div
           ref={loadMoreRef}
           className="flex h-full w-full shrink-0 snap-start items-center justify-center"
@@ -233,13 +295,6 @@ export const PollsList = () => {
           )}
         </div>
       </div>
-
-      {/* Floating Create Button for Mobile/Desktop */}
-      {isSignedIn && (
-        <div className="fixed right-6 bottom-6 z-50 md:right-10 md:bottom-10">
-          <CreatePollDialog />
-        </div>
-      )}
     </div>
   )
 }

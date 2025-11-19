@@ -5,6 +5,7 @@ import { ConvexProvider, ConvexReactClient } from "convex/react"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { Loader } from "@/components/loader"
+import { NotificationProvider } from "@/components/ui/notification"
 import { routeTree } from "./routeTree.gen"
 
 // Initialize Convex client
@@ -55,7 +56,9 @@ const router = createRouter({
         }}
       >
         <QueryClientProvider client={queryClient}>
-          <ConvexProvider client={convex}>{children}</ConvexProvider>
+          <ConvexProvider client={convex}>
+            <NotificationProvider>{children}</NotificationProvider>
+          </ConvexProvider>
         </QueryClientProvider>
       </ClerkProvider>
     )

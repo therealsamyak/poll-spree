@@ -3,11 +3,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { CommentSection } from "@/components/comments/comment-section"
 import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
+import { useNotification } from "@/components/ui/notification"
 import { generatePollSEOConfig } from "@/lib/seo"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
@@ -17,6 +17,7 @@ const PollPage = () => {
   const { userId, isSignedIn } = useAuth()
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const { showNotification, showSignInNotification } = useNotification()
 
   const poll = useQuery(api.polls.getPoll, { pollId: pollId as Id<"polls"> })
   const userVote = useQuery(api.polls.getUserVote, {
@@ -71,7 +72,17 @@ const PollPage = () => {
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      toast.error("Please sign in to vote")
+      showSignInNotification({
+        message: "Please sign in to vote",
+        onSignIn: () => {
+          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+          const clerkFrontendUrl =
+            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+            "https://willing-python-74.clerk.accounts.dev"
+          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
+          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+        },
+      })
       return
     }
 
@@ -88,12 +99,15 @@ const PollPage = () => {
         })
 
         if (result.success) {
-          toast.success("Vote removed!")
+          showNotification({ message: "Vote removed!", variant: "success" })
         } else {
-          toast.error(result.error || "Failed to remove vote")
+          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
         }
       } catch (_error) {
-        toast.error("An unexpected error occurred. Please try again.")
+        showNotification({
+          message: "An unexpected error occurred. Please try again.",
+          variant: "error",
+        })
       } finally {
         setIsVoting(false)
       }
@@ -110,12 +124,15 @@ const PollPage = () => {
       })
 
       if (result.success) {
-        toast.success("Vote recorded!")
+        showNotification({ message: "Vote recorded!", variant: "success" })
       } else {
-        toast.error(result.error || "Failed to vote")
+        showNotification({ message: result.error || "Failed to vote", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsVoting(false)
     }
@@ -132,14 +149,17 @@ const PollPage = () => {
       })
 
       if (result.success) {
-        toast.success("Poll deleted successfully!")
+        showNotification({ message: "Poll deleted successfully!", variant: "success" })
         // Navigate back to home
         window.location.href = "/"
       } else {
-        toast.error(result.error || "Failed to delete poll")
+        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
       }
     } catch (_error) {
-      toast.error("An unexpected error occurred. Please try again.")
+      showNotification({
+        message: "An unexpected error occurred. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsDeleting(false)
     }

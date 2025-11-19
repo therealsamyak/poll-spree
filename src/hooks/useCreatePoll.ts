@@ -1,7 +1,7 @@
 import { useAuth } from "@clerk/clerk-react"
 import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
-import { toast } from "sonner"
+import { useNotification } from "@/components/ui/notification"
 import { validateMultipleInputs } from "@/lib/badWordsFilter"
 import { api } from "../../convex/_generated/api"
 
@@ -14,6 +14,7 @@ export const useCreatePoll = () => {
   const { userId } = useAuth()
   const user = useQuery(api.users.getUser, { userId: userId || "" })
   const createPoll = useMutation(api.polls.createPoll)
+  const { showNotification } = useNotification()
 
   const [question, setQuestion] = useState("")
   const [options, setOptions] = useState<PollOption[]>([
@@ -68,9 +69,10 @@ export const useCreatePoll = () => {
 
       const validation = validateMultipleInputs(inputsToValidate)
       if (!validation.isValid) {
-        toast.error(
-          `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
-        )
+        showNotification({
+          message: `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
+          variant: "error",
+        })
         return
       }
 
@@ -83,7 +85,7 @@ export const useCreatePoll = () => {
       })
 
       if (result?.success) {
-        toast.success("Poll created successfully!")
+        showNotification({ message: "Poll created successfully!", variant: "success" })
         setQuestion("")
         setOptions([
           { id: "1", text: "" },
@@ -92,11 +94,11 @@ export const useCreatePoll = () => {
         setIsDev(false)
         onSuccess?.()
       } else {
-        toast.error(result?.error || "Failed to create poll")
+        showNotification({ message: result?.error || "Failed to create poll", variant: "error" })
       }
     } catch (error) {
       console.error("Error creating poll:", error)
-      toast.error("An unexpected error occurred")
+      showNotification({ message: "An unexpected error occurred", variant: "error" })
     } finally {
       setIsCreating(false)
     }
