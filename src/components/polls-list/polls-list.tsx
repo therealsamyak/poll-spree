@@ -230,7 +230,7 @@ export const PollsList = () => {
       {/* Desktop: Horizontal Layout */}
       <div
         ref={scrollContainerRef}
-        className="hidden w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] md:flex [&::-webkit-scrollbar]:hidden"
+        className="hidden h-screen w-full snap-x snap-mandatory overflow-x-auto overflow-y-auto [-ms-overflow-style:'none'] [scrollbar-width:'none'] md:flex [&::-webkit-scrollbar]:hidden"
       >
         {allPolls.map((poll, _index) => (
           <div
