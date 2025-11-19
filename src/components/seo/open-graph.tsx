@@ -1,5 +1,3 @@
-import { HeadContent } from "@tanstack/react-router"
-
 interface OpenGraphProps {
   title?: string
   description?: string
@@ -26,7 +24,7 @@ export const OpenGraph = ({
   locale = "en_US",
 }: OpenGraphProps) => {
   return (
-    <HeadContent>
+    <>
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:type" content={type} />
@@ -37,6 +35,6 @@ export const OpenGraph = ({
       <meta property="og:image:width" content={imageWidth.toString()} />
       <meta property="og:image:height" content={imageHeight.toString()} />
       <meta property="og:image:alt" content={imageAlt} />
-    </HeadContent>
+    </>
   )
 }

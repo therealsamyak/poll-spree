@@ -65,6 +65,8 @@ export const getPolls = query({
         authorUsername: poll.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
         createdAt: poll.createdAt,
+        views: poll.views || 0,
+        likes: poll.likes || 0,
         options: options.map((option) => ({
           id: option._id,
           pollId: option.pollId,
@@ -365,6 +367,7 @@ export const getPollsByUser = query({
     userId: v.string(),
     includeAuthored: v.boolean(),
     includeVoted: v.boolean(),
+    sort: v.optional(v.string()),
     paginationOpts: v.optional(
       v.object({
         numItems: v.number(),
@@ -373,7 +376,7 @@ export const getPollsByUser = query({
     ),
   },
   handler: async (ctx, args) => {
-    const { userId, includeAuthored, includeVoted, paginationOpts } = args
+    const { userId, includeAuthored, includeVoted, paginationOpts, sort = "recent" } = args
 
     const defaultPagination = { numItems: 20, cursor: null }
     const pagination = paginationOpts || defaultPagination
@@ -436,10 +439,21 @@ export const getPollsByUser = query({
       }),
     )
 
-    // Filter out null values and sort by creation date (newest first)
+    // Filter out null values and sort
     const sortedPolls = allPolls
       .filter((p): p is NonNullable<typeof p> => p !== null)
-      .sort((a, b) => b.createdAt - a.createdAt)
+      .sort((a, b) => {
+        switch (sort) {
+          case "oldest":
+            return a.createdAt - b.createdAt
+          case "most-voted":
+            return (b.totalVotes || 0) - (a.totalVotes || 0)
+          case "least-voted":
+            return (a.totalVotes || 0) - (b.totalVotes || 0)
+          default:
+            return b.createdAt - a.createdAt
+        }
+      })
 
     // Apply pagination
     let startIndex = 0
@@ -495,6 +509,8 @@ export const getPollsByUser = query({
         authorUsername: poll.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
         createdAt: poll.createdAt,
+        views: poll.views || 0,
+        likes: poll.likes || 0,
         options: options.map((option) => ({
           id: option._id,
           pollId: option.pollId,
@@ -710,5 +726,128 @@ export const getAllPollsForSitemap = query({
       _id: poll._id,
       createdAt: poll.createdAt,
     }))
+  },
+})
+
+export const viewPoll = mutation({
+  args: { pollId: v.id("polls") },
+  handler: async (ctx, args) => {
+    const poll = await ctx.db.get(args.pollId)
+    if (!poll) return
+    await ctx.db.patch(args.pollId, {
+      views: (poll.views || 0) + 1,
+    })
+  },
+})
+
+export const toggleLike = mutation({
+  args: { pollId: v.id("polls"), userId: v.string() },
+  handler: async (ctx, args) => {
+    const { pollId, userId } = args
+    const existingLike = await ctx.db
+      .query("pollLikes")
+      .withIndex("by_user_poll", (q) => q.eq("userId", userId).eq("pollId", pollId))
+      .first()
+
+    const poll = await ctx.db.get(pollId)
+    if (!poll) throw new Error("Poll not found")
+
+    if (existingLike) {
+      await ctx.db.delete(existingLike._id)
+      await ctx.db.patch(pollId, {
+        likes: Math.max(0, (poll.likes || 0) - 1),
+      })
+      return false // unliked
+    }
+    await ctx.db.insert("pollLikes", {
+      pollId,
+      userId,
+    })
+    await ctx.db.patch(pollId, {
+      likes: (poll.likes || 0) + 1,
+    })
+    return true // liked
+  },
+})
+
+export const getPollLikeStatus = query({
+  args: { pollId: v.id("polls"), userId: v.string() },
+  handler: async (ctx, args) => {
+    const like = await ctx.db
+      .query("pollLikes")
+      .withIndex("by_user_poll", (q) => q.eq("userId", args.userId).eq("pollId", args.pollId))
+      .first()
+    return !!like
+  },
+})
+
+export const getTrendingPolls = query({
+  args: {},
+  handler: async (ctx) => {
+    const polls = await ctx.db.query("polls").collect()
+
+    const sortedPolls = polls
+      .sort((a, b) => {
+        const scoreA = (a.totalVotes || 0) * 2 + (a.likes || 0) + (a.views || 0) * 0.1
+        const scoreB = (b.totalVotes || 0) * 2 + (b.likes || 0) + (b.views || 0) * 0.1
+        return scoreB - scoreA
+      })
+      .slice(0, 50)
+
+    const allOptions = await ctx.db.query("pollOptions").collect()
+    const optionsByPollId = new Map<string, typeof allOptions>()
+    allOptions.forEach((option) => {
+      if (!optionsByPollId.has(option.pollId)) {
+        optionsByPollId.set(option.pollId, [])
+      }
+      optionsByPollId.get(option.pollId)?.push(option)
+    })
+
+    const authorIds = [...new Set(sortedPolls.map((poll) => poll.authorId))]
+    const authors = await Promise.all(
+      authorIds.map((authorId) =>
+        ctx.db
+          .query("users")
+          .withIndex("by_userId", (q) => q.eq("userId", authorId))
+          .first(),
+      ),
+    )
+    const authorsById = new Map<string, (typeof authors)[0]>()
+    authors.forEach((author) => {
+      if (author) {
+        authorsById.set(author.userId, author)
+      }
+    })
+
+    const pollsWithOptions = sortedPolls.map((poll) => {
+      const options = optionsByPollId.get(poll._id) || []
+      const author = authorsById.get(poll.authorId)
+
+      return {
+        id: poll._id,
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        dev: poll.dev,
+        authorId: poll.authorId,
+        authorUsername: poll.authorUsername,
+        authorProfileImageUrl: author?.profileImageUrl,
+        createdAt: poll.createdAt,
+        views: poll.views || 0,
+        likes: poll.likes || 0,
+        options: options.map((option) => ({
+          id: option._id,
+          pollId: option.pollId,
+          text: option.text,
+          votes: option.votes,
+          votedUserIds: option.votedUserIds,
+        })),
+      }
+    })
+
+    return {
+      polls: pollsWithOptions,
+      isDone: true,
+      continueCursor: null,
+    }
   },
 })

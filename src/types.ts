@@ -17,6 +17,8 @@ export interface Poll {
   authorUsername: string
   authorProfileImageUrl?: string
   createdAt: number
+  views: number
+  likes: number
   options: PollOption[]
 }
 

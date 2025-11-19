@@ -2,9 +2,10 @@ import { useAuth } from "@clerk/clerk-react"
 import { createFileRoute, Link, notFound } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
+import { CommentSection } from "@/components/comments/comment-section"
 import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
 import { generatePollSEOConfig } from "@/lib/seo"
@@ -25,6 +26,13 @@ const PollPage = () => {
   const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
   const vote = useMutation(api.polls.vote)
   const deletePoll = useMutation(api.polls.deletePoll)
+  const viewPoll = useMutation(api.polls.viewPoll)
+
+  useEffect(() => {
+    if (pollId) {
+      viewPoll({ pollId: pollId as Id<"polls"> })
+    }
+  }, [pollId, viewPoll])
 
   // Show loading state while fetching poll
   if (poll === undefined) {
@@ -314,6 +322,10 @@ const PollPage = () => {
               <p className="text-muted-foreground">Vote to see the current results!</p>
             </div>
           )}
+
+          <div className="border-muted border-t pt-8">
+            <CommentSection pollId={pollId} />
+          </div>
         </div>
       </div>
     </>

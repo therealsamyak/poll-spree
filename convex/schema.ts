@@ -8,6 +8,8 @@ export default defineSchema({
     dev: v.boolean(),
     authorId: v.string(),
     authorUsername: v.string(),
+    views: v.optional(v.number()),
+    likes: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_createdAt", ["createdAt"])
@@ -27,6 +29,21 @@ export default defineSchema({
   })
     .index("by_poll_user", ["pollId", "userId"])
     .index("by_userId", ["userId"]),
+
+  comments: defineTable({
+    pollId: v.id("polls"),
+    userId: v.string(),
+    username: v.string(),
+    text: v.string(),
+    createdAt: v.number(),
+  }).index("by_pollId", ["pollId"]),
+
+  pollLikes: defineTable({
+    pollId: v.id("polls"),
+    userId: v.string(),
+  })
+    .index("by_pollId", ["pollId"])
+    .index("by_user_poll", ["userId", "pollId"]),
 
   users: defineTable({
     userId: v.string(),

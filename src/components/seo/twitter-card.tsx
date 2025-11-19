@@ -1,5 +1,3 @@
-import { HeadContent } from "@tanstack/react-router"
-
 interface TwitterCardProps {
   card?: string
   title?: string
@@ -20,7 +18,7 @@ export const TwitterCard = ({
   site = "@pollspree",
 }: TwitterCardProps) => {
   return (
-    <HeadContent>
+    <>
       <meta name="twitter:card" content={card} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
@@ -28,6 +26,6 @@ export const TwitterCard = ({
       <meta name="twitter:image:alt" content={imageAlt} />
       <meta name="twitter:creator" content={creator} />
       <meta name="twitter:site" content={site} />
-    </HeadContent>
+    </>
   )
 }

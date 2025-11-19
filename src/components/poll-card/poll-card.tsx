@@ -1,12 +1,12 @@
 import { useAuth } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Calendar, Trash2 } from "lucide-react"
+import { BarChart3, Calendar, Eye, Heart, MessageCircle, Share2, Trash2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -37,6 +37,19 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
 
   const vote = useMutation(api.polls.vote)
   const deletePoll = useMutation(api.polls.deletePoll)
+  const toggleLike = useMutation(api.polls.toggleLike)
+  const [isLiked, setIsLiked] = useState(false) // Optimistic UI
+
+  const likeStatus = useQuery(api.polls.getPollLikeStatus, {
+    pollId: poll.id as Id<"polls">,
+    userId: userId || "",
+  })
+
+  useEffect(() => {
+    if (likeStatus !== undefined) {
+      setIsLiked(likeStatus)
+    }
+  }, [likeStatus])
 
   // Use pre-fetched user vote if available, otherwise fetch it
   const fetchedUserVote = useQuery(api.polls.getUserVote, {
@@ -215,6 +228,30 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
     return result
   }
 
+  const handleLike = async () => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to like")
+      return
+    }
+    if (!userId) return
+
+    // Optimistic update
+    setIsLiked(!isLiked)
+
+    try {
+      await toggleLike({ pollId: poll.id as Id<"polls">, userId })
+    } catch (_error) {
+      setIsLiked(!isLiked) // Revert
+      toast.error("Failed to like poll")
+    }
+  }
+
+  const handleShare = () => {
+    const url = `${window.location.origin}/polls/${poll.id}`
+    navigator.clipboard.writeText(url)
+    toast.success("Link copied to clipboard!")
+  }
+
   return (
     <Card className="group flex h-full flex-col border border-muted bg-card/50 shadow-md backdrop-blur-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50">
       <CardHeader>
@@ -391,6 +428,41 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           </div>
         </DialogContent>
       </Dialog>
+      <CardFooter className="border-muted/50 border-t p-4">
+        <div className="flex w-full items-center justify-between text-muted-foreground text-sm">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleLike}
+              className={`flex items-center gap-1.5 transition-colors hover:text-red-500 ${isLiked ? "text-red-500" : ""}`}
+            >
+              <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+              <span>
+                {poll.likes + (isLiked && !likeStatus ? 1 : !isLiked && likeStatus ? -1 : 0)}
+              </span>
+            </button>
+            <Link
+              to="/polls/$pollId"
+              params={{ pollId: poll.id }}
+              className="flex items-center gap-1.5 transition-colors hover:text-blue-500"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>Comments</span>
+            </Link>
+            <div className="flex items-center gap-1.5">
+              <Eye className="h-4 w-4" />
+              <span>{poll.views || 0}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+          >
+            <Share2 className="h-4 w-4" />
+          </button>
+        </div>
+      </CardFooter>
     </Card>
   )
 }

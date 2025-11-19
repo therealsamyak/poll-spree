@@ -1,10 +1,10 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
-import { BarChart3, Loader2, Plus } from "lucide-react"
+import { BarChart3, ChevronLeft, ChevronRight, Loader2, Plus } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
-import { PollCard } from "@/components/poll-card"
+import { FeedPollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Poll } from "@/types"
@@ -20,9 +20,39 @@ export const PollsList = () => {
   const [allPolls, setAllPolls] = useState<Poll[]>([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const pollsResult = useQuery(api.polls.getPolls, { paginationOpts })
-  const stats = useQuery(api.polls.getPollsStats)
+  const _stats = useQuery(api.polls.getPollsStats)
+
+  // Scroll handlers
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const width = scrollContainerRef.current.clientWidth
+      scrollContainerRef.current.scrollBy({ left: -width, behavior: "smooth" })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const width = scrollContainerRef.current.clientWidth
+      scrollContainerRef.current.scrollBy({ left: width, behavior: "smooth" })
+    }
+  }
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        scrollLeft()
+      } else if (e.key === "ArrowRight") {
+        scrollRight()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
@@ -65,7 +95,8 @@ export const PollsList = () => {
         }
       },
       {
-        rootMargin: "100px", // Start loading when user is 100px away from the bottom
+        root: null, // Use viewport
+        rootMargin: "400px", // Load sooner
         threshold: 0.1,
       },
     )
@@ -86,7 +117,7 @@ export const PollsList = () => {
 
   if (pollsResult === undefined) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading polls...</p>
@@ -99,7 +130,7 @@ export const PollsList = () => {
 
   if (allPolls.length === 0) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center px-4">
+      <div className="flex h-full w-full items-center justify-center px-4">
         <Card className="mx-auto w-full max-w-md border-2 border-muted-foreground/20 border-dashed text-center">
           <CardHeader className="pb-4">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
@@ -127,60 +158,88 @@ export const PollsList = () => {
     )
   }
 
-  const _totalVotes = stats?.totalVotes || 0
-  const _totalPolls = stats?.totalPolls || allPolls.length
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Content */}
-      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header row: Recent Polls + Create Button */}
-        <div className="mb-8 flex w-full items-center justify-center sm:justify-between">
-          <h2 className="font-bold text-2xl">Recent Polls</h2>
-          {isSignedIn && (
-            <div className="hidden sm:block">
-              <CreatePollDialog />
+    <div className="relative h-[calc(100vh-4rem)] md:h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Navigation Buttons */}
+      <button
+        type="button"
+        onClick={scrollLeft}
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-40 h-12 w-12 items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border/50 text-foreground/70 hover:bg-background hover:text-foreground hover:scale-110 transition-all shadow-lg"
+        aria-label="Previous poll"
+      >
+        <ChevronLeft className="h-8 w-8" />
+      </button>
+
+      <button
+        type="button"
+        onClick={scrollRight}
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-40 h-12 w-12 items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border/50 text-foreground/70 hover:bg-background hover:text-foreground hover:scale-110 transition-all shadow-lg"
+        aria-label="Next poll"
+      >
+        <ChevronRight className="h-8 w-8" />
+      </button>
+
+      <div
+        ref={scrollContainerRef}
+        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
+      >
+        {allPolls.map((poll, _index) => (
+          <div
+            key={poll.id}
+            className="flex h-full w-full shrink-0 snap-start items-center justify-center p-4 md:p-8"
+          >
+            <div className="w-full max-w-3xl h-full flex items-center justify-center">
+              <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
+            </div>
+          </div>
+        ))}
+
+        {/* Infinite Scroll Trigger / Loading State */}
+        <div
+          ref={loadMoreRef}
+          className="flex h-full w-full shrink-0 snap-start items-center justify-center"
+        >
+          {!isDone && (
+            <div className="flex flex-col items-center gap-4 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="text-lg font-medium">Loading more polls...</span>
+            </div>
+          )}
+          {isDone && allPolls.length > 0 && (
+            <div className="flex flex-col items-center justify-center gap-6 text-center p-8">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-muted/50">
+                <BarChart3 className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-3xl font-bold">You're all caught up!</h3>
+                <p className="text-muted-foreground max-w-md text-lg">
+                  You've seen all the polls. Why not create your own?
+                </p>
+              </div>
+              {isSignedIn ? (
+                <CreatePollDialog />
+              ) : (
+                <SignInButton mode="modal">
+                  <Button className="gap-2 bg-primary shadow-lg hover:bg-primary/90">
+                    <Plus className="h-5 w-5" />
+                    Sign in to create polls
+                  </Button>
+                </SignInButton>
+              )}
+              <div className="mt-8">
+                <Footer />
+              </div>
             </div>
           )}
         </div>
-
-        {/* Polls Grid */}
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {allPolls.map((poll, index) => (
-            <div
-              key={poll.id}
-              className="slide-in-from-bottom-4 animate-in duration-500"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <PollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
-            </div>
-          ))}
-        </div>
-
-        {/* Infinite Scroll Trigger */}
-        {!isDone && continueCursor && (
-          <div ref={loadMoreRef} className="mt-8 flex justify-center py-4">
-            {isLoadingMore ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Loading more polls...</span>
-              </div>
-            ) : (
-              <div className="h-4" /> // Invisible trigger element
-            )}
-          </div>
-        )}
-
-        {/* End of content indicator */}
-        {isDone && allPolls.length > 0 && (
-          <div className="mt-8 text-center text-muted-foreground">
-            <p>You've reached the end!</p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <Footer />
       </div>
+
+      {/* Floating Create Button for Mobile/Desktop */}
+      {isSignedIn && (
+        <div className="fixed right-6 bottom-6 z-50 md:right-10 md:bottom-10">
+          <CreatePollDialog />
+        </div>
+      )}
     </div>
   )
 }

@@ -1,5 +1,3 @@
-import { HeadContent } from "@tanstack/react-router"
-
 interface MetaTagsProps {
   title?: string
   description?: string
@@ -22,7 +20,7 @@ export const MetaTags = ({
   charset = "UTF-8",
 }: MetaTagsProps) => {
   return (
-    <HeadContent>
+    <>
       <meta charSet={charset} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>{title}</title>
@@ -34,6 +32,6 @@ export const MetaTags = ({
       <meta httpEquiv="Content-Language" content={language} />
       <meta name="theme-color" content="#000000" />
       <meta name="color-scheme" content="dark light" />
-    </HeadContent>
+    </>
   )
 }
