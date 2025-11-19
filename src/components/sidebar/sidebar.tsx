@@ -1,7 +1,7 @@
 import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User } from "lucide-react"
+import { BarChart3, Edit, Home, LogOut, Plus, Settings, TrendingUp, User, Sparkles } from "lucide-react"
 import { useId, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { CreatePollDialogContent } from "@/components/create-poll-dialog"
@@ -40,7 +40,9 @@ export const Sidebar = () => {
 const SidebarContent = () => {
   const { isSignedIn, userId } = useAuth()
   const { signOut } = useClerk()
+  const navigate = useNavigate()
   const user = useQuery(api.users.getUser, { userId: userId || "" })
+  const randomPoll = useQuery(api.polls.getRandomPoll, {})
   const updateUsername = useMutation(api.users.updateUsername)
   const [newUsername, setNewUsername] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -49,6 +51,12 @@ const SidebarContent = () => {
   const { showNotification } = useNotification()
 
   const usernameId = useId()
+
+  const handleSurprise = () => {
+    if (randomPoll?.id) {
+      navigate({ to: "/polls/$pollId", params: { pollId: randomPoll.id } })
+    }
+  }
 
   const handleUpdateUsername = async () => {
     if (!newUsername.trim() || !userId) return
@@ -127,12 +135,20 @@ const SidebarContent = () => {
         </Link> */}
         <Link
           to="/trending"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
           activeProps={{ className: "bg-accent text-accent-foreground" }}
         >
           <TrendingUp className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Trending</span>
         </Link>
+        <Button
+          onClick={handleSurprise}
+          variant="ghost"
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+        >
+          <Sparkles className="h-6 w-6" />
+          <span className="ml-2 hidden md:inline">Surprise!</span>
+        </Button>
       </nav>
 
       {/* Actions */}
