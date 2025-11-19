@@ -16,7 +16,8 @@
     "convex:deploy": "convex deploy",
     "build:all": "concurrently \"bun run build:backend\" \"bun run build:frontend\"",
     "update": "bun upgrade && bun update",
-    "update:latest": "bun upgrade && bun update --latest"
+    "update:latest": "bun upgrade && bun update --latest",
+    "prepare": "bunx lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.6",
