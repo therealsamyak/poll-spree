@@ -221,25 +221,9 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
     return Math.round((votes / poll.totalVotes) * 100)
   }
 
-  // Helper to compute places while maintaining original order
+  // Keep options in original order
   const getOptionsWithPlaces = () => {
-    if (!isSignedIn || !userVote?.optionId) {
-      return poll.options.map((option) => ({ option, place: undefined }))
-    }
-
-    // Create a map of vote counts to places
-    const voteCounts = poll.options.map((option) => option.votes)
-    const uniqueSortedCounts = [...new Set(voteCounts)].sort((a, b) => b - a)
-    const countToPlace = new Map()
-    uniqueSortedCounts.forEach((count, index) => {
-      countToPlace.set(count, index + 1)
-    })
-
-    // Return options in original order with their places
-    return poll.options.map((option) => ({
-      option,
-      place: countToPlace.get(option.votes),
-    }))
+    return poll.options.map((option) => ({ option, place: undefined }))
   }
 
   const handleLike = async () => {
@@ -372,20 +356,12 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                     className="flex w-full flex-col items-start gap-1"
                     style={{ color: "var(--foreground)" }}
                   >
-                    <span className="flex items-center gap-2">
-                      {/* Only show place if user has voted and is signed in */}
-                      {selectedWithPlace?.place !== undefined && (
-                        <span className="font-bold text-lg" style={{ color: "var(--foreground)" }}>
-                          {selectedWithPlace.place}.
-                        </span>
-                      )}
-                      <span
-                        style={{ color: "var(--foreground)" }}
-                        className="block max-w-[10rem] truncate"
-                        title={selected.text}
-                      >
-                        {selected.text}
-                      </span>
+                    <span
+                      style={{ color: "var(--foreground)" }}
+                      className="block max-w-[10rem] truncate"
+                      title={selected.text}
+                    >
+                      {selected.text}
                     </span>
                     <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
                       {getVotePercentage(selected.votes)}% • {selected.votes} vote
@@ -427,17 +403,11 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                     className="flex w-full flex-col items-start gap-1"
                     style={{ color: "var(--foreground)" }}
                   >
-                    <span className="flex w-full items-center">
-                      {/* Only show place if user has voted and is signed in */}
-                      {place !== undefined && (
-                        <span className="mr-2 flex-shrink-0 flex-nowrap">{place}.</span>
-                      )}
-                      <span
-                        className="whitespace-pre-line break-words"
-                        style={{ wordBreak: "break-word" }}
-                      >
-                        {option.text}
-                      </span>
+                    <span
+                      className="whitespace-pre-line break-words"
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      {option.text}
                     </span>
                     {showResults && (
                       <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
