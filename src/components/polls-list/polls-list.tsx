@@ -230,14 +230,14 @@ export const PollsList = () => {
       {/* Desktop: Horizontal Layout */}
       <div
         ref={scrollContainerRef}
-        className="hidden h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] md:flex [&::-webkit-scrollbar]:hidden"
+        className="hidden w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] md:flex [&::-webkit-scrollbar]:hidden"
       >
         {allPolls.map((poll, _index) => (
           <div
             key={poll.id}
-            className="flex h-full w-full shrink-0 snap-start justify-center overflow-y-auto p-4 md:p-8"
+            className="flex w-full shrink-0 snap-start items-start justify-center overflow-y-auto p-4 md:p-8 pt-8 md:pt-12"
           >
-            <div className="mt-8 w-full max-w-3xl">
+            <div className="w-full max-w-3xl">
               <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
             </div>
           </div>
