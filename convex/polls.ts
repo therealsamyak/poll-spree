@@ -851,3 +851,44 @@ export const getTrendingPolls = query({
     }
   },
 })
+
+export const getRandomPoll = query({
+  args: {},
+  handler: async (ctx) => {
+    const polls = await ctx.db.query("polls").collect()
+
+    if (polls.length === 0) {
+      return null
+    }
+
+    const randomPoll = polls[Math.floor(Math.random() * polls.length)]
+
+    const options = await ctx.db
+      .query("pollOptions")
+      .withIndex("by_pollId", (q) => q.eq("pollId", randomPoll._id))
+      .collect()
+
+    const author = await ctx.db
+      .query("users")
+      .withIndex("by_userId", (q) => q.eq("userId", randomPoll.authorId))
+      .first()
+
+    return {
+      id: randomPoll._id,
+      question: randomPoll.question,
+      totalVotes: randomPoll.totalVotes,
+      dev: randomPoll.dev,
+      authorId: randomPoll.authorId,
+      authorUsername: randomPoll.authorUsername,
+      authorProfileImageUrl: author?.profileImageUrl,
+      createdAt: randomPoll.createdAt,
+      options: options.map((option) => ({
+        id: option._id,
+        pollId: option.pollId,
+        text: option.text,
+        votes: option.votes,
+        votedUserIds: option.votedUserIds,
+      })),
+    }
+  },
+})
