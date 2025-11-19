@@ -1,17 +1,11 @@
 import { SignIn } from "@clerk/clerk-react"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
 
 const SignInPage = () => {
-  const [redirectUrl, setRedirectUrl] = useState("/")
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      const redirect = params.get("redirect_url")
-      setRedirectUrl(redirect || "/")
-    }
-  }, [])
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  )
+  const redirectUrl = params.get("redirect_url") || "/"
 
   return (
     <div className="flex min-h-screen items-center justify-center">
