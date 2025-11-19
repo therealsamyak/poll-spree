@@ -124,20 +124,17 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
       showSignInNotification({
-        message: "Please sign in to vote",
-        onSignIn: () => {
-          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const clerkFrontendUrl =
-            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
-            "https://willing-python-74.clerk.accounts.dev"
-          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
-          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
-        },
-      })
-      return
-    }
+         message: "Please sign in to vote",
+         onSignIn: () => {
+           sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+           const redirectUrl = encodeURIComponent(window.location.pathname)
+           window.location.href = `/sign-in?redirect_url=${redirectUrl}`
+         },
+       })
+       return
+      }
 
-    if (!userId) return
+      if (!userId) return
 
     // If user clicks the same option, unvote
     if (userVote?.optionId === optionId) {
@@ -232,19 +229,16 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
         message: "Please sign in to like polls",
         onSignIn: () => {
           sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const clerkFrontendUrl =
-            import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
-            "https://willing-python-74.clerk.accounts.dev"
-          const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname)
-          window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
-        },
-      })
-      return
-    }
-    if (!userId) return
+          const redirectUrl = encodeURIComponent(window.location.pathname)
+          window.location.href = `/sign-in?redirect_url=${redirectUrl}`
+          },
+          })
+          return
+          }
+          if (!userId) return
 
-    // Optimistic update
-    setIsLiked(!isLiked)
+          // Optimistic update
+          setIsLiked(!isLiked)
 
     try {
       await toggleLike({ pollId: poll.id as Id<"polls">, userId })
@@ -334,15 +328,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                   showSignInNotification({
                     message: "Please sign in to vote",
                     onSignIn: () => {
-                      sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-                      const clerkFrontendUrl =
-                        import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
-                        "https://willing-python-74.clerk.accounts.dev"
-                      const redirectUrl = encodeURIComponent(
-                        window.location.origin + window.location.pathname,
-                      )
-                      window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
-                    },
+                       sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+                       const redirectUrl = encodeURIComponent(window.location.pathname)
+                       window.location.href = `/sign-in?redirect_url=${redirectUrl}`
+                     },
                   })
                   return
                 }
