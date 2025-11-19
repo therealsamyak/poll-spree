@@ -52,11 +52,6 @@ export const UsernameSetup = () => {
     if (!userId) {
       showSignInNotification({
         message: "Please sign in to continue",
-        onSignIn: () => {
-          sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
-          const redirectUrl = encodeURIComponent(window.location.pathname)
-          window.location.href = `/sign-in?redirect_url=${redirectUrl}`
-        },
       })
       return
     }
