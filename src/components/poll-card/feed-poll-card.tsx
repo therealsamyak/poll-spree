@@ -174,31 +174,9 @@ export const FeedPollCard = ({
     return Math.round((votes / poll.totalVotes) * 100)
   }
 
-  // Helper to compute places and sorted options
+  // Keep options in original order
   const getOptionsWithPlaces = () => {
-    if (!isSignedIn || !userVote?.optionId) {
-      return poll.options.map((option) => ({ option, place: undefined }))
-    }
-    const groups: Record<number, typeof poll.options> = {}
-    poll.options.forEach((option) => {
-      if (!groups[option.votes]) groups[option.votes] = []
-      groups[option.votes].push(option)
-    })
-    const sortedVoteCounts = Object.keys(groups)
-      .map((v) => Number(v))
-      .sort((a, b) => b - a)
-    let place = 1
-    const result: { option: (typeof poll.options)[0]; place: number }[] = []
-    for (const voteCount of sortedVoteCounts) {
-      const group = groups[voteCount].sort((a, b) =>
-        a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
-      )
-      for (const option of group) {
-        result.push({ option, place })
-      }
-      place += group.length
-    }
-    return result
+    return poll.options.map((option) => ({ option, place: undefined }))
   }
 
   const handleLike = async () => {
@@ -287,7 +265,7 @@ export const FeedPollCard = ({
 
       <CardContent className="flex-1 py-4">
         <div className="flex flex-col gap-3">
-          {getOptionsWithPlaces().map(({ option, place }) => {
+          {getOptionsWithPlaces().map(({ option }) => {
             const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
 
             return (
@@ -308,12 +286,7 @@ export const FeedPollCard = ({
                    borderColor: isSelected ? "var(--primary)" : undefined,
                  }}
                >
-                 <span className="flex w-full items-start gap-2">
-                   {place !== undefined && (
-                     <span className="mt-1 flex-shrink-0 font-bold text-xl">{place}.</span>
-                   )}
-                   <span className="min-w-0 flex-1 break-words text-left">{option.text}</span>
-                 </span>
+                 <span className="min-w-0 flex-1 break-words text-left">{option.text}</span>
                  {showResults && (
                    <span className="mt-2 text-sm opacity-90">
                      {getVotePercentage(option.votes)}% • {option.votes} vote
