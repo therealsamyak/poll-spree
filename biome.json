@@ -19,7 +19,7 @@
       "!**/src-tauri",
       "!**/.nuxt",
       "!bts.jsonc",
-      "!**/_generated/**"
+      "!**/_generated"
     ]
   },
   "formatter": {
@@ -69,6 +69,11 @@
     "formatter": {
       "quoteStyle": "double",
       "semicolons": "asNeeded"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   }
 }
