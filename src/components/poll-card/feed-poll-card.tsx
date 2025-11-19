@@ -222,8 +222,9 @@ export const FeedPollCard = ({
               <CardTitle
                 className="w-full cursor-pointer break-words font-bold text-3xl leading-tight transition-colors hover:text-primary"
                 style={{ wordBreak: "break-word" }}
+                title={poll.question}
               >
-                {poll.question}
+                {poll.question.length > 75 ? `${poll.question.slice(0, 75)}...` : poll.question}
               </CardTitle>
             </Link>
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
