@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrendingRouteImport } from './routes/trending'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersUsernameRouteImport } from './routes/users.$username'
 import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
@@ -18,6 +20,16 @@ import { Route as PollsPollIdRouteImport } from './routes/polls.$pollId'
 const TrendingRoute = TrendingRouteImport.update({
   id: '/trending',
   path: '/trending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +55,8 @@ const PollsPollIdRoute = PollsPollIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
@@ -50,6 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
@@ -58,6 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trending': typeof TrendingRoute
   '/polls/$pollId': typeof PollsPollIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
@@ -67,15 +85,26 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/sign-in'
+    | '/sign-up'
     | '/trending'
     | '/polls/$pollId'
     | '/sitemap/xml'
     | '/users/$username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/trending' | '/polls/$pollId' | '/sitemap/xml' | '/users/$username'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   id:
     | '__root__'
     | '/'
+    | '/sign-in'
+    | '/sign-up'
     | '/trending'
     | '/polls/$pollId'
     | '/sitemap/xml'
@@ -84,6 +113,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   TrendingRoute: typeof TrendingRoute
   PollsPollIdRoute: typeof PollsPollIdRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
@@ -97,6 +128,20 @@ declare module '@tanstack/react-router' {
       path: '/trending'
       fullPath: '/trending'
       preLoaderRoute: typeof TrendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -132,6 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   TrendingRoute: TrendingRoute,
   PollsPollIdRoute: PollsPollIdRoute,
   SitemapXmlRoute: SitemapXmlRoute,
