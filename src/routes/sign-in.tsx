@@ -7,15 +7,18 @@ const SignInPage = () => {
   )
   const redirectUrl = params.get("redirect_url") || "/"
 
+  // Decode the redirect URL if it's encoded
+  const decodedRedirectUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/"
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
-        <SignIn fallbackRedirectUrl={redirectUrl} signUpFallbackRedirectUrl={redirectUrl} />
+        <SignIn fallbackRedirectUrl={decodedRedirectUrl} signUpFallbackRedirectUrl={decodedRedirectUrl} />
         <div className="mt-4 text-center text-sm">
           Don't have an account?{" "}
           <Link
             to="/sign-up"
-            search={redirectUrl !== "/" ? { redirect_url: redirectUrl } : undefined}
+            search={decodedRedirectUrl !== "/" ? { redirect_url: decodedRedirectUrl } : undefined}
           >
             Sign up
           </Link>
