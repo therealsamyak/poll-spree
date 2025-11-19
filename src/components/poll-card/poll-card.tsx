@@ -267,20 +267,21 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           <div className="flex-1 space-y-3">
             {/* Fixed-height question container with dynamic font size */}
             <div className="flex h-[72px] items-center">
-             <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
-               {(() => {
-                 const displayText = poll.question.length > 75 ? `${poll.question.slice(0, 75)}...` : poll.question
-                 return (
-                   <CardTitle
-                     className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
-                     style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
-                     title={poll.question}
-                   >
-                     {displayText}
-                   </CardTitle>
-                 )
-               })()}
-             </Link>
+              <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
+                {(() => {
+                  const displayText =
+                    poll.question.length > 75 ? `${poll.question.slice(0, 75)}...` : poll.question
+                  return (
+                    <CardTitle
+                      className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
+                      style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
+                      title={poll.question}
+                    >
+                      {displayText}
+                    </CardTitle>
+                  )
+                })()}
+              </Link>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
               <div className="flex items-center gap-1.5">
@@ -328,7 +329,25 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
             <Button
               variant="outline"
               className="w-full rounded-xl border border-muted bg-muted p-4 font-medium text-base text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
-              onClick={() => setExpanded(true)}
+              onClick={() => {
+                if (!isSignedIn) {
+                  showSignInNotification({
+                    message: "Please sign in to vote",
+                    onSignIn: () => {
+                      sessionStorage.setItem("redirectAfterSignIn", window.location.pathname)
+                      const clerkFrontendUrl =
+                        import.meta.env.VITE_CLERK_FRONTEND_API_URL ||
+                        "https://willing-python-74.clerk.accounts.dev"
+                      const redirectUrl = encodeURIComponent(
+                        window.location.origin + window.location.pathname,
+                      )
+                      window.location.href = `${clerkFrontendUrl}/v1/client/sign_in?redirect_url=${redirectUrl}`
+                    },
+                  })
+                  return
+                }
+                setExpanded(true)
+              }}
               style={{ minHeight: 48 }}
             >
               Vote
