@@ -3,7 +3,13 @@ import { useMutation } from "convex/react"
 import { ArrowRight, Sparkles, User } from "lucide-react"
 import { useId, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useNotification } from "@/components/ui/notification"
@@ -27,7 +33,10 @@ export const UsernameSetup = () => {
     // Validate username using comprehensive validation
     const validation = validateUsername(username)
     if (!validation.isValid) {
-      showNotification({ message: validation.error || "Invalid username", variant: "error" })
+      showNotification({
+        message: validation.error || "Invalid username",
+        variant: "error",
+      })
       return
     }
 
@@ -63,9 +72,15 @@ export const UsernameSetup = () => {
       })
 
       if (result.success) {
-        showNotification({ message: "Username set successfully!", variant: "success" })
+        showNotification({
+          message: "Username set successfully!",
+          variant: "success",
+        })
       } else {
-        showNotification({ message: result.error || "Failed to set username", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to set username",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -110,7 +125,8 @@ export const UsernameSetup = () => {
                   required
                 />
                 <p className="text-muted-foreground text-xs">
-                  English letters, numbers, underscores, and hyphens only (3-20 characters)
+                  English letters, numbers, underscores, and hyphens only (3-20
+                  characters)
                 </p>
               </div>
 

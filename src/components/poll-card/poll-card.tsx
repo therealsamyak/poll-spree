@@ -1,12 +1,31 @@
 import { useAuth } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Calendar, Eye, Heart, MessageCircle, Share2, Trash2 } from "lucide-react"
+import {
+  BarChart3,
+  Calendar,
+  Eye,
+  Heart,
+  MessageCircle,
+  Share2,
+  Trash2,
+} from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useNotification } from "@/components/ui/notification"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -27,7 +46,11 @@ const getQuestionFontSize = (length: number) => {
   return "text-sm sm:text-xs lg:text-sm" // very long
 }
 
-export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: PollCardProps) => {
+export const PollCard = ({
+  poll,
+  onPollDeleted,
+  userVote: preFetchedUserVote,
+}: PollCardProps) => {
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const { userId, isSignedIn } = useAuth()
@@ -69,10 +92,12 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
   // Add loading state check to prevent flash
   const isUserVoteLoading = userVote === undefined && isSignedIn
 
-  const hasVoted = userVote?.optionId !== null && userVote?.optionId !== undefined
+  const hasVoted =
+    userVote?.optionId !== null && userVote?.optionId !== undefined
   const canDelete = currentUser && poll.authorId === userId
   const isAuthor = poll.authorId === userId
-  const _showResults = !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
+  const _showResults =
+    !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
 
   // Only move the selected option to the top if:
   // - The user has selected an option (userVote?.optionId)
@@ -142,7 +167,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
         if (result.success) {
           showNotification({ message: "Vote removed!", variant: "success" })
         } else {
-          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
+          showNotification({
+            message: result.error || "Failed to remove vote",
+            variant: "error",
+          })
         }
       } catch {
         showNotification({
@@ -167,7 +195,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       if (result.success) {
         showNotification({ message: "Vote recorded!", variant: "success" })
       } else {
-        showNotification({ message: result.error || "Failed to vote", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to vote",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -190,10 +221,16 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
       })
 
       if (result.success) {
-        showNotification({ message: "Poll deleted successfully!", variant: "success" })
+        showNotification({
+          message: "Poll deleted successfully!",
+          variant: "success",
+        })
         onPollDeleted?.()
       } else {
-        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to delete poll",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -237,7 +274,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
   const handleShare = () => {
     const url = `${window.location.origin}/polls/${poll.id}`
     navigator.clipboard.writeText(url)
-    showNotification({ message: "Link copied to clipboard!", variant: "success" })
+    showNotification({
+      message: "Link copied to clipboard!",
+      variant: "success",
+    })
   }
 
   return (
@@ -247,14 +287,24 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           <div className="flex-1 space-y-3">
             {/* Fixed-height question container with dynamic font size */}
             <div className="flex h-[72px] items-center">
-              <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="w-full">
+              <Link
+                to="/polls/$pollId"
+                params={{ pollId: poll.id }}
+                className="w-full"
+              >
                 {(() => {
                   const displayText =
-                    poll.question.length > 75 ? `${poll.question.slice(0, 75)}...` : poll.question
+                    poll.question.length > 75
+                      ? `${poll.question.slice(0, 75)}...`
+                      : poll.question
                   return (
                     <CardTitle
                       className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
-                      style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
+                      style={{
+                        lineHeight: 1.15,
+                        width: "100%",
+                        wordBreak: "break-word",
+                      }}
                       title={poll.question}
                     >
                       {displayText}
@@ -270,7 +320,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                   params={{ username: poll.authorUsername }}
                   className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
                 >
-                  <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
+                  <Avatar
+                    size="sm"
+                    profileImageUrl={poll.authorProfileImageUrl}
+                  />
                   <span className="font-medium">{poll.authorUsername}</span>
                 </Link>
               </div>
@@ -325,7 +378,9 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           {!isUserVoteLoading &&
             userVote?.optionId &&
             (() => {
-              const selected = poll.options.find((o) => o.id === userVote.optionId)
+              const selected = poll.options.find(
+                (o) => o.id === userVote.optionId,
+              )
               if (!selected) return null
               const optionsWithPlaces = getOptionsWithPlaces()
               const _selectedWithPlace = optionsWithPlaces.find(
@@ -356,8 +411,12 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                     >
                       {selected.text}
                     </span>
-                    <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
-                      {getVotePercentage(selected.votes)}% • {selected.votes} vote
+                    <span
+                      className="mt-1 text-xs"
+                      style={{ color: "var(--foreground)" }}
+                    >
+                      {getVotePercentage(selected.votes)}% • {selected.votes}{" "}
+                      vote
                       {selected.votes === 1 ? "" : "s"}
                     </span>
                   </span>
@@ -374,7 +433,8 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
           </DialogHeader>
           <div className="flex flex-col gap-3">
             {getOptionsWithPlaces().map(({ option }) => {
-              const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
+              const isSelected =
+                !isUserVoteLoading && userVote?.optionId === option.id
               const showResults = !isUserVoteLoading && userVote?.optionId
               return (
                 <Button
@@ -403,7 +463,10 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
                       {option.text}
                     </span>
                     {showResults && (
-                      <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
+                      <span
+                        className="mt-1 text-xs"
+                        style={{ color: "var(--foreground)" }}
+                      >
                         {getVotePercentage(option.votes)}% • {option.votes} vote
                         {option.votes === 1 ? "" : "s"}
                       </span>
@@ -425,7 +488,12 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
             >
               <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
               <span>
-                {poll.likes + (isLiked && !likeStatus ? 1 : !isLiked && likeStatus ? -1 : 0)}
+                {poll.likes +
+                  (isLiked && !likeStatus
+                    ? 1
+                    : !isLiked && likeStatus
+                      ? -1
+                      : 0)}
               </span>
             </button>
             <Link

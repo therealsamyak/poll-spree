@@ -34,7 +34,10 @@ export const generateSEODescription = (
   )
 }
 
-export const generateSEOKeywords = (baseKeywords: string[], additionalKeywords: string[] = []) => {
+export const generateSEOKeywords = (
+  baseKeywords: string[],
+  additionalKeywords: string[] = [],
+) => {
   const defaultKeywords = [
     "polls",
     "voting",
@@ -45,10 +48,15 @@ export const generateSEOKeywords = (baseKeywords: string[], additionalKeywords: 
     "social media polls",
   ]
 
-  return [...defaultKeywords, ...baseKeywords, ...additionalKeywords].filter(Boolean).join(", ")
+  return [...defaultKeywords, ...baseKeywords, ...additionalKeywords]
+    .filter(Boolean)
+    .join(", ")
 }
 
-export const generateCanonicalUrl = (path: string, baseUrl = "https://pollspree.com") => {
+export const generateCanonicalUrl = (
+  path: string,
+  baseUrl = "https://pollspree.com",
+) => {
   return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`
 }
 
@@ -59,7 +67,9 @@ export const generateStructuredData = (config: SEOConfig) => {
     name: config.title,
     description: config.description,
     url: config.canonical,
-    ...(config.author && { author: { "@type": "Person", name: config.author } }),
+    ...(config.author && {
+      author: { "@type": "Person", name: config.author },
+    }),
     ...(config.publishedTime && { datePublished: config.publishedTime }),
     ...(config.modifiedTime && { dateModified: config.modifiedTime }),
   }
@@ -85,7 +95,11 @@ export const generateStructuredData = (config: SEOConfig) => {
   return baseData
 }
 
-export const generateSitemapUrl = (path: string, priority = 0.5, changefreq = "weekly") => {
+export const generateSitemapUrl = (
+  path: string,
+  priority = 0.5,
+  changefreq = "weekly",
+) => {
   return {
     loc: `https://pollspree.com${path}`,
     lastmod: new Date().toISOString(),

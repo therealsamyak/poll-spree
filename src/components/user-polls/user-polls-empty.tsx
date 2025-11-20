@@ -1,5 +1,10 @@
 import { BarChart3, UserX } from "lucide-react"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 type EmptyStateType = "user-not-found" | "no-polls" | "no-results"
 
@@ -35,8 +40,13 @@ export const UserPollsEmpty = ({
             : `${username} has not created or voted on any polls.`,
         }
       case "no-results": {
-        const filterLabels = filters?.map((f) => (f === "authored" ? "authored" : "voted on")) || []
-        const filterText = filterLabels.length === 1 ? filterLabels[0] : filterLabels.join(" or ")
+        const filterLabels =
+          filters?.map((f) => (f === "authored" ? "authored" : "voted on")) ||
+          []
+        const filterText =
+          filterLabels.length === 1
+            ? filterLabels[0]
+            : filterLabels.join(" or ")
 
         return {
           icon: BarChart3,
@@ -60,7 +70,9 @@ export const UserPollsEmpty = ({
             <IconComponent className="h-8 w-8 text-muted-foreground" />
           </div>
           <CardTitle className="font-bold text-2xl">{content.title}</CardTitle>
-          <CardDescription className="text-base">{content.description}</CardDescription>
+          <CardDescription className="text-base">
+            {content.description}
+          </CardDescription>
         </CardHeader>
       </Card>
     </div>

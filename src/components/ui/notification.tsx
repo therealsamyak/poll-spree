@@ -10,7 +10,12 @@ interface NotificationProps {
   duration?: number
 }
 
-const Notification = ({ message, variant, onClose, duration = 3000 }: NotificationProps) => {
+const Notification = ({
+  message,
+  variant,
+  onClose,
+  duration = 3000,
+}: NotificationProps) => {
   const [isVisible, setIsVisible] = React.useState(true)
 
   React.useEffect(() => {
@@ -50,10 +55,17 @@ const Notification = ({ message, variant, onClose, duration = 3000 }: Notificati
         isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
       )}
     >
-      <div className={cn("relative w-full rounded-lg border p-4 shadow-lg", variants[variant])}>
+      <div
+        className={cn(
+          "relative w-full rounded-lg border p-4 shadow-lg",
+          variants[variant],
+        )}
+      >
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex-shrink-0">{icons[variant]}</div>
-          <p className="flex-1 font-medium text-sm leading-relaxed">{message}</p>
+          <p className="flex-1 font-medium text-sm leading-relaxed">
+            {message}
+          </p>
           {onClose && (
             <button
               type="button"
@@ -78,9 +90,15 @@ interface NotificationContextType {
   showSignInNotification: () => void
 }
 
-const NotificationContext = React.createContext<NotificationContextType | null>(null)
+const NotificationContext = React.createContext<NotificationContextType | null>(
+  null,
+)
 
-export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
+export const NotificationProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   const [notifications, setNotifications] = React.useState<
     Array<{
       id: string
@@ -94,10 +112,13 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     isOpen: false,
   })
 
-  const showNotification = React.useCallback((props: Omit<NotificationProps, "onClose">) => {
-    const id = Math.random().toString(36).slice(2, 11)
-    setNotifications((prev) => [...prev, { id, props }])
-  }, [])
+  const showNotification = React.useCallback(
+    (props: Omit<NotificationProps, "onClose">) => {
+      const id = Math.random().toString(36).slice(2, 11)
+      setNotifications((prev) => [...prev, { id, props }])
+    },
+    [],
+  )
 
   const showSignInNotification = React.useCallback(() => {
     setSignInModal({
@@ -116,11 +137,17 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
   }, [])
 
   return (
-    <NotificationContext.Provider value={{ showNotification, showSignInNotification }}>
+    <NotificationContext.Provider
+      value={{ showNotification, showSignInNotification }}
+    >
       {children}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {notifications.map(({ id, props }) => (
-          <Notification key={id} {...props} onClose={() => removeNotification(id)} />
+          <Notification
+            key={id}
+            {...props}
+            onClose={() => removeNotification(id)}
+          />
         ))}
       </div>
       <SignInModal isOpen={signInModal.isOpen} onClose={closeSignInModal} />
@@ -131,7 +158,9 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 export const useNotification = () => {
   const context = React.useContext(NotificationContext)
   if (!context) {
-    throw new Error("useNotification must be used within a NotificationProvider")
+    throw new Error(
+      "useNotification must be used within a NotificationProvider",
+    )
   }
   return context
 }

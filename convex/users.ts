@@ -5,7 +5,9 @@ import { validateTextContent } from "./badWordsFilter"
 /**
  * Comprehensive username validation following security best practices
  */
-const validateUsername = (username: string): { isValid: boolean; error?: string } => {
+const validateUsername = (
+  username: string,
+): { isValid: boolean; error?: string } => {
   // Trim whitespace first
   const trimmed = username.trim()
 
@@ -16,7 +18,10 @@ const validateUsername = (username: string): { isValid: boolean; error?: string 
 
   // Check length (3-20 characters)
   if (trimmed.length < 3) {
-    return { isValid: false, error: "Username must be at least 3 characters long" }
+    return {
+      isValid: false,
+      error: "Username must be at least 3 characters long",
+    }
   }
 
   if (trimmed.length > 20) {
@@ -25,12 +30,18 @@ const validateUsername = (username: string): { isValid: boolean; error?: string 
 
   // Check for leading/trailing whitespace (shouldn't happen after trim, but double-check)
   if (username !== trimmed) {
-    return { isValid: false, error: "Username cannot have leading or trailing spaces" }
+    return {
+      isValid: false,
+      error: "Username cannot have leading or trailing spaces",
+    }
   }
 
   // Check for multiple consecutive spaces
   if (/\s{2,}/.test(username)) {
-    return { isValid: false, error: "Username cannot have multiple consecutive spaces" }
+    return {
+      isValid: false,
+      error: "Username cannot have multiple consecutive spaces",
+    }
   }
 
   // Only allow ASCII letters, numbers, underscores, and hyphens
@@ -38,7 +49,8 @@ const validateUsername = (username: string): { isValid: boolean; error?: string 
   if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
     return {
       isValid: false,
-      error: "Username can only contain English letters, numbers, underscores, and hyphens",
+      error:
+        "Username can only contain English letters, numbers, underscores, and hyphens",
     }
   }
 
@@ -49,12 +61,18 @@ const validateUsername = (username: string): { isValid: boolean; error?: string 
 
   // Prevent usernames that end with hyphens or underscores (optional, but cleaner)
   if (/[-_]$/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot end with a hyphen or underscore" }
+    return {
+      isValid: false,
+      error: "Username cannot end with a hyphen or underscore",
+    }
   }
 
   // Prevent consecutive hyphens or underscores (optional, but cleaner)
   if (/[-_]{2,}/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot have consecutive hyphens or underscores" }
+    return {
+      isValid: false,
+      error: "Username cannot have consecutive hyphens or underscores",
+    }
   }
 
   return { isValid: true }
@@ -387,7 +405,9 @@ export const deleteAccount = mutation({
 
     // Step 2: Remove user from all poll options they voted for and adjust vote counts
     for (const option of optionsUserVotedFor) {
-      const updatedVotedUserIds = option.votedUserIds.filter((id) => id !== userId)
+      const updatedVotedUserIds = option.votedUserIds.filter(
+        (id) => id !== userId,
+      )
       const newVoteCount = updatedVotedUserIds.length
 
       await ctx.db.patch(option._id, {
@@ -486,7 +506,9 @@ export const deleteClerkUser = action({
       if (!response.ok) {
         const errorData = await response.json()
         console.error("Clerk API error:", errorData)
-        throw new Error(`Failed to delete Clerk user: ${errorData.message || response.statusText}`)
+        throw new Error(
+          `Failed to delete Clerk user: ${errorData.message || response.statusText}`,
+        )
       }
 
       console.log("Successfully deleted user from Clerk")

@@ -1,11 +1,25 @@
 import { useAuth } from "@clerk/clerk-react"
 import { Link } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
-import { BarChart3, Calendar, Eye, Heart, MessageCircle, Share2, Trash2 } from "lucide-react"
+import {
+  BarChart3,
+  Calendar,
+  Eye,
+  Heart,
+  MessageCircle,
+  Share2,
+  Trash2,
+} from "lucide-react"
 import { useEffect, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { useNotification } from "@/components/ui/notification"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -59,7 +73,8 @@ export const FeedPollCard = ({
   // Add loading state check to prevent flash
   const isUserVoteLoading = userVote === undefined && isSignedIn
 
-  const hasVoted = userVote?.optionId !== null && userVote?.optionId !== undefined
+  const hasVoted =
+    userVote?.optionId !== null && userVote?.optionId !== undefined
   const canDelete = currentUser && poll.authorId === userId
   const isAuthor = poll.authorId === userId
   const showResults = !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
@@ -97,7 +112,10 @@ export const FeedPollCard = ({
         if (result.success) {
           // Vote removed successfully
         } else {
-          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
+          showNotification({
+            message: result.error || "Failed to remove vote",
+            variant: "error",
+          })
         }
       } catch (_error) {
         showNotification({
@@ -122,7 +140,10 @@ export const FeedPollCard = ({
       if (result.success) {
         // Vote recorded successfully
       } else {
-        showNotification({ message: result.error || "Failed to vote", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to vote",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -145,10 +166,16 @@ export const FeedPollCard = ({
       })
 
       if (result.success) {
-        showNotification({ message: "Poll deleted successfully!", variant: "success" })
+        showNotification({
+          message: "Poll deleted successfully!",
+          variant: "success",
+        })
         onPollDeleted?.()
       } else {
-        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to delete poll",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -192,7 +219,10 @@ export const FeedPollCard = ({
   const handleShare = () => {
     const url = `${window.location.origin}/polls/${poll.id}`
     navigator.clipboard.writeText(url)
-    showNotification({ message: "Link copied to clipboard!", variant: "success" })
+    showNotification({
+      message: "Link copied to clipboard!",
+      variant: "success",
+    })
   }
 
   return (
@@ -200,7 +230,11 @@ export const FeedPollCard = ({
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-3">
-            <Link to="/polls/$pollId" params={{ pollId: poll.id }} className="block w-full">
+            <Link
+              to="/polls/$pollId"
+              params={{ pollId: poll.id }}
+              className="block w-full"
+            >
               <CardTitle
                 className="w-full cursor-pointer break-words font-bold text-3xl leading-tight transition-colors hover:text-primary"
                 style={{ wordBreak: "break-word" }}
@@ -214,7 +248,10 @@ export const FeedPollCard = ({
                 params={{ username: poll.authorUsername }}
                 className="flex items-center gap-2 transition-all hover:underline hover:opacity-80"
               >
-                <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
+                <Avatar
+                  size="sm"
+                  profileImageUrl={poll.authorProfileImageUrl}
+                />
                 <span className="font-medium">{poll.authorUsername}</span>
               </Link>
               <div className="flex items-center gap-1.5">
@@ -248,7 +285,8 @@ export const FeedPollCard = ({
       <CardContent className="flex-1 py-4">
         <div className="flex flex-col gap-3">
           {getOptionsWithPlaces().map(({ option }) => {
-            const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
+            const isSelected =
+              !isUserVoteLoading && userVote?.optionId === option.id
 
             return (
               <Button
@@ -268,7 +306,9 @@ export const FeedPollCard = ({
                   borderColor: isSelected ? "var(--primary)" : undefined,
                 }}
               >
-                <span className="min-w-0 flex-1 break-words text-left">{option.text}</span>
+                <span className="min-w-0 flex-1 break-words text-left">
+                  {option.text}
+                </span>
                 {showResults && (
                   <span className="mt-2 text-sm opacity-90">
                     {getVotePercentage(option.votes)}% • {option.votes} vote
@@ -295,7 +335,12 @@ export const FeedPollCard = ({
                 <Heart className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`} />
               </div>
               <span className="font-medium text-base">
-                {poll.likes + (isLiked && !likeStatus ? 1 : !isLiked && likeStatus ? -1 : 0)}
+                {poll.likes +
+                  (isLiked && !likeStatus
+                    ? 1
+                    : !isLiked && likeStatus
+                      ? -1
+                      : 0)}
               </span>
             </button>
             <Link

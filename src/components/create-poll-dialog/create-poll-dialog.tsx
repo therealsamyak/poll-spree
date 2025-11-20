@@ -83,7 +83,9 @@ export const CreatePollDialogContent = ({
           {icon}
           Create New Poll
         </DialogTitle>
-        <DialogDescription>Ask a question and let people vote!</DialogDescription>
+        <DialogDescription>
+          Ask a question and let people vote!
+        </DialogDescription>
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -99,7 +101,9 @@ export const CreatePollDialogContent = ({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               className={`min-h-[80px] resize-none pr-16 ${getCharacterCountBg(question.length, 150)} ${
-                question.length > 150 ? "border-destructive focus-visible:ring-destructive" : ""
+                question.length > 150
+                  ? "border-destructive focus-visible:ring-destructive"
+                  : ""
               }`}
               required
             />
@@ -110,7 +114,9 @@ export const CreatePollDialogContent = ({
             </div>
           </div>
           {question.length > 150 && (
-            <p className="text-destructive text-xs">Question cannot exceed 150 characters</p>
+            <p className="text-destructive text-xs">
+              Question cannot exceed 150 characters
+            </p>
           )}
         </div>
 
@@ -188,7 +194,12 @@ export const CreatePollDialogContent = ({
         </div> */}
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isCreating}
+          >
             Cancel
           </Button>
           <Button

@@ -9,7 +9,9 @@ export const cn = (...inputs: ClassValue[]) => {
  * Comprehensive username validation following security best practices
  * Based on recommendations from Stack Overflow and security guidelines
  */
-export const validateUsername = (username: string): { isValid: boolean; error?: string } => {
+export const validateUsername = (
+  username: string,
+): { isValid: boolean; error?: string } => {
   // Trim whitespace first
   const trimmed = username.trim()
 
@@ -20,7 +22,10 @@ export const validateUsername = (username: string): { isValid: boolean; error?: 
 
   // Check length (3-20 characters)
   if (trimmed.length < 3) {
-    return { isValid: false, error: "Username must be at least 3 characters long" }
+    return {
+      isValid: false,
+      error: "Username must be at least 3 characters long",
+    }
   }
 
   if (trimmed.length > 20) {
@@ -29,12 +34,18 @@ export const validateUsername = (username: string): { isValid: boolean; error?: 
 
   // Check for leading/trailing whitespace (shouldn't happen after trim, but double-check)
   if (username !== trimmed) {
-    return { isValid: false, error: "Username cannot have leading or trailing spaces" }
+    return {
+      isValid: false,
+      error: "Username cannot have leading or trailing spaces",
+    }
   }
 
   // Check for multiple consecutive spaces
   if (/\s{2,}/.test(username)) {
-    return { isValid: false, error: "Username cannot have multiple consecutive spaces" }
+    return {
+      isValid: false,
+      error: "Username cannot have multiple consecutive spaces",
+    }
   }
 
   // Only allow ASCII letters, numbers, underscores, and hyphens
@@ -42,7 +53,8 @@ export const validateUsername = (username: string): { isValid: boolean; error?: 
   if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
     return {
       isValid: false,
-      error: "Username can only contain English letters, numbers, underscores, and hyphens",
+      error:
+        "Username can only contain English letters, numbers, underscores, and hyphens",
     }
   }
 
@@ -53,12 +65,18 @@ export const validateUsername = (username: string): { isValid: boolean; error?: 
 
   // Prevent usernames that end with hyphens or underscores (optional, but cleaner)
   if (/[-_]$/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot end with a hyphen or underscore" }
+    return {
+      isValid: false,
+      error: "Username cannot end with a hyphen or underscore",
+    }
   }
 
   // Prevent consecutive hyphens or underscores (optional, but cleaner)
   if (/[-_]{2,}/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot have consecutive hyphens or underscores" }
+    return {
+      isValid: false,
+      error: "Username cannot have consecutive hyphens or underscores",
+    }
   }
 
   return { isValid: true }

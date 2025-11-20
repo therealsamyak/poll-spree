@@ -8,7 +8,13 @@ import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
@@ -21,7 +27,10 @@ const Trending = () => {
   const allPolls = pollsResult?.polls || []
 
   // Batch fetch user votes for all visible polls
-  const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
+  const pollIds = useMemo(
+    () => allPolls.map((poll) => poll.id as Id<"polls">),
+    [allPolls],
+  )
   const userVotes = useQuery(api.polls.getUserVotesForPolls, {
     pollIds,
     userId: userId || "",
@@ -46,7 +55,9 @@ const Trending = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <TrendingUp className="h-8 w-8 text-muted-foreground" />
             </div>
-            <CardTitle className="font-bold text-2xl">No trending polls yet</CardTitle>
+            <CardTitle className="font-bold text-2xl">
+              No trending polls yet
+            </CardTitle>
             <CardDescription className="text-base">
               Be the first to create a viral poll!
             </CardDescription>

@@ -21,7 +21,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { showNotification } = useNotification()
 
-  const comments = useQuery(api.comments.list, { pollId: pollId as Id<"polls"> })
+  const comments = useQuery(api.comments.list, {
+    pollId: pollId as Id<"polls">,
+  })
   const createComment = useMutation(api.comments.create)
   const deleteComment = useMutation(api.comments.deleteComment)
   const user = useQuery(api.users.getUser, { userId: userId || "" })
@@ -32,7 +34,10 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
 
     // Validate comment for inappropriate content
     if (!isTextSafe(text)) {
-      showNotification({ message: "Comment contains inappropriate content", variant: "error" })
+      showNotification({
+        message: "Comment contains inappropriate content",
+        variant: "error",
+      })
       return
     }
 
@@ -58,7 +63,10 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
       await deleteComment({ commentId, userId: userId || "" })
       showNotification({ message: "Comment deleted", variant: "success" })
     } catch (_error) {
-      showNotification({ message: "Failed to delete comment", variant: "error" })
+      showNotification({
+        message: "Failed to delete comment",
+        variant: "error",
+      })
     }
   }
 
@@ -98,14 +106,19 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
 
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div key={comment._id} className="flex gap-4 rounded-lg bg-muted/30 p-4">
+          <div
+            key={comment._id}
+            className="flex gap-4 rounded-lg bg-muted/30 p-4"
+          >
             <Avatar size="sm" profileImageUrl={comment.authorProfileImageUrl} />
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{comment.username}</span>
                   <span className="text-muted-foreground text-xs">
-                    {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                    {formatDistanceToNow(comment.createdAt, {
+                      addSuffix: true,
+                    })}
                   </span>
                 </div>
                 {userId === comment.userId && (
@@ -119,7 +132,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
                   </Button>
                 )}
               </div>
-              <p className="whitespace-pre-wrap break-words text-sm">{comment.text}</p>
+              <p className="whitespace-pre-wrap break-words text-sm">
+                {comment.text}
+              </p>
             </div>
           </div>
         ))}

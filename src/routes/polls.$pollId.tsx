@@ -52,7 +52,8 @@ const PollPage = () => {
     throw notFound()
   }
 
-  const hasVoted = userVote?.optionId !== null && userVote?.optionId !== undefined
+  const hasVoted =
+    userVote?.optionId !== null && userVote?.optionId !== undefined
   const canDelete = currentUser && poll.authorId === userId
   const isAuthor = poll.authorId === userId
   const isUserVoteLoading = userVote === undefined && isSignedIn
@@ -91,7 +92,10 @@ const PollPage = () => {
         if (result.success) {
           showNotification({ message: "Vote removed!", variant: "success" })
         } else {
-          showNotification({ message: result.error || "Failed to remove vote", variant: "error" })
+          showNotification({
+            message: result.error || "Failed to remove vote",
+            variant: "error",
+          })
         }
       } catch (_error) {
         showNotification({
@@ -116,7 +120,10 @@ const PollPage = () => {
       if (result.success) {
         showNotification({ message: "Vote recorded!", variant: "success" })
       } else {
-        showNotification({ message: result.error || "Failed to vote", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to vote",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -139,11 +146,17 @@ const PollPage = () => {
       })
 
       if (result.success) {
-        showNotification({ message: "Poll deleted successfully!", variant: "success" })
+        showNotification({
+          message: "Poll deleted successfully!",
+          variant: "success",
+        })
         // Navigate back to home
         window.location.href = "/"
       } else {
-        showNotification({ message: result.error || "Failed to delete poll", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to delete poll",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -220,7 +233,10 @@ const PollPage = () => {
                     params={{ username: poll.authorUsername }}
                     className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
                   >
-                    <Avatar size="sm" profileImageUrl={poll.authorProfileImageUrl} />
+                    <Avatar
+                      size="sm"
+                      profileImageUrl={poll.authorProfileImageUrl}
+                    />
                     <span className="font-medium">{poll.authorUsername}</span>
                   </Link>
                 </div>
@@ -265,7 +281,8 @@ const PollPage = () => {
 
             <div className="grid gap-4">
               {getOptionsWithPlaces().map(({ option, place }) => {
-                const isSelected = !isUserVoteLoading && userVote?.optionId === option.id
+                const isSelected =
+                  !isUserVoteLoading && userVote?.optionId === option.id
 
                 return (
                   <Button
@@ -305,8 +322,12 @@ const PollPage = () => {
                         </span>
                       </span>
                       {showResults && (
-                        <span className="mt-2 text-sm" style={{ color: "var(--foreground)" }}>
-                          {getVotePercentage(option.votes)}% • {option.votes} vote
+                        <span
+                          className="mt-2 text-sm"
+                          style={{ color: "var(--foreground)" }}
+                        >
+                          {getVotePercentage(option.votes)}% • {option.votes}{" "}
+                          vote
                           {option.votes === 1 ? "" : "s"}
                         </span>
                       )}
@@ -329,7 +350,9 @@ const PollPage = () => {
           {/* Results hidden message for signed in users who haven't voted */}
           {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
             <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
-              <p className="text-muted-foreground">Vote to see the current results!</p>
+              <p className="text-muted-foreground">
+                Vote to see the current results!
+              </p>
             </div>
           )}
 

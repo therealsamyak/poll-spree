@@ -33,7 +33,11 @@ export const SitemapXml = () => {
 </urlset>`
 
   // Return the XML content with proper headers
-  return <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>{sitemap}</pre>
+  return (
+    <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+      {sitemap}
+    </pre>
+  )
 }
 
 // This component will be rendered as XML

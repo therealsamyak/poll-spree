@@ -6,7 +6,9 @@ export const ErrorFallback = ({ error }: ErrorFallbackProps) => {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <h1 className="mb-4 font-bold text-2xl text-destructive">Something went wrong</h1>
+        <h1 className="mb-4 font-bold text-2xl text-destructive">
+          Something went wrong
+        </h1>
         <p className="mb-4 text-muted-foreground">
           {error.message || "An unexpected error occurred"}
         </p>
