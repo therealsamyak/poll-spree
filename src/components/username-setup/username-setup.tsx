@@ -50,9 +50,7 @@ export const UsernameSetup = () => {
     }
 
     if (!userId) {
-      showSignInNotification({
-        message: "Please sign in to continue",
-      })
+      showSignInNotification()
       return
     }
 

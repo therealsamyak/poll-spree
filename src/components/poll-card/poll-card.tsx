@@ -123,9 +123,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      showSignInNotification({
-        message: "Please sign in to vote",
-      })
+      showSignInNotification()
       return
     }
 
@@ -220,9 +218,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
 
   const handleLike = async () => {
     if (!isSignedIn) {
-      showSignInNotification({
-        message: "Please sign in to like polls",
-      })
+      showSignInNotification()
       return
     }
     if (!userId) return
@@ -315,9 +311,7 @@ export const PollCard = ({ poll, onPollDeleted, userVote: preFetchedUserVote }: 
               className="w-full rounded-xl border border-muted bg-muted p-4 font-medium text-base text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
               onClick={() => {
                 if (!isSignedIn) {
-                  showSignInNotification({
-                    message: "Please sign in to vote",
-                  })
+                  showSignInNotification()
                   return
                 }
                 setExpanded(true)
