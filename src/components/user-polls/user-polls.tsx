@@ -27,7 +27,9 @@ export const UserPolls = () => {
 
   // Get user data
   const user = useQuery(api.users.getUserByUsername, { username })
-  const userStats = useQuery(api.polls.getUserStats, { userId: user?.userId || "" })
+  const userStats = useQuery(api.polls.getUserStats, {
+    userId: user?.userId || "",
+  })
 
   // Parse filter and sort from URL params
   const filter = search.filter || "authored,voted"
@@ -46,7 +48,10 @@ export const UserPolls = () => {
   })
 
   // Batch fetch user votes for all visible polls
-  const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
+  const pollIds = useMemo(
+    () => allPolls.map((poll) => poll.id as Id<"polls">),
+    [allPolls],
+  )
   const userVotes = useQuery(api.polls.getUserVotesForPolls, {
     pollIds,
     userId: userId || "",
@@ -87,7 +92,11 @@ export const UserPolls = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0]
-        if (target.isIntersecting && pollsResult?.continueCursor && !pollsResult?.isDone) {
+        if (
+          target.isIntersecting &&
+          pollsResult?.continueCursor &&
+          !pollsResult?.isDone
+        ) {
           loadMore()
         }
       },
@@ -130,7 +139,9 @@ export const UserPolls = () => {
             <Users className="h-8 w-8 text-muted-foreground" />
           </div>
           <h1 className="font-bold text-2xl">User not found</h1>
-          <p className="text-base">The user you're looking for doesn't exist.</p>
+          <p className="text-base">
+            The user you're looking for doesn't exist.
+          </p>
         </div>
       </div>
     )
@@ -165,7 +176,9 @@ export const UserPolls = () => {
                 className="h-20 w-20 border-4 border-background shadow-lg"
               />
             </div>
-            <h1 className="mb-4 font-bold text-4xl tracking-tight sm:text-5xl">@{user.username}</h1>
+            <h1 className="mb-4 font-bold text-4xl tracking-tight sm:text-5xl">
+              @{user.username}
+            </h1>
             <div className="mx-auto mb-8 flex max-w-2xl items-center justify-center gap-8 text-muted-foreground text-sm">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />

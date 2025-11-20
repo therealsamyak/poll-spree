@@ -37,13 +37,20 @@ export const useCreatePoll = () => {
   }
 
   const updateOption = (id: string, text: string) => {
-    setOptions(options.map((option) => (option.id === id ? { ...option, text } : option)))
+    setOptions(
+      options.map((option) =>
+        option.id === id ? { ...option, text } : option,
+      ),
+    )
   }
 
   const canAddOption = options.length < 10
   const canRemoveOption = options.length > 2
 
-  const handleCreatePoll = async (e: React.FormEvent, onSuccess?: () => void) => {
+  const handleCreatePoll = async (
+    e: React.FormEvent,
+    onSuccess?: () => void,
+  ) => {
     e.preventDefault()
     if (!userId || !user) return
 
@@ -85,7 +92,10 @@ export const useCreatePoll = () => {
       })
 
       if (result?.success) {
-        showNotification({ message: "Poll created successfully!", variant: "success" })
+        showNotification({
+          message: "Poll created successfully!",
+          variant: "success",
+        })
         setQuestion("")
         setOptions([
           { id: "1", text: "" },
@@ -94,11 +104,17 @@ export const useCreatePoll = () => {
         setIsDev(false)
         onSuccess?.()
       } else {
-        showNotification({ message: result?.error || "Failed to create poll", variant: "error" })
+        showNotification({
+          message: result?.error || "Failed to create poll",
+          variant: "error",
+        })
       }
     } catch (error) {
       console.error("Error creating poll:", error)
-      showNotification({ message: "An unexpected error occurred", variant: "error" })
+      showNotification({
+        message: "An unexpected error occurred",
+        variant: "error",
+      })
     } finally {
       setIsCreating(false)
     }

@@ -8,7 +8,11 @@ interface AvatarProps {
   profileImageUrl?: string
 }
 
-export const Avatar = ({ size = "md", className, profileImageUrl }: AvatarProps) => {
+export const Avatar = ({
+  size = "md",
+  className,
+  profileImageUrl,
+}: AvatarProps) => {
   const { user } = useUser()
 
   // Use the provided profile image URL or fall back to the current user's image
@@ -35,7 +39,11 @@ export const Avatar = ({ size = "md", className, profileImageUrl }: AvatarProps)
       )}
     >
       {imageUrl ? (
-        <img src={imageUrl} alt="Profile" className="h-full w-full object-cover" />
+        <img
+          src={imageUrl}
+          alt="Profile"
+          className="h-full w-full object-cover"
+        />
       ) : (
         <User className={cn("text-primary", iconSizes[size])} />
       )}

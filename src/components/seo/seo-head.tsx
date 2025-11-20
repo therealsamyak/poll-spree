@@ -33,11 +33,28 @@ export const SEOHead = ({
   return (
     // @ts-expect-error - HeadContent types are tricky
     <HeadContent>
-      <MetaTags title={title} description={description} keywords={keywords} canonical={canonical} />
-      <OpenGraph title={title} description={description} url={canonical} image={ogImage} />
-      <TwitterCard title={title} description={description} image={twitterImage} />
+      <MetaTags
+        title={title}
+        description={description}
+        keywords={keywords}
+        canonical={canonical}
+      />
+      <OpenGraph
+        title={title}
+        description={description}
+        url={canonical}
+        image={ogImage}
+      />
+      <TwitterCard
+        title={title}
+        description={description}
+        image={twitterImage}
+      />
       {structuredData && (
-        <StructuredData type={structuredData.type} pollData={structuredData.pollData} />
+        <StructuredData
+          type={structuredData.type}
+          pollData={structuredData.pollData}
+        />
       )}
     </HeadContent>
   )

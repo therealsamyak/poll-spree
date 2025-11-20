@@ -74,7 +74,10 @@ const SidebarContent = () => {
     // Validate username using comprehensive validation
     const validation = validateUsername(newUsername)
     if (!validation.isValid) {
-      showNotification({ message: validation.error || "Invalid username", variant: "error" })
+      showNotification({
+        message: validation.error || "Invalid username",
+        variant: "error",
+      })
       return
     }
 
@@ -88,14 +91,23 @@ const SidebarContent = () => {
     }
 
     try {
-      const result = await updateUsername({ userId, username: newUsername.trim() })
+      const result = await updateUsername({
+        userId,
+        username: newUsername.trim(),
+      })
 
       if (result.success) {
         setNewUsername("")
         setIsDialogOpen(false)
-        showNotification({ message: "Username updated successfully!", variant: "success" })
+        showNotification({
+          message: "Username updated successfully!",
+          variant: "success",
+        })
       } else {
-        showNotification({ message: result.error || "Failed to update username", variant: "error" })
+        showNotification({
+          message: result.error || "Failed to update username",
+          variant: "error",
+        })
       }
     } catch (_error) {
       showNotification({
@@ -177,7 +189,9 @@ const SidebarContent = () => {
             </>
           )}
           <div className="flex items-center justify-between">
-            <span className="hidden font-medium text-muted-foreground text-sm md:block">Theme</span>
+            <span className="hidden font-medium text-muted-foreground text-sm md:block">
+              Theme
+            </span>
             <ModeToggle />
           </div>
           <Separator className="hidden md:block" />
@@ -210,7 +224,10 @@ const SidebarContent = () => {
                     <span>View Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsDialogOpen(true)} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => setIsDialogOpen(true)}
+                  className="cursor-pointer"
+                >
                   <Edit className="mr-2 h-4 w-4" />
                   <span>Change Username</span>
                 </DropdownMenuItem>
@@ -221,7 +238,10 @@ const SidebarContent = () => {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => signOut()}
+                  className="cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>
                 </DropdownMenuItem>
@@ -229,7 +249,9 @@ const SidebarContent = () => {
             </DropdownMenu>
           ) : (
             <SignInButton mode="modal">
-              <Button className="w-full gap-2 bg-primary shadow-lg hover:bg-accent">Sign In</Button>
+              <Button className="w-full gap-2 bg-primary shadow-lg hover:bg-accent">
+                Sign In
+              </Button>
             </SignInButton>
           )}
         </div>
@@ -241,8 +263,8 @@ const SidebarContent = () => {
           <DialogHeader>
             <DialogTitle>Change Username</DialogTitle>
             <DialogDescription>
-              Enter a new username. It must be 3-20 characters long and contain only letters,
-              numbers, underscores, and hyphens.
+              Enter a new username. It must be 3-20 characters long and contain
+              only letters, numbers, underscores, and hyphens.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">

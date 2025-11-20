@@ -75,7 +75,18 @@ export const StructuredData = ({
     if (scriptRef.current) {
       scriptRef.current.textContent = JSON.stringify(baseData)
     }
-  }, [type, name, description, url, logo, image, author, datePublished, dateModified, pollData])
+  }, [
+    type,
+    name,
+    description,
+    url,
+    logo,
+    image,
+    author,
+    datePublished,
+    dateModified,
+    pollData,
+  ])
 
   return <script ref={scriptRef} type="application/ld+json" />
 }

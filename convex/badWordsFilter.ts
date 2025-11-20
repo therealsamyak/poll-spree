@@ -33,7 +33,23 @@ export const validateTextContent = (text: string): boolean => {
       o: ["0", "o"],
       s: ["$", "5"],
       t: ["7"],
-      u: ["ü", "ù", "ú", "û", "ü", "ū", "ů", "ű", "ų", "ư", "ū", "ů", "ű", "ų", "ư"],
+      u: [
+        "ü",
+        "ù",
+        "ú",
+        "û",
+        "ü",
+        "ū",
+        "ů",
+        "ű",
+        "ų",
+        "ư",
+        "ū",
+        "ů",
+        "ű",
+        "ų",
+        "ư",
+      ],
     }
 
     // Create variations with leetspeak substitutions
@@ -44,7 +60,9 @@ export const validateTextContent = (text: string): boolean => {
       for (const variation of variations) {
         if (variation.includes(original)) {
           for (const substitute of substitutes) {
-            newVariations.push(variation.replace(new RegExp(original, "g"), substitute))
+            newVariations.push(
+              variation.replace(new RegExp(original, "g"), substitute),
+            )
           }
         }
       }

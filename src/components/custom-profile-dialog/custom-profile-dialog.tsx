@@ -21,7 +21,10 @@ interface CustomProfileDialogProps {
   onClose: () => void
 }
 
-export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProps) => {
+export const CustomProfileDialog = ({
+  isOpen,
+  onClose,
+}: CustomProfileDialogProps) => {
   const { user } = useUser()
   const { signOut } = useClerk()
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -38,7 +41,10 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
     try {
       await signOut()
       onClose()
-      showNotification({ message: "Signed out successfully", variant: "success" })
+      showNotification({
+        message: "Signed out successfully",
+        variant: "success",
+      })
     } catch (_error) {
       showNotification({ message: "Failed to sign out", variant: "error" })
     }
@@ -63,25 +69,36 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
       // Step 4: Refresh the page to clear any remaining state
       window.location.reload()
     } catch (_error) {
-      showNotification({ message: "Failed to delete account. Please try again.", variant: "error" })
+      showNotification({
+        message: "Failed to delete account. Please try again.",
+        variant: "error",
+      })
     } finally {
       setIsDeleting(false)
     }
   }
 
-  const handleProfilePictureUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePictureUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0]
     if (!file || !user) return
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      showNotification({ message: "Please select an image file", variant: "error" })
+      showNotification({
+        message: "Please select an image file",
+        variant: "error",
+      })
       return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      showNotification({ message: "Image size must be less than 5MB", variant: "error" })
+      showNotification({
+        message: "Image size must be less than 5MB",
+        variant: "error",
+      })
       return
     }
 
@@ -103,7 +120,10 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
         }
       }, 1000)
 
-      showNotification({ message: "Profile picture updated successfully!", variant: "success" })
+      showNotification({
+        message: "Profile picture updated successfully!",
+        variant: "success",
+      })
     } catch (_error) {
       showNotification({
         message: "Failed to upload profile picture. Please try again.",
@@ -139,7 +159,10 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
         }
       }, 1000)
 
-      showNotification({ message: "Profile picture removed successfully!", variant: "success" })
+      showNotification({
+        message: "Profile picture removed successfully!",
+        variant: "success",
+      })
     } catch (_error) {
       showNotification({
         message: "Failed to remove profile picture. Please try again.",
@@ -158,7 +181,9 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
             <User className="h-5 w-5" />
             Profile Settings
           </DialogTitle>
-          <DialogDescription>Manage your account settings and preferences</DialogDescription>
+          <DialogDescription>
+            Manage your account settings and preferences
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -215,7 +240,8 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
                 {user?.primaryEmailAddress?.emailAddress}
               </p>
               <p className="text-sm">
-                <span className="font-medium">Name:</span> {user?.fullName || "Not set"}
+                <span className="font-medium">Name:</span>{" "}
+                {user?.fullName || "Not set"}
               </p>
             </div>
           </div>
@@ -226,7 +252,11 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
           <div className="space-y-2">
             <h4 className="font-medium">Actions</h4>
             <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={handleSignOut}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out
               </Button>
@@ -251,7 +281,10 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
       </DialogContent>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
+      <Dialog
+        open={showDeleteConfirmation}
+        onOpenChange={setShowDeleteConfirmation}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
@@ -259,8 +292,8 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
               Delete Account
             </DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete your account and all
-              associated data including:
+              This action cannot be undone. This will permanently delete your
+              account and all associated data including:
             </DialogDescription>
           </DialogHeader>
 
@@ -281,7 +314,11 @@ export const CustomProfileDialog = ({ isOpen, onClose }: CustomProfileDialogProp
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting}>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+            >
               {isDeleting ? "Deleting..." : "Delete Account"}
             </Button>
           </DialogFooter>

@@ -47,7 +47,9 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
         <Checkbox
           id={authoredId}
           checked={currentFilters.includes("authored")}
-          onCheckedChange={(checked) => handleFilterChange("authored", checked as boolean)}
+          onCheckedChange={(checked) =>
+            handleFilterChange("authored", checked as boolean)
+          }
         />
         <Label htmlFor={authoredId} className="font-medium text-sm">
           Authored
@@ -57,7 +59,9 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
         <Checkbox
           id={votedId}
           checked={currentFilters.includes("voted")}
-          onCheckedChange={(checked) => handleFilterChange("voted", checked as boolean)}
+          onCheckedChange={(checked) =>
+            handleFilterChange("voted", checked as boolean)
+          }
         />
         <Label htmlFor={votedId} className="font-medium text-sm">
           Voted On

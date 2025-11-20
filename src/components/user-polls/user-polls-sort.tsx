@@ -36,7 +36,8 @@ export const UserPollsSort = ({ currentSort }: UserPollsSortProps) => {
   }
 
   const currentSortLabel =
-    sortOptions.find((option) => option.value === currentSort)?.label || "Sort by"
+    sortOptions.find((option) => option.value === currentSort)?.label ||
+    "Sort by"
 
   return (
     <DropdownMenu>

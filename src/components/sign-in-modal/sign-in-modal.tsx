@@ -24,16 +24,22 @@ export const SignInModal = ({ isOpen, onClose }: SignInModalProps) => {
             <LogIn className="h-5 w-5" />
             Sign In Required
           </DialogTitle>
-          <DialogDescription>Sign in to vote, comment, and create polls</DialogDescription>
+          <DialogDescription>
+            Sign in to vote, comment, and create polls
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-3 sm:flex-row sm:gap-2">
           <SignInButton mode="modal">
-            <Button className="w-full sm:flex-1 gap-2">
+            <Button className="w-full gap-2 sm:flex-1">
               <LogIn className="h-4 w-4" />
               Sign In
             </Button>
           </SignInButton>
-          <Button variant="outline" onClick={onClose} className="w-full sm:flex-1">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:flex-1"
+          >
             Maybe Later
           </Button>
         </DialogFooter>

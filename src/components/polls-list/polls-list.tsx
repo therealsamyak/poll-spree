@@ -1,12 +1,24 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { useQuery } from "convex/react"
-import { BarChart3, ChevronLeft, ChevronRight, Loader2, Plus } from "lucide-react"
+import {
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Plus,
+} from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { CreatePollDialog } from "@/components/create-poll-dialog"
 import { Footer } from "@/components/footer"
 import { FeedPollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import type { Poll } from "@/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -41,7 +53,10 @@ export const PollsList = () => {
   }, [])
 
   // Batch fetch user votes for all visible polls
-  const pollIds = useMemo(() => allPolls.map((poll) => poll.id as Id<"polls">), [allPolls])
+  const pollIds = useMemo(
+    () => allPolls.map((poll) => poll.id as Id<"polls">),
+    [allPolls],
+  )
   const userVotes = useQuery(api.polls.getUserVotesForPolls, {
     pollIds,
     userId: userId || "",
@@ -76,7 +91,11 @@ export const PollsList = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0]
-        if (target.isIntersecting && pollsResult?.continueCursor && !pollsResult?.isDone) {
+        if (
+          target.isIntersecting &&
+          pollsResult?.continueCursor &&
+          !pollsResult?.isDone
+        ) {
           loadMore()
         }
       },
@@ -238,7 +257,10 @@ export const PollsList = () => {
             className="flex w-full shrink-0 snap-start items-start justify-center overflow-y-auto p-4 pt-8 md:p-8 md:pt-12"
           >
             <div className="w-full max-w-3xl">
-              <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
+              <FeedPollCard
+                poll={poll}
+                userVote={userVotes?.[poll.id] || null}
+              />
             </div>
           </div>
         ))}

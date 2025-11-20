@@ -2,7 +2,9 @@ import { SignIn } from "@clerk/clerk-react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
 const SignInPage = () => {
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "")
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  )
   const redirectUrl = params.get("redirect_url") || "/"
 
   // Decode the redirect URL if it's encoded
@@ -19,7 +21,11 @@ const SignInPage = () => {
           Don't have an account?{" "}
           <Link
             to="/sign-up"
-            search={decodedRedirectUrl !== "/" ? { redirect_url: decodedRedirectUrl } : undefined}
+            search={
+              decodedRedirectUrl !== "/"
+                ? { redirect_url: decodedRedirectUrl }
+                : undefined
+            }
           >
             Sign up
           </Link>
