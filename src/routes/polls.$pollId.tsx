@@ -72,9 +72,7 @@ const PollPage = () => {
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      showSignInNotification({
-        message: "Please sign in to vote",
-      })
+      showSignInNotification()
       return
     }
 

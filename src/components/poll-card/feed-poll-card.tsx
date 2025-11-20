@@ -78,9 +78,7 @@ export const FeedPollCard = ({
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
-      showSignInNotification({
-        message: "Please sign in to vote",
-      })
+      showSignInNotification()
       return
     }
 
@@ -175,9 +173,7 @@ export const FeedPollCard = ({
 
   const handleLike = async () => {
     if (!isSignedIn) {
-      showSignInNotification({
-        message: "Please sign in to like polls",
-      })
+      showSignInNotification()
       return
     }
     if (!userId) return
