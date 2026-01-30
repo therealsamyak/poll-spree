@@ -53,3 +53,7 @@ next-env.d.ts
 
 # Other
 dev-dist
+
+.opencode*
+.sisyphus*
+.serena*
