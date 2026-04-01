@@ -54,7 +54,7 @@ const createPollIcon = <Plus className="h-5 w-5 text-primary" />
 
 export const Sidebar = () => {
   return (
-    <aside className="fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r bg-background md:w-64">
+    <aside className="fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r bg-background transition-colors duration-300 md:w-64">
       <SidebarContent />
     </aside>
   )
@@ -138,17 +138,19 @@ const SidebarContent = () => {
   }
 
   return (
-    <div className="flex h-full max-h-screen flex-col overflow-hidden border-r bg-background">
+    <div className="flex h-full max-h-screen flex-col overflow-hidden border-r bg-background transition-colors duration-300">
       {/* Logo and Brand */}
       <div className="flex h-16 min-h-16 items-center justify-center border-b px-0 md:px-6">
         <Link
           to="/"
           className="flex h-16 w-16 items-center justify-center transition-opacity hover:opacity-80 md:h-auto md:w-auto md:space-x-3"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <BarChart3 className="h-5 w-5" />
           </div>
-          <span className="hidden font-bold md:inline">PollSpree</span>
+          <span className="hidden font-bold text-lg tracking-tight md:inline">
+            PollSpree
+          </span>
         </Link>
       </div>
 
@@ -156,7 +158,7 @@ const SidebarContent = () => {
       <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
         <Link
           to="/"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
         >
           <Home className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Home</span>
@@ -170,8 +172,10 @@ const SidebarContent = () => {
         </Link> */}
         <Link
           to="/trending"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
-          activeProps={{ className: "bg-accent text-accent-foreground" }}
+          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          activeProps={{
+            className: "bg-primary/10 text-primary font-semibold",
+          }}
         >
           <TrendingUp className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Trending</span>
@@ -179,9 +183,9 @@ const SidebarContent = () => {
         <Button
           onClick={handleSurprise}
           variant="ghost"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+          className="group flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
         >
-          <Sparkles className="h-6 w-6" />
+          <Sparkles className="h-6 w-6 group-hover:animate-spin" />
           <span className="ml-2 hidden md:inline">Surprise!</span>
         </Button>
       </nav>
@@ -193,7 +197,7 @@ const SidebarContent = () => {
             <>
               <Button
                 onClick={() => setIsCreatePollOpen(true)}
-                className="flex size-9 items-center justify-center rounded-lg border border-transparent text-foreground hover:border-border hover:bg-primary/40 hover:text-foreground md:w-auto md:justify-start md:px-3 dark:hover:border-border dark:hover:bg-primary/50 dark:hover:text-foreground"
+                className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md md:w-auto md:justify-start md:px-3"
               >
                 <Plus className="h-6 w-6" />
                 <span className="hidden md:inline">Create Poll</span>
@@ -214,7 +218,7 @@ const SidebarContent = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
+                  className="justify-center text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <Avatar size="sm" />
@@ -262,7 +266,7 @@ const SidebarContent = () => {
             </DropdownMenu>
           ) : (
             <SignInButton mode="modal">
-              <Button className="w-full gap-2 bg-primary shadow-lg hover:bg-accent">
+              <Button className="w-full gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
                 Sign In
               </Button>
             </SignInButton>
