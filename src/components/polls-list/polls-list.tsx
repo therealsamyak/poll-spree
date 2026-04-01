@@ -7,9 +7,17 @@ import {
   Loader2,
   Plus,
 } from "lucide-react"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { CreatePollDialog } from "@/components/create-poll-dialog"
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { Footer } from "@/components/footer"
+import { Loader } from "@/components/loader"
 import { FeedPollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,6 +30,12 @@ import {
 import type { Poll } from "@/types"
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
+
+const CreatePollDialog = lazy(() =>
+  import("@/components/create-poll-dialog").then((m) => ({
+    default: m.CreatePollDialog,
+  })),
+)
 
 export const PollsList = () => {
   const { isSignedIn, userId } = useAuth()
@@ -165,7 +179,9 @@ export const PollsList = () => {
           </CardHeader>
           <CardContent className="pb-6">
             {isSignedIn ? (
-              <CreatePollDialog />
+              <Suspense fallback={<Loader />}>
+                <CreatePollDialog />
+              </Suspense>
             ) : (
               <SignInButton mode="modal">
                 <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg hover:from-primary/90 hover:to-primary/70">
@@ -229,7 +245,9 @@ export const PollsList = () => {
                 </p>
               </div>
               {isSignedIn ? (
-                <CreatePollDialog />
+                <Suspense fallback={<Loader />}>
+                  <CreatePollDialog />
+                </Suspense>
               ) : (
                 <SignInButton mode="modal">
                   <Button className="gap-2 bg-primary shadow-lg hover:bg-primary/90">
@@ -288,7 +306,9 @@ export const PollsList = () => {
                 </p>
               </div>
               {isSignedIn ? (
-                <CreatePollDialog />
+                <Suspense fallback={<Loader />}>
+                  <CreatePollDialog />
+                </Suspense>
               ) : (
                 <SignInButton mode="modal">
                   <Button className="gap-2 bg-primary shadow-lg hover:bg-primary/90">

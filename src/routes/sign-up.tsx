@@ -1,11 +1,14 @@
 import { SignUp } from "@clerk/clerk-react"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { z } from "zod"
+
+const searchSchema = z.object({
+  redirect_url: z.string().optional(),
+})
 
 const SignUpPage = () => {
-  const params = new URLSearchParams(
-    typeof window !== "undefined" ? window.location.search : "",
-  )
-  const redirectUrl = params.get("redirect_url") || "/"
+  const search = Route.useSearch()
+  const redirectUrl = search.redirect_url || "/"
 
   // Decode the redirect URL if it's encoded
   const decodedRedirectUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/"
@@ -37,4 +40,5 @@ const SignUpPage = () => {
 
 export const Route = createFileRoute("/sign-up")({
   component: SignUpPage,
+  validateSearch: searchSchema,
 })

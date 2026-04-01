@@ -15,10 +15,24 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useCreatePoll } from "@/hooks/useCreatePoll"
 
+const getCharacterCountColor = (length: number, max: number) => {
+  if (length > max) return "text-destructive"
+  if (length > max * 0.9) return "text-accent-foreground"
+  return "text-muted-foreground"
+}
+
+const getCharacterCountBg = (length: number, max: number) => {
+  if (length > max) return "bg-destructive/10 dark:bg-destructive/20"
+  if (length > max * 0.9) return "bg-accent/10 dark:bg-accent/20"
+  return ""
+}
+
+const DefaultIcon = <Sparkles className="h-5 w-5 text-primary" />
+
 // Shared dialog component that can be used by both sidebar and homepage
 export const CreatePollDialogContent = ({
   onClose,
-  icon = <Sparkles className="h-5 w-5 text-primary" />,
+  icon = DefaultIcon,
 }: {
   onClose: () => void
   icon?: React.ReactNode
@@ -56,19 +70,6 @@ export const CreatePollDialogContent = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     await handleCreatePoll(e, onClose)
-  }
-
-  // Character count styling functions
-  const getCharacterCountColor = (length: number, max: number) => {
-    if (length > max) return "text-destructive"
-    if (length > max * 0.9) return "text-accent-foreground"
-    return "text-muted-foreground"
-  }
-
-  const getCharacterCountBg = (length: number, max: number) => {
-    if (length > max) return "bg-destructive/10 dark:bg-destructive/20"
-    if (length > max * 0.9) return "bg-accent/10 dark:bg-accent/20"
-    return ""
   }
 
   // Validation states

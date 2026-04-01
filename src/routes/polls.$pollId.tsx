@@ -1,5 +1,10 @@
 import { useAuth } from "@clerk/clerk-react"
-import { createFileRoute, Link, notFound } from "@tanstack/react-router"
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  useRouter,
+} from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -12,9 +17,58 @@ import { generatePollSEOConfig } from "@/lib/seo"
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
+const formatDateTime = (timestamp: number) => {
+  const date = new Date(timestamp)
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  })
+}
+
+const getVotePercentage = (votes: number, totalVotes: number) => {
+  if (totalVotes === 0) return 0
+  return Math.round((votes / totalVotes) * 100)
+}
+
+type PollOption = { id: string; text: string; votes: number }
+
+const getOptionsWithPlaces = (
+  options: PollOption[],
+  showResults: boolean,
+): { option: PollOption; place: number | undefined }[] => {
+  if (!showResults) {
+    return options.map((option) => ({ option, place: undefined }))
+  }
+  const groups: Record<number, PollOption[]> = {}
+  options.forEach((option) => {
+    if (!groups[option.votes]) groups[option.votes] = []
+    groups[option.votes].push(option)
+  })
+  const sortedVoteCounts = Object.keys(groups)
+    .map((v) => Number(v))
+    .sort((a, b) => b - a)
+  let place = 1
+  const result: { option: PollOption; place: number }[] = []
+  for (const voteCount of sortedVoteCounts) {
+    const group = groups[voteCount].sort((a, b) =>
+      a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
+    )
+    for (const option of group) {
+      result.push({ option, place })
+    }
+    place += group.length
+  }
+  return result
+}
+
 const PollPage = () => {
   const { pollId } = Route.useParams()
   const { userId, isSignedIn } = useAuth()
+  const router = useRouter()
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const { showNotification, showSignInNotification } = useNotification()
@@ -58,18 +112,6 @@ const PollPage = () => {
   const isAuthor = poll.authorId === userId
   const isUserVoteLoading = userVote === undefined && isSignedIn
   const showResults = !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
-
-  const formatDateTime = (timestamp: number) => {
-    const date = new Date(timestamp)
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
-  }
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
@@ -151,7 +193,7 @@ const PollPage = () => {
           variant: "success",
         })
         // Navigate back to home
-        window.location.href = "/"
+        router.navigate({ to: "/" })
       } else {
         showNotification({
           message: result.error || "Failed to delete poll",
@@ -166,39 +208,6 @@ const PollPage = () => {
     } finally {
       setIsDeleting(false)
     }
-  }
-
-  // Helper: get vote percentage
-  const getVotePercentage = (votes: number) => {
-    if (poll.totalVotes === 0) return 0
-    return Math.round((votes / poll.totalVotes) * 100)
-  }
-
-  // Helper to compute places and sorted options
-  const getOptionsWithPlaces = () => {
-    if (!showResults) {
-      return poll.options.map((option) => ({ option, place: undefined }))
-    }
-    const groups: Record<number, typeof poll.options> = {}
-    poll.options.forEach((option) => {
-      if (!groups[option.votes]) groups[option.votes] = []
-      groups[option.votes].push(option)
-    })
-    const sortedVoteCounts = Object.keys(groups)
-      .map((v) => Number(v))
-      .sort((a, b) => b - a)
-    let place = 1
-    const result: { option: (typeof poll.options)[0]; place: number }[] = []
-    for (const voteCount of sortedVoteCounts) {
-      const group = groups[voteCount].sort((a, b) =>
-        a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
-      )
-      for (const option of group) {
-        result.push({ option, place })
-      }
-      place += group.length
-    }
-    return result
   }
 
   const seoConfig = generatePollSEOConfig(poll)
@@ -280,61 +289,63 @@ const PollPage = () => {
             </h2>
 
             <div className="grid gap-4">
-              {getOptionsWithPlaces().map(({ option, place }) => {
-                const isSelected =
-                  !isUserVoteLoading && userVote?.optionId === option.id
+              {getOptionsWithPlaces(poll.options, Boolean(showResults)).map(
+                ({ option, place }) => {
+                  const isSelected =
+                    !isUserVoteLoading && userVote?.optionId === option.id
 
-                return (
-                  <Button
-                    key={option.id}
-                    variant={isSelected ? "default" : "outline"}
-                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
-                      isSelected
-                        ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                        : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
-                    } hover:border-primary`}
-                    onClick={() => handleVote(option.id)}
-                    disabled={isVoting || isUserVoteLoading}
-                    style={{
-                      minHeight: 64,
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
-                      color: "var(--foreground)",
-                      borderColor: isSelected ? "var(--primary)" : undefined,
-                    }}
-                  >
-                    <span
-                      className="flex w-full flex-col items-start gap-2"
-                      style={{ color: "var(--foreground)" }}
+                  return (
+                    <Button
+                      key={option.id}
+                      variant={isSelected ? "default" : "outline"}
+                      className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
+                        isSelected
+                          ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
+                          : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
+                      } hover:border-primary`}
+                      onClick={() => handleVote(option.id)}
+                      disabled={isVoting || isUserVoteLoading}
+                      style={{
+                        minHeight: 64,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        color: "var(--foreground)",
+                        borderColor: isSelected ? "var(--primary)" : undefined,
+                      }}
                     >
-                      <span className="flex w-full items-center">
-                        {/* Show place if user has voted and is signed in */}
-                        {place !== undefined && (
-                          <span className="mr-3 shrink-0 flex-nowrap font-bold text-xl">
-                            {place}.
+                      <span
+                        className="flex w-full flex-col items-start gap-2"
+                        style={{ color: "var(--foreground)" }}
+                      >
+                        <span className="flex w-full items-center">
+                          {/* Show place if user has voted and is signed in */}
+                          {place !== undefined && (
+                            <span className="mr-3 shrink-0 flex-nowrap font-bold text-xl">
+                              {place}.
+                            </span>
+                          )}
+                          <span
+                            className="wrap-break-word whitespace-pre-line text-lg"
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {option.text}
+                          </span>
+                        </span>
+                        {showResults && (
+                          <span
+                            className="mt-2 text-sm"
+                            style={{ color: "var(--foreground)" }}
+                          >
+                            {getVotePercentage(option.votes, poll.totalVotes)}%
+                            • {option.votes} vote
+                            {option.votes === 1 ? "" : "s"}
                           </span>
                         )}
-                        <span
-                          className="wrap-break-word whitespace-pre-line text-lg"
-                          style={{ wordBreak: "break-word" }}
-                        >
-                          {option.text}
-                        </span>
                       </span>
-                      {showResults && (
-                        <span
-                          className="mt-2 text-sm"
-                          style={{ color: "var(--foreground)" }}
-                        >
-                          {getVotePercentage(option.votes)}% • {option.votes}{" "}
-                          vote
-                          {option.votes === 1 ? "" : "s"}
-                        </span>
-                      )}
-                    </span>
-                  </Button>
-                )
-              })}
+                    </Button>
+                  )
+                },
+              )}
             </div>
           </div>
 
