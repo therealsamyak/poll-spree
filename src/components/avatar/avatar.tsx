@@ -33,7 +33,7 @@ export const Avatar = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/20 to-primary/30",
+        "flex items-center justify-center overflow-hidden rounded-full bg-muted ring-2 ring-border transition-all duration-200 hover:scale-105 hover:ring-primary/50",
         sizeClasses[size],
         className,
       )}
@@ -45,7 +45,7 @@ export const Avatar = ({
           className="h-full w-full object-cover"
         />
       ) : (
-        <User className={cn("text-primary", iconSizes[size])} />
+        <User className={cn("text-muted-foreground", iconSizes[size])} />
       )}
     </div>
   )
