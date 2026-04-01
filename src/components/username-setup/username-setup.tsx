@@ -97,10 +97,10 @@ export const UsernameSetup = () => {
       <div className="w-full max-w-md">
         <Card className="border-0 bg-gradient-to-br from-card to-card/50 shadow-xl backdrop-blur-sm">
           <CardHeader className="pb-6 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
               <User className="h-10 w-10 text-primary" />
             </div>
-            <CardTitle className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-2xl text-transparent">
+            <CardTitle className="font-bold text-2xl text-foreground">
               Welcome to PollSpree!
             </CardTitle>
             <CardDescription className="text-base">
@@ -133,7 +133,7 @@ export const UsernameSetup = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting || !username.trim()}
-                className="h-12 w-full gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg hover:from-primary/90 hover:to-primary/70"
+                className="h-12 w-full gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90"
               >
                 {isSubmitting ? (
                   "Setting username..."

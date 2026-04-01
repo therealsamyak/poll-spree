@@ -24,10 +24,12 @@ const Index = () => {
   // Show loading state while checking user
   if (isSignedIn && user === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="space-y-4 text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-primary border-b-2" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="animate-pulse text-base text-muted-foreground">
+            Loading...
+          </p>
         </div>
       </div>
     )

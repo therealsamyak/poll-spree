@@ -14,13 +14,13 @@ const SignUpPage = () => {
   const decodedRedirectUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/"
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md">
         <SignUp
           fallbackRedirectUrl={decodedRedirectUrl}
           signInFallbackRedirectUrl={decodedRedirectUrl}
         />
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-4 text-center text-sm tracking-tight">
           Already have an account?{" "}
           <Link
             to="/sign-in"
@@ -29,6 +29,7 @@ const SignUpPage = () => {
                 ? { redirect_url: decodedRedirectUrl }
                 : undefined
             }
+            className="font-medium text-primary"
           >
             Sign in
           </Link>

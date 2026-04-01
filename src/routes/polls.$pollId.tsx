@@ -95,7 +95,7 @@ const PollPage = () => {
       <div className="flex min-h-screen items-center justify-center">
         <div className="space-y-4 text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-primary border-b-2" />
-          <p className="text-muted-foreground">Loading poll...</p>
+          <p className="animate-pulse text-muted-foreground">Loading poll...</p>
         </div>
       </div>
     )
@@ -224,13 +224,13 @@ const PollPage = () => {
           pollData: seoConfig.pollData,
         }}
       />
-      <div className="container mx-auto max-w-4xl p-6">
+      <div className="fade-in container mx-auto max-w-4xl animate-in p-6">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-4">
               {/* Question */}
-              <h1 className="wrap-break-word font-bold text-3xl text-foreground leading-tight">
+              <h1 className="wrap-break-word font-bold text-3xl text-foreground leading-tight tracking-tight">
                 {poll.question}
               </h1>
 
@@ -240,7 +240,7 @@ const PollPage = () => {
                   <Link
                     to="/users/$username"
                     params={{ username: poll.authorUsername }}
-                    className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
+                    className="flex items-center gap-1.5 transition-all duration-200 hover:underline hover:opacity-80"
                   >
                     <Avatar
                       size="sm"
@@ -250,14 +250,14 @@ const PollPage = () => {
                   </Link>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-primary/20 to-primary/30">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                     <Calendar className="h-3 w-3 text-primary" />
                   </div>
                   <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-accent/20 to-accent/30">
-                    <BarChart3 className="h-3 w-3 text-accent-foreground" />
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <BarChart3 className="h-3 w-3 text-primary" />
                   </div>
                   <span className="font-medium">{poll.totalVotes} votes</span>
                 </div>
@@ -280,7 +280,7 @@ const PollPage = () => {
 
           {/* Voting Options */}
           <div className="space-y-4">
-            <h2 className="font-semibold text-foreground text-xl">
+            <h2 className="font-semibold text-foreground text-xl tracking-tight">
               {!isSignedIn
                 ? "Vote on this poll:"
                 : !isUserVoteLoading && !hasVoted && !isAuthor
@@ -301,7 +301,7 @@ const PollPage = () => {
                       className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
                         isSelected
                           ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                          : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
+                          : "border-border bg-card text-foreground hover:scale-[1.01] hover:bg-primary/10 hover:text-primary hover:shadow-md"
                       } hover:border-primary`}
                       onClick={() => handleVote(option.id)}
                       disabled={isVoting || isUserVoteLoading}
@@ -309,14 +309,10 @@ const PollPage = () => {
                         minHeight: 64,
                         whiteSpace: "normal",
                         wordBreak: "break-word",
-                        color: "var(--foreground)",
                         borderColor: isSelected ? "var(--primary)" : undefined,
                       }}
                     >
-                      <span
-                        className="flex w-full flex-col items-start gap-2"
-                        style={{ color: "var(--foreground)" }}
-                      >
+                      <span className="flex w-full flex-col items-start gap-2 text-foreground">
                         <span className="flex w-full items-center">
                           {/* Show place if user has voted and is signed in */}
                           {place !== undefined && (
@@ -332,10 +328,7 @@ const PollPage = () => {
                           </span>
                         </span>
                         {showResults && (
-                          <span
-                            className="mt-2 text-sm"
-                            style={{ color: "var(--foreground)" }}
-                          >
+                          <span className="mt-2 text-foreground text-sm">
                             {getVotePercentage(option.votes, poll.totalVotes)}%
                             • {option.votes} vote
                             {option.votes === 1 ? "" : "s"}
@@ -351,7 +344,7 @@ const PollPage = () => {
 
           {/* Sign in prompt for non-signed in users */}
           {!isSignedIn && (
-            <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
+            <div className="rounded-xl border border-border/50 bg-card p-4 text-center">
               <p className="text-muted-foreground">
                 Sign in to vote on this poll and see real-time results!
               </p>
@@ -360,14 +353,14 @@ const PollPage = () => {
 
           {/* Results hidden message for signed in users who haven't voted */}
           {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
-            <div className="rounded-lg border border-muted bg-muted/50 p-4 text-center">
+            <div className="rounded-xl border border-border/50 bg-card p-4 text-center">
               <p className="text-muted-foreground">
                 Vote to see the current results!
               </p>
             </div>
           )}
 
-          <div className="border-muted border-t pt-8">
+          <div className="border-border/50 border-t pt-8">
             <CommentSection pollId={pollId} />
           </div>
         </div>
