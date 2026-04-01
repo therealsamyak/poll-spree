@@ -1,5 +1,11 @@
 import { useUser } from "@clerk/clerk-react"
-import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router"
+import {
+  createRootRoute,
+  HeadContent,
+  Outlet,
+  Scripts,
+  useRouterState,
+} from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useMutation } from "convex/react"
 import { useEffect, useState } from "react"
@@ -12,7 +18,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthState } from "@/lib/clerk"
 import { api } from "../../convex/_generated/api"
-import "../index.css"
+import indexCss from "../index.css?url"
 
 const RootComponent = () => {
   const isFetching = useRouterState({
@@ -28,10 +34,8 @@ const RootComponent = () => {
     setIsClient(true)
   }, [])
 
-  // Sync profile image URL with Convex when user changes
   useEffect(() => {
     if (user?.id && user?.imageUrl !== undefined) {
-      // Update the profile image URL in our Convex users table
       updateProfileImage({
         userId: user.id,
         profileImageUrl: user.imageUrl || "",
@@ -41,29 +45,48 @@ const RootComponent = () => {
     }
   }, [user?.id, user?.imageUrl, updateProfileImage])
 
-  // Show loading while Clerk is initializing or during SSR
-  if (!isLoaded || !isClient) {
-    return <Loading />
-  }
-
   return (
-    <>
-      <SEOHead />
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <div className="flex max-h-screen max-w-screen overflow-hidden">
-          <Sidebar />
-          <main className="ml-16 flex-1 overflow-auto md:ml-64">
-            {isFetching ? <Loader /> : <Outlet />}
-          </main>
-        </div>
-        <Toaster richColors />
-      </ThemeProvider>
-      <TanStackRouterDevtools position="bottom-right" />
-    </>
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {!isLoaded || !isClient ? (
+          <Loading />
+        ) : (
+          <>
+            <SEOHead />
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+              <div className="flex max-h-screen max-w-screen overflow-hidden">
+                <Sidebar />
+                <main className="ml-16 flex-1 overflow-auto md:ml-64">
+                  {isFetching ? <Loader /> : <Outlet />}
+                </main>
+              </div>
+              <Toaster richColors />
+            </ThemeProvider>
+            <TanStackRouterDevtools position="bottom-right" />
+          </>
+        )}
+        <Scripts />
+      </body>
+    </html>
   )
 }
 
 export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: NotFound,
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+      { name: "theme-color", content: "#3b82f6" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+    links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "stylesheet", href: indexCss },
+    ],
+  }),
 })
