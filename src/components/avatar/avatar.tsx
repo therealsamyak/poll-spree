@@ -8,6 +8,18 @@ interface AvatarProps {
   profileImageUrl?: string
 }
 
+const sizeClasses = {
+  sm: "h-6 w-6",
+  md: "h-8 w-8",
+  lg: "h-12 w-12",
+} as const
+
+const iconSizes = {
+  sm: "h-3 w-3",
+  md: "h-4 w-4",
+  lg: "h-6 w-6",
+} as const
+
 export const Avatar = ({
   size = "md",
   className,
@@ -17,18 +29,6 @@ export const Avatar = ({
 
   // Use the provided profile image URL or fall back to the current user's image
   const imageUrl = profileImageUrl || user?.imageUrl
-
-  const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-8 w-8",
-    lg: "h-12 w-12",
-  }
-
-  const iconSizes = {
-    sm: "h-3 w-3",
-    md: "h-4 w-4",
-    lg: "h-6 w-6",
-  }
 
   return (
     <div

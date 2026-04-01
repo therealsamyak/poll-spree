@@ -2,9 +2,9 @@ import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Loader2, Plus, TrendingUp } from "lucide-react"
-import { useMemo } from "react"
-import { CreatePollDialog } from "@/components/create-poll-dialog"
+import { lazy, Suspense, useMemo } from "react"
 import { Footer } from "@/components/footer"
+import { Loader } from "@/components/loader"
 import { PollCard } from "@/components/poll-card"
 import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
@@ -18,13 +18,19 @@ import {
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
+const CreatePollDialog = lazy(() =>
+  import("@/components/create-poll-dialog").then((m) => ({
+    default: m.CreatePollDialog,
+  })),
+)
+
 const Trending = () => {
   const { isSignedIn, userId } = useAuth()
 
   const pollsResult = useQuery(api.polls.getTrendingPolls)
 
   // Trending polls are already sorted and limited by backend, so we don't need infinite scroll logic for now
-  const allPolls = pollsResult?.polls || []
+  const allPolls = useMemo(() => pollsResult?.polls || [], [pollsResult?.polls])
 
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(
@@ -64,7 +70,9 @@ const Trending = () => {
           </CardHeader>
           <CardContent className="pb-6">
             {isSignedIn ? (
-              <CreatePollDialog />
+              <Suspense fallback={<Loader />}>
+                <CreatePollDialog />
+              </Suspense>
             ) : (
               <SignInButton mode="modal">
                 <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg hover:from-primary/90 hover:to-primary/70">
@@ -98,7 +106,9 @@ const Trending = () => {
             </h2>
             {isSignedIn && (
               <div className="hidden sm:block">
-                <CreatePollDialog />
+                <Suspense fallback={<Loader />}>
+                  <CreatePollDialog />
+                </Suspense>
               </div>
             )}
           </div>

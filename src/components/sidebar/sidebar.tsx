@@ -12,10 +12,21 @@ import {
   TrendingUp,
   User,
 } from "lucide-react"
-import { useId, useState } from "react"
+import { lazy, Suspense, useId, useState } from "react"
 import { Avatar } from "@/components/avatar"
-import { CreatePollDialogContent } from "@/components/create-poll-dialog"
-import { CustomProfileDialog } from "@/components/custom-profile-dialog"
+
+const CreatePollDialogContent = lazy(() =>
+  import("@/components/create-poll-dialog").then((m) => ({
+    default: m.CreatePollDialogContent,
+  })),
+)
+const CustomProfileDialog = lazy(() =>
+  import("@/components/custom-profile-dialog").then((m) => ({
+    default: m.CustomProfileDialog,
+  })),
+)
+
+import { Loader } from "@/components/loader"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,6 +49,8 @@ import { useNotification } from "@/components/ui/notification"
 import { Separator } from "@/components/ui/separator"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
 import { api } from "../../../convex/_generated/api"
+
+const createPollIcon = <Plus className="h-5 w-5 text-primary" />
 
 export const Sidebar = () => {
   return (
@@ -290,17 +303,21 @@ const SidebarContent = () => {
 
       {/* Create Poll Dialog */}
       <Dialog open={isCreatePollOpen} onOpenChange={setIsCreatePollOpen}>
-        <CreatePollDialogContent
-          onClose={() => setIsCreatePollOpen(false)}
-          icon={<Plus className="h-5 w-5 text-primary" />}
-        />
+        <Suspense fallback={<Loader />}>
+          <CreatePollDialogContent
+            onClose={() => setIsCreatePollOpen(false)}
+            icon={createPollIcon}
+          />
+        </Suspense>
       </Dialog>
 
       {/* Custom Profile Dialog */}
-      <CustomProfileDialog
-        isOpen={isProfileDialogOpen}
-        onClose={() => setIsProfileDialogOpen(false)}
-      />
+      <Suspense fallback={<Loader />}>
+        <CustomProfileDialog
+          isOpen={isProfileDialogOpen}
+          onClose={() => setIsProfileDialogOpen(false)}
+        />
+      </Suspense>
     </div>
   )
 }

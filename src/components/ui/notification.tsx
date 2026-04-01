@@ -1,7 +1,14 @@
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react"
 import * as React from "react"
-import { SignInModal } from "@/components/sign-in-modal"
+import { lazy, Suspense } from "react"
+import { Loader } from "@/components/loader"
 import { cn } from "@/lib/utils"
+
+const SignInModal = lazy(() =>
+  import("@/components/sign-in-modal").then((m) => ({
+    default: m.SignInModal,
+  })),
+)
 
 interface NotificationProps {
   message: string
@@ -150,7 +157,9 @@ export const NotificationProvider = ({
           />
         ))}
       </div>
-      <SignInModal isOpen={signInModal.isOpen} onClose={closeSignInModal} />
+      <Suspense fallback={<Loader />}>
+        <SignInModal isOpen={signInModal.isOpen} onClose={closeSignInModal} />
+      </Suspense>
     </NotificationContext.Provider>
   )
 }
