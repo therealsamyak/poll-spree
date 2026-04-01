@@ -56,11 +56,17 @@ const RootComponent = () => {
         ) : (
           <>
             <SEOHead />
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-              <div className="flex max-h-screen max-w-screen overflow-hidden">
+            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+              <div className="flex max-h-screen max-w-screen overflow-hidden bg-background">
                 <Sidebar />
-                <main className="ml-16 flex-1 overflow-auto md:ml-64">
-                  {isFetching ? <Loader /> : <Outlet />}
+                <main className="ml-16 flex-1 overflow-auto transition-colors duration-300 md:ml-64">
+                  {isFetching ? (
+                    <Loader />
+                  ) : (
+                    <div className="min-h-full animate-in">
+                      <Outlet />
+                    </div>
+                  )}
                 </main>
               </div>
               <Toaster richColors />
@@ -81,12 +87,16 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { name: "theme-color", content: "#3b82f6" },
+      { name: "theme-color", content: "#CB4839" },
       { name: "robots", content: "noindex, nofollow" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: indexCss },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap",
+      },
     ],
   }),
 })
