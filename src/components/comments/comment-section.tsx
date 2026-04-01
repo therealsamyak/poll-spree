@@ -76,7 +76,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
 
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold text-lg">Comments ({comments.length})</h3>
+      <h3 className="font-semibold text-lg tracking-tight">
+        Comments ({comments.length})
+      </h3>
 
       {isSignedIn && (
         <form onSubmit={handleSubmit} className="flex gap-4">
@@ -108,7 +110,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
         {comments.map((comment) => (
           <div
             key={comment._id}
-            className="flex gap-4 rounded-lg bg-muted/30 p-4"
+            className="group flex gap-4 rounded-xl bg-muted/30 p-4 transition-all duration-200"
           >
             <Avatar size="sm" profileImageUrl={comment.authorProfileImageUrl} />
             <div className="flex-1 space-y-1">
@@ -139,7 +141,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
           </div>
         ))}
         {comments.length === 0 && (
-          <div className="py-8 text-center text-muted-foreground">
+          <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">
             No comments yet. Be the first to share your thoughts!
           </div>
         )}

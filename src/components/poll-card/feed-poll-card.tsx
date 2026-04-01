@@ -220,7 +220,7 @@ export const FeedPollCard = memo(
     }
 
     return (
-      <Card className="flex h-full w-full max-w-2xl flex-col justify-center border-none bg-transparent shadow-none">
+      <Card className="hover:-translate-y-1 flex h-full w-full max-w-2xl flex-col justify-center border-none bg-transparent shadow-none transition-all duration-300 hover:shadow-2xl">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-3">
@@ -230,7 +230,7 @@ export const FeedPollCard = memo(
                 className="block w-full"
               >
                 <CardTitle
-                  className="w-full cursor-pointer break-words font-bold text-3xl leading-tight transition-colors hover:text-primary"
+                  className="w-full cursor-pointer break-words font-bold text-3xl text-foreground leading-tight tracking-tight transition-colors hover:text-primary"
                   style={{ wordBreak: "break-word" }}
                 >
                   {poll.question}
@@ -240,7 +240,7 @@ export const FeedPollCard = memo(
                 <Link
                   to="/users/$username"
                   params={{ username: poll.authorUsername }}
-                  className="flex items-center gap-2 transition-all hover:underline hover:opacity-80"
+                  className="flex items-center gap-2 transition-all duration-200 hover:underline hover:opacity-80"
                 >
                   <Avatar
                     size="sm"
@@ -255,8 +255,8 @@ export const FeedPollCard = memo(
                   <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/10">
-                    <BarChart3 className="h-3 w-3 text-accent-foreground" />
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <BarChart3 className="h-3 w-3 text-primary" />
                   </div>
                   <span className="font-medium">{poll.totalVotes} votes</span>
                 </div>
@@ -289,7 +289,7 @@ export const FeedPollCard = memo(
                   className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
                     isSelected
                       ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                      : "border-muted bg-card/50 text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20"
+                      : "border-muted bg-card text-foreground hover:scale-[1.01] hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20"
                   } hover:border-primary`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting || isUserVoteLoading}
@@ -322,10 +322,10 @@ export const FeedPollCard = memo(
               <button
                 type="button"
                 onClick={handleLike}
-                className={`flex items-center gap-2 transition-colors hover:text-red-500 ${isLiked ? "text-red-500" : ""}`}
+                className={`flex items-center gap-2 transition-all duration-200 hover:text-destructive ${isLiked ? "text-destructive" : ""}`}
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${isLiked ? "bg-red-500/10" : "bg-muted hover:bg-red-500/10"}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${isLiked ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
                 >
                   <Heart
                     className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`}
@@ -343,15 +343,15 @@ export const FeedPollCard = memo(
               <Link
                 to="/polls/$pollId"
                 params={{ pollId: poll.id }}
-                className="flex items-center gap-2 transition-colors hover:text-blue-500"
+                className="flex items-center gap-2 transition-all duration-200 hover:text-primary"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-blue-500/10">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-colors hover:bg-primary/10">
                   <MessageCircle className="h-5 w-5" />
                 </div>
                 <span className="font-medium text-base">Comments</span>
               </Link>
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50">
                   <Eye className="h-5 w-5" />
                 </div>
                 <span className="font-medium text-base">{poll.views || 0}</span>
@@ -360,9 +360,9 @@ export const FeedPollCard = memo(
             <button
               type="button"
               onClick={handleShare}
-              className="flex items-center gap-2 transition-colors hover:text-foreground"
+              className="flex items-center gap-2 transition-all duration-200 hover:text-foreground"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors hover:bg-foreground/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-colors hover:bg-foreground/10">
                 <Share2 className="h-5 w-5" />
               </div>
             </button>

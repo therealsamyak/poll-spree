@@ -66,7 +66,7 @@ const PollQuestionTitle = ({ question }: { question: string }) => {
     question.length > 75 ? `${question.slice(0, 75)}...` : question
   return (
     <CardTitle
-      className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
+      className={`w-full cursor-pointer break-words font-bold text-foreground leading-tight tracking-tight transition-colors hover:text-primary ${getQuestionFontSize(displayText.length)}`}
       style={{ lineHeight: 1.15, width: "100%", wordBreak: "break-word" }}
       title={question}
     >
@@ -93,29 +93,24 @@ const SelectedOptionButton = ({
   return (
     <Button
       variant={"default"}
-      className="flex h-auto w-full items-center justify-between rounded-xl border border-primary bg-primary/80 p-4 font-medium text-base shadow-lg ring-2 ring-primary/20 transition-all duration-200 hover:text-primary-foreground"
+      className="flex h-auto w-full items-center justify-between rounded-xl border border-primary bg-primary/80 p-4 font-medium text-base text-foreground shadow-lg ring-2 ring-primary/20 transition-all duration-200 hover:text-primary-foreground"
       onClick={() => setExpanded(true)}
       style={{
         minHeight: 48,
         whiteSpace: "normal",
         wordBreak: "break-word",
-        color: "var(--foreground)",
         borderColor: "var(--primary)",
       }}
       data-ps-selected-option
     >
-      <span
-        className="flex w-full flex-col items-start gap-1"
-        style={{ color: "var(--foreground)" }}
-      >
+      <span className="flex w-full flex-col items-start gap-1 text-foreground">
         <span
-          style={{ color: "var(--foreground)" }}
-          className="block max-w-[10rem] truncate"
+          className="block max-w-[10rem] truncate text-foreground"
           title={selected.text}
         >
           {selected.text}
         </span>
-        <span className="mt-1 text-xs" style={{ color: "var(--foreground)" }}>
+        <span className="mt-1 text-foreground text-xs">
           {getVotePercentage(selected.votes, poll.totalVotes)}% •{" "}
           {selected.votes} vote
           {selected.votes === 1 ? "" : "s"}
@@ -336,7 +331,7 @@ export const PollCard = memo(
     }
 
     return (
-      <Card className="group flex h-full flex-col border border-muted bg-card/50 shadow-md backdrop-blur-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50">
+      <Card className="group hover:-translate-y-0.5 flex h-full flex-col border border-muted bg-card shadow-md backdrop-blur-sm transition-all duration-300 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-gradient-to-br dark:from-card dark:to-card/50">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-3">
@@ -365,13 +360,13 @@ export const PollCard = memo(
                   </Link>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/30">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                     <Calendar className="h-3 w-3 text-primary" />
                   </div>
                   <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/30">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                     <BarChart3 className="h-3 w-3 text-accent-foreground" />
                   </div>
                   <span className="font-medium">{poll.totalVotes} votes</span>
@@ -398,7 +393,7 @@ export const PollCard = memo(
             {!isUserVoteLoading && !userVote?.optionId && (
               <Button
                 variant="outline"
-                className="w-full rounded-xl border border-muted bg-muted p-4 font-medium text-base text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
+                className="w-full rounded-xl border border-muted bg-card p-4 font-medium text-base text-foreground transition-all duration-200 hover:scale-[1.01] hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"
                 onClick={() => {
                   if (!isSignedIn) {
                     showSignInNotification()
@@ -436,22 +431,18 @@ export const PollCard = memo(
                   <Button
                     key={option.id}
                     variant={isSelected ? "default" : "outline"}
-                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 font-medium text-base transition-all duration-200 ${isSelected ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : "border-muted bg-muted text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
+                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 font-medium text-base transition-all duration-200 ${isSelected ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground" : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
                     onClick={() => handleVote(option.id)}
                     disabled={isVoting || isUserVoteLoading}
                     style={{
                       minHeight: 48,
                       whiteSpace: "normal",
                       wordBreak: "break-word",
-                      color: "var(--foreground)",
                       borderColor: isSelected ? "var(--primary)" : undefined,
                     }}
                     data-ps-modal-option
                   >
-                    <span
-                      className="flex w-full flex-col items-start gap-1"
-                      style={{ color: "var(--foreground)" }}
-                    >
+                    <span className="flex w-full flex-col items-start gap-1 text-foreground">
                       <span
                         className="whitespace-pre-line break-words"
                         style={{ wordBreak: "break-word" }}
@@ -459,10 +450,7 @@ export const PollCard = memo(
                         {option.text}
                       </span>
                       {showResults && (
-                        <span
-                          className="mt-1 text-xs"
-                          style={{ color: "var(--foreground)" }}
-                        >
+                        <span className="mt-1 text-foreground text-xs">
                           {getVotePercentage(option.votes, poll.totalVotes)}% •{" "}
                           {option.votes} vote
                           {option.votes === 1 ? "" : "s"}
@@ -475,13 +463,13 @@ export const PollCard = memo(
             </div>
           </DialogContent>
         </Dialog>
-        <CardFooter className="border-muted/50 border-t p-4">
+        <CardFooter className="border-border/50 border-t p-4">
           <div className="flex w-full items-center justify-between text-muted-foreground text-sm">
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={handleLike}
-                className={`flex items-center gap-1.5 transition-colors hover:text-red-500 ${displayIsLiked ? "text-red-500" : ""}`}
+                className={`flex items-center gap-1.5 transition-all duration-200 hover:text-destructive ${displayIsLiked ? "text-destructive" : ""}`}
               >
                 <Heart
                   className={`h-4 w-4 ${displayIsLiked ? "fill-current" : ""}`}
@@ -498,7 +486,7 @@ export const PollCard = memo(
               <Link
                 to="/polls/$pollId"
                 params={{ pollId: poll.id }}
-                className="flex items-center gap-1.5 transition-colors hover:text-blue-500"
+                className="flex items-center gap-1.5 transition-all duration-200 hover:text-primary"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>Comments</span>
@@ -511,7 +499,7 @@ export const PollCard = memo(
             <button
               type="button"
               onClick={handleShare}
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-all duration-200 hover:text-foreground"
             >
               <Share2 className="h-4 w-4" />
             </button>

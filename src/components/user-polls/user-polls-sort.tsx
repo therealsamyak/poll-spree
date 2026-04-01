@@ -52,7 +52,11 @@ export const UserPollsSort = ({ currentSort }: UserPollsSortProps) => {
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleSortChange(option.value)}
-            className={currentSort === option.value ? "bg-accent" : ""}
+            className={
+              currentSort === option.value
+                ? "bg-primary/10 font-medium text-primary"
+                : ""
+            }
           >
             {option.label}
           </DropdownMenuItem>

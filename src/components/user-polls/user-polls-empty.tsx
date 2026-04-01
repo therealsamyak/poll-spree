@@ -64,10 +64,10 @@ export const UserPollsEmpty = ({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
-      <Card className="mx-auto w-full max-w-md border-2 border-muted-foreground/20 border-dashed text-center">
+      <Card className="mx-auto w-full max-w-md border-2 border-primary/20 border-dashed text-center">
         <CardHeader className="pb-4">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <IconComponent className="h-8 w-8 text-muted-foreground" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <IconComponent className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="font-bold text-2xl">{content.title}</CardTitle>
           <CardDescription className="text-base">

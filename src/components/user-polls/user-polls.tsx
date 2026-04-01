@@ -165,11 +165,11 @@ export const UserPolls = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-primary/[0.02] to-background">
         <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
+            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-primary/5">
               <Avatar
                 size="lg"
                 profileImageUrl={user.profileImageUrl}
@@ -223,7 +223,7 @@ export const UserPolls = () => {
             {allPolls.map((poll, index) => (
               <div
                 key={poll.id}
-                className="slide-in-from-bottom-4 animate-in duration-500"
+                className="slide-in-from-bottom-4 animate-in transition-all duration-300 duration-500 hover:shadow-xl"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <PollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
