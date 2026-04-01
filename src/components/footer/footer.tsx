@@ -3,14 +3,14 @@ import { SiGithub, SiX } from "react-icons/si"
 
 export const Footer = () => {
   return (
-    <footer className="mt-16 border-t pt-8">
+    <footer className="mt-auto border-border/50 border-t pt-8">
       <div className="space-y-6 text-center">
         <div className="flex items-center justify-center space-x-6">
           <a
             href="https://github.com/therealsamyak/poll-spree"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground transition-colors duration-200 hover:text-primary"
           >
             <SiGithub className="h-5 w-5" />
           </a>
@@ -18,7 +18,7 @@ export const Footer = () => {
             href="https://x.com/samheart564"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground transition-colors duration-200 hover:text-primary"
           >
             <SiX className="h-5 w-5" />
           </a>
@@ -29,7 +29,7 @@ export const Footer = () => {
             community
           </p>
           <p className="text-muted-foreground text-xs">
-            © 2025 PollSpree. All rights reserved.
+            © 2026 PollSpree. All rights reserved.
           </p>
         </div>
       </div>

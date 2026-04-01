@@ -80,7 +80,7 @@ export const CreatePollDialogContent = ({
   return (
     <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-xl">
+        <DialogTitle className="flex items-center gap-2 text-xl tracking-tight">
           {icon}
           Create New Poll
         </DialogTitle>
@@ -206,7 +206,7 @@ export const CreatePollDialogContent = ({
           <Button
             type="submit"
             disabled={isCreating || !isFormValid}
-            className="border border-transparent text-foreground hover:border-border dark:hover:border-border"
+            className="bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
           >
             {isCreating ? "Creating..." : "Create Poll"}
           </Button>
@@ -223,7 +223,7 @@ export const CreatePollDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 border border-transparent text-foreground hover:border-border hover:bg-primary/40 hover:text-foreground dark:hover:border-border dark:hover:bg-primary/50 dark:hover:text-foreground">
+        <Button className="gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
           <Plus className="h-4 w-4" />
           Create Poll
         </Button>
