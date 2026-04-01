@@ -20,7 +20,7 @@ export const SignInModal = ({ isOpen, onClose }: SignInModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 tracking-tight">
             <LogIn className="h-5 w-5" />
             Sign In Required
           </DialogTitle>
@@ -30,7 +30,7 @@ export const SignInModal = ({ isOpen, onClose }: SignInModalProps) => {
         </DialogHeader>
         <DialogFooter className="flex-col gap-3 sm:flex-row sm:gap-2">
           <SignInButton mode="modal">
-            <Button className="w-full gap-2 sm:flex-1">
+            <Button className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90 sm:flex-1">
               <LogIn className="h-4 w-4" />
               Sign In
             </Button>

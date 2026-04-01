@@ -47,7 +47,9 @@ const Trending = () => {
       <div className="flex h-full w-full items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading trending polls...</p>
+          <p className="animate-pulse text-muted-foreground">
+            Loading trending polls...
+          </p>
         </div>
       </div>
     )
@@ -56,12 +58,12 @@ const Trending = () => {
   if (allPolls.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <Card className="mx-auto w-full max-w-md border-2 border-muted-foreground/20 border-dashed text-center">
+        <Card className="mx-auto w-full max-w-md border-2 border-primary/20 border-dashed text-center">
           <CardHeader className="pb-4">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <TrendingUp className="h-8 w-8 text-muted-foreground" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <TrendingUp className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="font-bold text-2xl">
+            <CardTitle className="font-bold text-2xl tracking-tight">
               No trending polls yet
             </CardTitle>
             <CardDescription className="text-base">
@@ -75,7 +77,7 @@ const Trending = () => {
               </Suspense>
             ) : (
               <SignInButton mode="modal">
-                <Button className="gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg hover:from-primary/90 hover:to-primary/70">
+                <Button className="gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
                   <Plus className="h-4 w-4" />
                   Sign in to create polls
                 </Button>
@@ -100,7 +102,7 @@ const Trending = () => {
         <div className="h-full w-full overflow-y-auto px-4 py-8 pb-20 sm:px-6 lg:px-8">
           {/* Header row: Trending Polls + Create Button */}
           <div className="mb-8 flex w-full items-center justify-center sm:justify-between">
-            <h2 className="flex items-center gap-2 font-bold text-2xl">
+            <h2 className="flex items-center gap-2 font-bold text-2xl tracking-tight">
               <TrendingUp className="h-6 w-6 text-primary" />
               Trending Polls
             </h2>
@@ -127,7 +129,7 @@ const Trending = () => {
           </div>
 
           {/* End of content indicator */}
-          <div className="mt-8 text-center text-muted-foreground">
+          <div className="mt-8 text-center text-muted-foreground text-sm">
             <p>Showing top 50 trending polls</p>
           </div>
 

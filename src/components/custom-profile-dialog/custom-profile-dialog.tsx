@@ -177,7 +177,7 @@ export const CustomProfileDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 tracking-tight">
             <User className="h-5 w-5" />
             Profile Settings
           </DialogTitle>
