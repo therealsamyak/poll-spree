@@ -18,7 +18,6 @@ import {
   useState,
 } from "react"
 
-import { Footer } from "@/components/footer"
 import { Loader } from "@/components/loader"
 import { FeedPollCard } from "@/components/poll-card"
 import { Button } from "@/components/ui/button"
@@ -262,9 +261,6 @@ export const PollsList = () => {
                   </Button>
                 </SignInButton>
               )}
-              <div className="mt-8">
-                <Footer />
-              </div>
             </div>
           )}
         </div>
@@ -327,9 +323,6 @@ export const PollsList = () => {
                   </Button>
                 </SignInButton>
               )}
-              <div className="mt-8">
-                <Footer />
-              </div>
             </div>
           )}
         </div>

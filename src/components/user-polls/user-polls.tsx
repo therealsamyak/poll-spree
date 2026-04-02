@@ -6,7 +6,6 @@ import { BarChart3, Loader2, Users } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { Avatar } from "@/components/avatar"
-import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import type { Poll } from "@/types"
 
@@ -241,8 +240,6 @@ export const UserPolls = () => {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   )
 }

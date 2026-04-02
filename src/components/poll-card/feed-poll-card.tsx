@@ -50,14 +50,11 @@ export const FeedPollCard = memo(
     const vote = useMutation(api.polls.vote)
     const deletePoll = useMutation(api.polls.deletePoll)
     const toggleLike = useMutation(api.polls.toggleLike)
+
     const likeStatus = useQuery(api.polls.getPollLikeStatus, {
       pollId: poll.id as Id<"polls">,
       userId: userId || "",
     })
-
-    const [isLiked, setIsLiked] = useState<boolean | null>(null)
-
-    const displayIsLiked = isLiked ?? likeStatus ?? false
 
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
@@ -80,21 +77,26 @@ export const FeedPollCard = memo(
     const showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
 
-    const { handleVote, handleDelete, handleLike, isVoting, isDeleting } =
-      usePollActions({
-        pollId: poll.id,
-        userId,
-        isSignedIn,
-        userVote,
-        vote,
-        deletePoll,
-        toggleLike,
-        onPollDeleted,
-        showNotification,
-        showSignInNotification,
-        setIsLiked,
-        showVoteNotifications: false,
-      })
+    const {
+      handleVote,
+      handleDelete,
+      handleLike,
+      isVoting,
+      isDeleting,
+      isLiking,
+    } = usePollActions({
+      pollId: poll.id,
+      userId,
+      isSignedIn,
+      userVote,
+      vote,
+      deletePoll,
+      toggleLike,
+      onPollDeleted,
+      showNotification,
+      showSignInNotification,
+      showVoteNotifications: false,
+    })
 
     const handleShare = () => {
       const url = `${window.location.origin}/polls/${poll.id}`
@@ -208,23 +210,17 @@ export const FeedPollCard = memo(
               <button
                 type="button"
                 onClick={handleLike}
-                className={`hover:text-destructive flex items-center gap-2 ${displayIsLiked ? "text-destructive" : ""}`}
+                disabled={isLiking}
+                className={`hover:text-destructive flex items-center gap-2 ${likeStatus ? "text-destructive" : ""}`}
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${displayIsLiked ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${likeStatus ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
                 >
                   <Heart
-                    className={`h-5 w-5 ${displayIsLiked ? "fill-current" : ""}`}
+                    className={`h-5 w-5 ${likeStatus ? "fill-current" : ""}`}
                   />
                 </div>
-                <span className="text-base font-medium">
-                  {poll.likes +
-                    (displayIsLiked && !likeStatus
-                      ? 1
-                      : !displayIsLiked && likeStatus
-                        ? -1
-                        : 0)}
-                </span>
+                <span className="text-base font-medium">{poll.likes}</span>
               </button>
               <Link
                 to="/polls/$pollId"

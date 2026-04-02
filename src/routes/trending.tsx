@@ -5,7 +5,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { Plus, TrendingUp } from "lucide-react"
 import { Suspense, lazy, useMemo } from "react"
 
-import { Footer } from "@/components/footer"
 import { Loader } from "@/components/loader"
 import { PollCard } from "@/components/poll-card"
 import { SEOHead } from "@/components/seo"
@@ -127,9 +126,6 @@ const Trending = () => {
           <div className="text-muted-foreground mt-8 text-center text-sm">
             <p>Showing top 50 trending polls</p>
           </div>
-
-          {/* Footer */}
-          <Footer />
         </div>
       </div>
     </>

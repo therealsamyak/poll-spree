@@ -26,9 +26,6 @@ interface UsePollActionsParams {
     variant: "success" | "error" | "warning" | "info"
   }) => void
   showSignInNotification: () => void
-  setIsLiked?: (
-    updater: boolean | null | ((prev: boolean | null) => boolean | null),
-  ) => void
   showVoteNotifications?: boolean
 }
 
@@ -43,11 +40,11 @@ export const usePollActions = ({
   onPollDeleted,
   showNotification,
   showSignInNotification,
-  setIsLiked,
   showVoteNotifications = true,
 }: UsePollActionsParams) => {
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isLiking, setIsLiking] = useState(false)
 
   const handleVote = async (optionId: string) => {
     if (!isSignedIn) {
@@ -158,22 +155,26 @@ export const usePollActions = ({
       showSignInNotification()
       return
     }
-    if (!userId) {
-      return
-    }
-    if (!toggleLike || !setIsLiked) {
+    if (!userId || !toggleLike) {
       return
     }
 
-    setIsLiked((prev) => !prev)
-
+    setIsLiking(true)
     try {
       await toggleLike({ pollId: pollId as Id<"polls">, userId })
     } catch {
-      setIsLiked((prev) => !prev)
       showNotification({ message: "Failed to like poll", variant: "error" })
+    } finally {
+      setIsLiking(false)
     }
   }
 
-  return { handleVote, handleDelete, handleLike, isVoting, isDeleting }
+  return {
+    handleVote,
+    handleDelete,
+    handleLike,
+    isVoting,
+    isDeleting,
+    isLiking,
+  }
 }

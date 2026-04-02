@@ -134,14 +134,11 @@ export const PollCard = memo(
     const vote = useMutation(api.polls.vote)
     const deletePoll = useMutation(api.polls.deletePoll)
     const toggleLike = useMutation(api.polls.toggleLike)
-    const [isLiked, setIsLiked] = useState<boolean | null>(null)
 
     const likeStatus = useQuery(api.polls.getPollLikeStatus, {
       pollId: poll.id as Id<"polls">,
       userId: userId || "",
     })
-
-    const displayIsLiked = isLiked ?? likeStatus ?? false
 
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
@@ -164,20 +161,25 @@ export const PollCard = memo(
     const _showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
 
-    const { handleVote, handleDelete, handleLike, isVoting, isDeleting } =
-      usePollActions({
-        pollId: poll.id,
-        userId,
-        isSignedIn,
-        userVote,
-        vote,
-        deletePoll,
-        toggleLike,
-        onPollDeleted,
-        showNotification,
-        showSignInNotification,
-        setIsLiked,
-      })
+    const {
+      handleVote,
+      handleDelete,
+      handleLike,
+      isVoting,
+      isDeleting,
+      isLiking,
+    } = usePollActions({
+      pollId: poll.id,
+      userId,
+      isSignedIn,
+      userVote,
+      vote,
+      deletePoll,
+      toggleLike,
+      onPollDeleted,
+      showNotification,
+      showSignInNotification,
+    })
 
     // Only move the selected option to the top if:
     // - The user has selected an option (userVote?.optionId)
@@ -362,19 +364,13 @@ export const PollCard = memo(
               <button
                 type="button"
                 onClick={handleLike}
-                className={`hover:text-destructive flex items-center gap-1.5 ${displayIsLiked ? "text-destructive" : ""}`}
+                disabled={isLiking}
+                className={`hover:text-destructive flex items-center gap-1.5 ${likeStatus ? "text-destructive" : ""}`}
               >
                 <Heart
-                  className={`h-4 w-4 ${displayIsLiked ? "fill-current" : ""}`}
+                  className={`h-4 w-4 ${likeStatus ? "fill-current" : ""}`}
                 />
-                <span>
-                  {poll.likes +
-                    (displayIsLiked && !likeStatus
-                      ? 1
-                      : !displayIsLiked && likeStatus
-                        ? -1
-                        : 0)}
-                </span>
+                <span>{poll.likes}</span>
               </button>
               <Link
                 to="/polls/$pollId"
