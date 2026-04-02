@@ -1,5 +1,6 @@
 import { useNavigate } from "@tanstack/react-router"
 import { ChevronDown } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,10 +12,10 @@ import {
 type SortOption = "recent" | "oldest" | "most-voted" | "least-voted"
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "recent", label: "Newest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "most-voted", label: "Most Voted" },
-  { value: "least-voted", label: "Least Voted" },
+  { label: "Newest", value: "recent" },
+  { label: "Oldest", value: "oldest" },
+  { label: "Most Voted", value: "most-voted" },
+  { label: "Least Voted", value: "least-voted" },
 ]
 
 interface UserPollsSortProps {
@@ -27,11 +28,11 @@ export const UserPollsSort = ({ currentSort }: UserPollsSortProps) => {
   const handleSortChange = (sort: SortOption) => {
     navigate({
       from: "/users/$username",
+      replace: true,
       search: (prev) => ({
         ...prev,
         sort,
       }),
-      replace: true,
     })
   }
 
@@ -54,7 +55,7 @@ export const UserPollsSort = ({ currentSort }: UserPollsSortProps) => {
             onClick={() => handleSortChange(option.value)}
             className={
               currentSort === option.value
-                ? "bg-primary/10 font-medium text-primary"
+                ? "bg-primary/10 text-primary font-medium"
                 : ""
             }
           >

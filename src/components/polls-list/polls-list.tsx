@@ -8,14 +8,15 @@ import {
   Plus,
 } from "lucide-react"
 import {
-  lazy,
   Suspense,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react"
+
 import { Footer } from "@/components/footer"
 import { Loader } from "@/components/loader"
 import { FeedPollCard } from "@/components/poll-card"
@@ -28,6 +29,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import type { Poll } from "@/types"
+
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -40,8 +42,8 @@ const CreatePollDialog = lazy(() =>
 export const PollsList = () => {
   const { isSignedIn, userId } = useAuth()
   const [paginationOpts, setPaginationOpts] = useState({
-    numItems: 20,
     cursor: null as string | null,
+    numItems: 20,
   })
   const [allPolls, setAllPolls] = useState<Poll[]>([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -55,14 +57,14 @@ export const PollsList = () => {
   const scrollLeft = useCallback(() => {
     if (scrollContainerRef.current) {
       const width = scrollContainerRef.current.clientWidth
-      scrollContainerRef.current.scrollBy({ left: -width, behavior: "smooth" })
+      scrollContainerRef.current.scrollBy({ behavior: "smooth", left: -width })
     }
   }, [])
 
   const scrollRight = useCallback(() => {
     if (scrollContainerRef.current) {
       const width = scrollContainerRef.current.clientWidth
-      scrollContainerRef.current.scrollBy({ left: width, behavior: "smooth" })
+      scrollContainerRef.current.scrollBy({ behavior: "smooth", left: width })
     }
   }, [])
 
@@ -155,8 +157,8 @@ export const PollsList = () => {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="space-y-4 text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="animate-pulse text-muted-foreground">
+          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
+          <p className="text-muted-foreground animate-pulse">
             Loading polls...
           </p>
         </div>
@@ -169,12 +171,12 @@ export const PollsList = () => {
   if (allPolls.length === 0) {
     return (
       <div className="flex h-full w-full items-center justify-center px-4">
-        <Card className="mx-auto w-full max-w-md border-2 border-primary/20 border-dashed text-center">
+        <Card className="border-primary/20 mx-auto w-full max-w-md border-2 border-dashed text-center">
           <CardHeader className="pb-4">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <BarChart3 className="h-8 w-8 text-primary" />
+            <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <BarChart3 className="text-primary h-8 w-8" />
             </div>
-            <CardTitle className="font-bold text-2xl">No polls yet</CardTitle>
+            <CardTitle className="text-2xl font-bold">No polls yet</CardTitle>
             <CardDescription className="text-base">
               Be the first to create a poll and start the conversation!
             </CardDescription>
@@ -186,7 +188,7 @@ export const PollsList = () => {
               </Suspense>
             ) : (
               <SignInButton mode="modal">
-                <Button className="gap-2 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm">
                   <Plus className="h-4 w-4" />
                   Sign in to create polls
                 </Button>
@@ -199,12 +201,12 @@ export const PollsList = () => {
   }
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20 md:h-screen md:overflow-hidden">
+    <div className="from-background via-background to-muted/20 relative min-h-screen w-full bg-gradient-to-br md:h-screen md:overflow-hidden">
       {/* Desktop Navigation Buttons */}
       <button
         type="button"
         onClick={scrollLeft}
-        className="-translate-y-1/2 absolute top-1/2 left-4 z-40 hidden h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/50 text-foreground/80 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-background hover:text-foreground hover:shadow-xl md:flex"
+        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 left-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:shadow-xl md:flex"
         aria-label="Previous poll"
       >
         <ChevronLeft className="h-8 w-8" />
@@ -213,7 +215,7 @@ export const PollsList = () => {
       <button
         type="button"
         onClick={scrollRight}
-        className="-translate-y-1/2 absolute top-1/2 right-4 z-40 hidden h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/50 text-foreground/80 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-background hover:text-foreground hover:shadow-xl md:flex"
+        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 right-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:shadow-xl md:flex"
         aria-label="Next poll"
       >
         <ChevronRight className="h-8 w-8" />
@@ -230,23 +232,23 @@ export const PollsList = () => {
         {/* Mobile Infinite Scroll Trigger / Loading State */}
         <div ref={loadMoreRef} className="w-full">
           {!isDone && (
-            <div className="flex flex-col items-center gap-4 py-8 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center gap-4 py-8">
               <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="animate-pulse font-medium text-base">
+              <span className="animate-pulse text-base font-medium">
                 Loading more polls...
               </span>
             </div>
           )}
           {isDone && allPolls.length > 0 && (
             <div className="flex flex-col items-center justify-center gap-6 p-8 text-center">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
-                <BarChart3 className="h-12 w-12 text-primary" />
+              <div className="bg-primary/10 flex h-24 w-24 items-center justify-center rounded-full">
+                <BarChart3 className="text-primary h-12 w-12" />
               </div>
               <div className="space-y-2">
-                <h3 className="font-bold text-3xl tracking-tight">
+                <h3 className="text-3xl font-bold tracking-tight">
                   You're all caught up!
                 </h3>
-                <p className="max-w-md text-lg text-muted-foreground">
+                <p className="text-muted-foreground max-w-md text-lg">
                   You've seen all the polls. Why not create your own?
                 </p>
               </div>
@@ -256,7 +258,7 @@ export const PollsList = () => {
                 </Suspense>
               ) : (
                 <SignInButton mode="modal">
-                  <Button className="gap-2 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm">
                     <Plus className="h-5 w-5" />
                     Sign in to create polls
                   </Button>
@@ -295,23 +297,23 @@ export const PollsList = () => {
           className="flex h-full w-full shrink-0 snap-start items-center justify-center"
         >
           {!isDone && (
-            <div className="flex flex-col items-center gap-4 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="animate-pulse font-medium text-base">
+              <span className="animate-pulse text-base font-medium">
                 Loading more polls...
               </span>
             </div>
           )}
           {isDone && allPolls.length > 0 && (
             <div className="flex flex-col items-center justify-center gap-6 p-8 text-center">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
-                <BarChart3 className="h-12 w-12 text-primary" />
+              <div className="bg-primary/10 flex h-24 w-24 items-center justify-center rounded-full">
+                <BarChart3 className="text-primary h-12 w-12" />
               </div>
               <div className="space-y-2">
-                <h3 className="font-bold text-3xl tracking-tight">
+                <h3 className="text-3xl font-bold tracking-tight">
                   You're all caught up!
                 </h3>
-                <p className="max-w-md text-lg text-muted-foreground">
+                <p className="text-muted-foreground max-w-md text-lg">
                   You've seen all the polls. Why not create your own?
                 </p>
               </div>
@@ -321,7 +323,7 @@ export const PollsList = () => {
                 </Suspense>
               ) : (
                 <SignInButton mode="modal">
-                  <Button className="gap-2 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90">
+                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm">
                     <Plus className="h-5 w-5" />
                     Sign in to create polls
                   </Button>

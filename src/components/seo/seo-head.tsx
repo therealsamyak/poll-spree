@@ -1,4 +1,5 @@
 import { HeadContent } from "@tanstack/react-router"
+
 import { MetaTags } from "./meta-tags"
 import { OpenGraph } from "./open-graph"
 import { StructuredData } from "./structured-data"
@@ -29,33 +30,27 @@ export const SEOHead = ({
   ogImage,
   twitterImage,
   structuredData,
-}: SEOHeadProps) => {
-  return (
-    // @ts-expect-error - HeadContent types are tricky
-    <HeadContent>
-      <MetaTags
-        title={title}
-        description={description}
-        keywords={keywords}
-        canonical={canonical}
+}: SEOHeadProps) => (
+  // @ts-expect-error - HeadContent types are tricky
+  <HeadContent>
+    <MetaTags
+      title={title}
+      description={description}
+      keywords={keywords}
+      canonical={canonical}
+    />
+    <OpenGraph
+      title={title}
+      description={description}
+      url={canonical}
+      image={ogImage}
+    />
+    <TwitterCard title={title} description={description} image={twitterImage} />
+    {structuredData && (
+      <StructuredData
+        type={structuredData.type}
+        pollData={structuredData.pollData}
       />
-      <OpenGraph
-        title={title}
-        description={description}
-        url={canonical}
-        image={ogImage}
-      />
-      <TwitterCard
-        title={title}
-        description={description}
-        image={twitterImage}
-      />
-      {structuredData && (
-        <StructuredData
-          type={structuredData.type}
-          pollData={structuredData.pollData}
-        />
-      )}
-    </HeadContent>
-  )
-}
+    )}
+  </HeadContent>
+)

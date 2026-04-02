@@ -39,11 +39,11 @@ export interface CreatePollData {
   dev?: boolean
 }
 
-export type VoteRequest = {
+export interface VoteRequest {
   optionId: Id<"pollOptions">
 }
 
-export type VoteResponse = {
+export interface VoteResponse {
   success: boolean
   poll: PollWithOptionsType
 }

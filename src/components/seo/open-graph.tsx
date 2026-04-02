@@ -22,19 +22,17 @@ export const OpenGraph = ({
   type = "website",
   siteName = "PollSpree",
   locale = "en_US",
-}: OpenGraphProps) => {
-  return (
-    <>
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={siteName} />
-      <meta property="og:locale" content={locale} />
-      {url && <meta property="og:url" content={url} />}
-      <meta property="og:image" content={image} />
-      <meta property="og:image:width" content={imageWidth.toString()} />
-      <meta property="og:image:height" content={imageHeight.toString()} />
-      <meta property="og:image:alt" content={imageAlt} />
-    </>
-  )
-}
+}: OpenGraphProps) => (
+  <>
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content={locale} />
+    {url && <meta property="og:url" content={url} />}
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content={imageWidth.toString()} />
+    <meta property="og:image:height" content={imageHeight.toString()} />
+    <meta property="og:image:alt" content={imageAlt} />
+  </>
+)

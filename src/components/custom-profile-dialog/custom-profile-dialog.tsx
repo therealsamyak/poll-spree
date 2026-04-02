@@ -2,6 +2,7 @@ import { useClerk, useUser } from "@clerk/clerk-react"
 import { useAction, useMutation } from "convex/react"
 import { AlertTriangle, Camera, LogOut, Trash2, User } from "lucide-react"
 import { useRef, useState } from "react"
+
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { useNotification } from "@/components/ui/notification"
 import { Separator } from "@/components/ui/separator"
+
 import { api } from "../../../convex/_generated/api"
 
 interface CustomProfileDialogProps {
@@ -45,13 +47,15 @@ export const CustomProfileDialog = ({
         message: "Signed out successfully",
         variant: "success",
       })
-    } catch (_error) {
+    } catch {
       showNotification({ message: "Failed to sign out", variant: "error" })
     }
   }
 
   const handleDeleteAccount = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
 
     setIsDeleting(true)
     try {
@@ -68,7 +72,7 @@ export const CustomProfileDialog = ({
 
       // Step 4: Refresh the page to clear any remaining state
       window.location.reload()
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "Failed to delete account. Please try again.",
         variant: "error",
@@ -82,7 +86,9 @@ export const CustomProfileDialog = ({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0]
-    if (!file || !user) return
+    if (!file || !user) {
+      return
+    }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -112,10 +118,10 @@ export const CustomProfileDialog = ({
       setTimeout(async () => {
         try {
           await updateProfileImage({
-            userId: user.id,
             profileImageUrl: user.imageUrl || "",
+            userId: user.id,
           })
-        } catch (_error) {
+        } catch {
           // Don't show error to user as the main operation succeeded
         }
       }, 1000)
@@ -124,7 +130,7 @@ export const CustomProfileDialog = ({
         message: "Profile picture updated successfully!",
         variant: "success",
       })
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "Failed to upload profile picture. Please try again.",
         variant: "error",
@@ -139,7 +145,9 @@ export const CustomProfileDialog = ({
   }
 
   const handleRemoveProfilePicture = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
 
     setIsUploading(true)
     try {
@@ -151,10 +159,10 @@ export const CustomProfileDialog = ({
       setTimeout(async () => {
         try {
           await updateProfileImage({
-            userId: user.id,
             profileImageUrl: "",
+            userId: user.id,
           })
-        } catch (_error) {
+        } catch {
           // Don't show error to user as the main operation succeeded
         }
       }, 1000)
@@ -163,7 +171,7 @@ export const CustomProfileDialog = ({
         message: "Profile picture removed successfully!",
         variant: "success",
       })
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "Failed to remove profile picture. Please try again.",
         variant: "error",
@@ -287,7 +295,7 @@ export const CustomProfileDialog = ({
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
+            <DialogTitle className="text-destructive flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
               Delete Account
             </DialogTitle>
@@ -298,7 +306,7 @@ export const CustomProfileDialog = ({
           </DialogHeader>
 
           <div className="space-y-2">
-            <ul className="list-inside list-disc space-y-1 text-muted-foreground text-sm">
+            <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
               <li>All polls you've created</li>
               <li>All votes you've cast</li>
               <li>Your username and profile data</li>

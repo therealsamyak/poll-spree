@@ -17,21 +17,19 @@ export const MetaTags = ({
   robots = "index, follow",
   canonical,
   language = "en",
-  charset = "UTF-8",
-}: MetaTagsProps) => {
-  return (
-    <>
-      <meta charSet={charset} />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
-      <meta name="robots" content={robots} />
-      {canonical && <link rel="canonical" href={canonical} />}
-      <meta httpEquiv="Content-Language" content={language} />
-      <meta name="theme-color" content="#000000" />
-      <meta name="color-scheme" content="dark light" />
-    </>
-  )
-}
+  charset = "utf8",
+}: MetaTagsProps) => (
+  <>
+    <meta charSet={charset} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+    <meta name="robots" content={robots} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta httpEquiv="Content-Language" content={language} />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark light" />
+  </>
+)

@@ -3,11 +3,13 @@ import { useMutation, useQuery } from "convex/react"
 import { formatDistanceToNow } from "date-fns"
 import { Send, Trash2 } from "lucide-react"
 import { useState } from "react"
+
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/components/ui/notification"
 import { Textarea } from "@/components/ui/textarea"
 import { isTextSafe } from "@/lib/badWordsFilter"
+
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 
@@ -30,7 +32,9 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!text.trim() || !user) return
+    if (!text.trim() || !user) {
+      return
+    }
 
     // Validate comment for inappropriate content
     if (!isTextSafe(text)) {
@@ -51,7 +55,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
       })
       setText("")
       showNotification({ message: "Comment posted!", variant: "success" })
-    } catch (_error) {
+    } catch {
       showNotification({ message: "Failed to post comment", variant: "error" })
     } finally {
       setIsSubmitting(false)
@@ -62,7 +66,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
     try {
       await deleteComment({ commentId, userId: userId || "" })
       showNotification({ message: "Comment deleted", variant: "success" })
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "Failed to delete comment",
         variant: "error",
@@ -71,12 +75,12 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   }
 
   if (comments === undefined) {
-    return <div className="h-20 animate-pulse rounded-lg bg-muted" />
+    return <div className="bg-muted h-20 animate-pulse rounded-lg" />
   }
 
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold text-lg tracking-tight">
+      <h3 className="text-lg font-semibold tracking-tight">
         Comments ({comments.length})
       </h3>
 
@@ -110,7 +114,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
         {comments.map((comment) => (
           <div
             key={comment._id}
-            className="group flex gap-4 rounded-xl bg-muted/30 p-4 transition-all duration-200"
+            className="group bg-muted/30 flex gap-4 rounded-xl p-4 transition-all duration-200"
           >
             <Avatar size="sm" profileImageUrl={comment.authorProfileImageUrl} />
             <div className="flex-1 space-y-1">
@@ -127,21 +131,21 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-destructive opacity-0 transition-opacity group-hover:opacity-100"
+                    className="text-destructive h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
                     onClick={() => handleDelete(comment._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>
-              <p className="whitespace-pre-wrap break-words text-sm">
+              <p className="text-sm break-words whitespace-pre-wrap">
                 {comment.text}
               </p>
             </div>
           </div>
         ))}
         {comments.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-muted-foreground">
+          <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-12 text-center">
             No comments yet. Be the first to share your thoughts!
           </div>
         )}

@@ -1,5 +1,6 @@
 import { Plus, Sparkles, X } from "lucide-react"
 import { useEffect, useId, useRef, useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -16,18 +17,26 @@ import { Textarea } from "@/components/ui/textarea"
 import { useCreatePoll } from "@/hooks/useCreatePoll"
 
 const getCharacterCountColor = (length: number, max: number) => {
-  if (length > max) return "text-destructive"
-  if (length > max * 0.9) return "text-accent-foreground"
+  if (length > max) {
+    return "text-destructive"
+  }
+  if (length > max * 0.9) {
+    return "text-accent-foreground"
+  }
   return "text-muted-foreground"
 }
 
 const getCharacterCountBg = (length: number, max: number) => {
-  if (length > max) return "bg-destructive/10 dark:bg-destructive/20"
-  if (length > max * 0.9) return "bg-accent/10 dark:bg-accent/20"
+  if (length > max) {
+    return "bg-destructive/10 dark:bg-destructive/20"
+  }
+  if (length > max * 0.9) {
+    return "bg-accent/10 dark:bg-accent/20"
+  }
   return ""
 }
 
-const DefaultIcon = <Sparkles className="h-5 w-5 text-primary" />
+const DefaultIcon = <Sparkles className="text-primary h-5 w-5" />
 
 // Shared dialog component that can be used by both sidebar and homepage
 export const CreatePollDialogContent = ({
@@ -41,8 +50,8 @@ export const CreatePollDialogContent = ({
     question,
     setQuestion,
     options,
-    // isDev,
-    // setIsDev,
+    // IsDev,
+    // SetIsDev,
     isCreating,
     handleCreatePoll,
     addOption,
@@ -92,7 +101,7 @@ export const CreatePollDialogContent = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Question */}
         <div className="space-y-2">
-          <Label htmlFor={questionId} className="font-medium text-sm">
+          <Label htmlFor={questionId} className="text-sm font-medium">
             Question *
           </Label>
           <div className="relative">
@@ -109,7 +118,7 @@ export const CreatePollDialogContent = ({
               required
             />
             <div
-              className={`absolute right-3 bottom-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(question.length, 150)}`}
+              className={`bg-background/80 absolute right-3 bottom-3 rounded px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(question.length, 150)}`}
             >
               {question.length}/150
             </div>
@@ -123,7 +132,7 @@ export const CreatePollDialogContent = ({
 
         {/* Options */}
         <div className="space-y-3">
-          <Label className="font-medium text-sm">Options *</Label>
+          <Label className="text-sm font-medium">Options *</Label>
           <div className="space-y-3">
             {options.map((option, index) => (
               <div key={option.id} className="flex items-center gap-2">
@@ -143,7 +152,7 @@ export const CreatePollDialogContent = ({
                     required
                   />
                   <div
-                    className={`-translate-y-1/2 absolute top-1/2 right-3 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 50)}`}
+                    className={`bg-background/80 absolute top-1/2 right-3 -translate-y-1/2 rounded px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 50)}`}
                   >
                     {option.text.length}/50
                   </div>
@@ -206,7 +215,7 @@ export const CreatePollDialogContent = ({
           <Button
             type="submit"
             disabled={isCreating || !isFormValid}
-            className="bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
           >
             {isCreating ? "Creating..." : "Create Poll"}
           </Button>
@@ -223,7 +232,7 @@ export const CreatePollDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm transition-all duration-200">
           <Plus className="h-4 w-4" />
           Create Poll
         </Button>

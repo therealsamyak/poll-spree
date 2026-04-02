@@ -35,13 +35,13 @@ export const StructuredData = ({
     const baseData = {
       "@context": "https://schema.org",
       "@type": type,
-      name,
       description,
-      url,
       logo: {
         "@type": "ImageObject",
         url: logo,
       },
+      name,
+      url,
       ...(image && {
         image: {
           "@type": "ImageObject",
@@ -56,6 +56,11 @@ export const StructuredData = ({
     // Add poll-specific structured data
     if (type === "Poll" && pollData) {
       Object.assign(baseData, {
+        interactionStatistic: {
+          "@type": "InteractionCounter",
+          interactionType: "https://schema.org/VoteAction",
+          userInteractionCount: pollData.totalVotes,
+        },
         mainEntity: {
           "@type": "Question",
           name: pollData.question,
@@ -63,11 +68,6 @@ export const StructuredData = ({
             "@type": "Answer",
             text: option,
           })),
-        },
-        interactionStatistic: {
-          "@type": "InteractionCounter",
-          interactionType: "https://schema.org/VoteAction",
-          userInteractionCount: pollData.totalVotes,
         },
       })
     }

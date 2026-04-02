@@ -1,4 +1,5 @@
 import { v } from "convex/values"
+
 import { mutation, query } from "./_generated/server"
 import { validateTextContent } from "./badWordsFilter"
 
@@ -47,11 +48,11 @@ export const create = mutation({
     }
 
     await ctx.db.insert("comments", {
+      createdAt: Date.now(),
       pollId: args.pollId,
       text: args.text,
       userId: args.userId,
       username: args.username,
-      createdAt: Date.now(),
     })
   },
 })

@@ -2,6 +2,7 @@ import { useAuth, useUser } from "@clerk/clerk-react"
 import { useMutation } from "convex/react"
 import { ArrowRight, Sparkles, User } from "lucide-react"
 import { useId, useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { useNotification } from "@/components/ui/notification"
 import { isTextSafe } from "@/lib/badWordsFilter"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
+
 import { api } from "../../../convex/_generated/api"
 
 export const UsernameSetup = () => {
@@ -66,9 +68,9 @@ export const UsernameSetup = () => {
     setIsSubmitting(true)
     try {
       const result = await createUser({
+        profileImageUrl: user?.imageUrl,
         userId,
         username: username.trim(),
-        profileImageUrl: user?.imageUrl,
       })
 
       if (result.success) {
@@ -82,7 +84,7 @@ export const UsernameSetup = () => {
           variant: "error",
         })
       }
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "An unexpected error occurred. Please try again.",
         variant: "error",
@@ -93,14 +95,14 @@ export const UsernameSetup = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 px-4">
+    <div className="from-background via-background to-muted/20 flex min-h-screen items-center justify-center bg-gradient-to-br px-4">
       <div className="w-full max-w-md">
-        <Card className="border-0 bg-gradient-to-br from-card to-card/50 shadow-xl backdrop-blur-sm">
+        <Card className="from-card to-card/50 border-0 bg-gradient-to-br shadow-xl backdrop-blur-sm">
           <CardHeader className="pb-6 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-              <User className="h-10 w-10 text-primary" />
+            <div className="bg-primary/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
+              <User className="text-primary h-10 w-10" />
             </div>
-            <CardTitle className="font-bold text-2xl text-foreground">
+            <CardTitle className="text-foreground text-2xl font-bold">
               Welcome to PollSpree!
             </CardTitle>
             <CardDescription className="text-base">
@@ -111,7 +113,7 @@ export const UsernameSetup = () => {
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor={usernameId} className="font-medium text-sm">
+                <Label htmlFor={usernameId} className="text-sm font-medium">
                   Username
                 </Label>
                 <Input
@@ -133,7 +135,7 @@ export const UsernameSetup = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting || !username.trim()}
-                className="h-12 w-full gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-full gap-2 shadow-sm transition-all duration-200"
               >
                 {isSubmitting ? (
                   "Setting username..."
@@ -148,10 +150,10 @@ export const UsernameSetup = () => {
             </form>
 
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 text-muted-foreground text-sm">
-                <div className="h-1 w-1 rounded-full bg-muted-foreground" />
+              <div className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+                <div className="bg-muted-foreground h-1 w-1 rounded-full" />
                 <span>Your username will be visible to other users</span>
-                <div className="h-1 w-1 rounded-full bg-muted-foreground" />
+                <div className="bg-muted-foreground h-1 w-1 rounded-full" />
               </div>
             </div>
           </CardContent>

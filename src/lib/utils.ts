@@ -1,9 +1,8 @@
-import { type ClassValue, clsx } from "clsx"
+import { clsx } from "clsx"
+import type { ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-export const cn = (...inputs: ClassValue[]) => {
-  return twMerge(clsx(inputs))
-}
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 
 /**
  * Comprehensive username validation following security best practices
@@ -17,34 +16,34 @@ export const validateUsername = (
 
   // Check if empty after trimming
   if (!trimmed) {
-    return { isValid: false, error: "Username cannot be empty" }
+    return { error: "Username cannot be empty", isValid: false }
   }
 
   // Check length (3-20 characters)
   if (trimmed.length < 3) {
     return {
-      isValid: false,
       error: "Username must be at least 3 characters long",
+      isValid: false,
     }
   }
 
   if (trimmed.length > 20) {
-    return { isValid: false, error: "Username must be 20 characters or less" }
+    return { error: "Username must be 20 characters or less", isValid: false }
   }
 
   // Check for leading/trailing whitespace (shouldn't happen after trim, but double-check)
   if (username !== trimmed) {
     return {
-      isValid: false,
       error: "Username cannot have leading or trailing spaces",
+      isValid: false,
     }
   }
 
   // Check for multiple consecutive spaces
   if (/\s{2,}/.test(username)) {
     return {
-      isValid: false,
       error: "Username cannot have multiple consecutive spaces",
+      isValid: false,
     }
   }
 
@@ -52,30 +51,30 @@ export const validateUsername = (
   // This prevents Unicode control characters, bidirectional text, and other problematic characters
   if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
     return {
-      isValid: false,
       error:
         "Username can only contain English letters, numbers, underscores, and hyphens",
+      isValid: false,
     }
   }
 
   // Prevent usernames that start with numbers (optional, but common practice)
   if (/^\d/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot start with a number" }
+    return { error: "Username cannot start with a number", isValid: false }
   }
 
   // Prevent usernames that end with hyphens or underscores (optional, but cleaner)
   if (/[-_]$/.test(trimmed)) {
     return {
-      isValid: false,
       error: "Username cannot end with a hyphen or underscore",
+      isValid: false,
     }
   }
 
   // Prevent consecutive hyphens or underscores (optional, but cleaner)
   if (/[-_]{2,}/.test(trimmed)) {
     return {
-      isValid: false,
       error: "Username cannot have consecutive hyphens or underscores",
+      isValid: false,
     }
   }
 
@@ -85,9 +84,8 @@ export const validateUsername = (
 /**
  * Normalize username for consistent storage and comparison
  */
-export const normalizeUsername = (username: string): string => {
-  return username.trim().toLowerCase()
-}
+export const normalizeUsername = (username: string): string =>
+  username.trim().toLowerCase()
 
 /**
  * Check if username is reserved (common reserved usernames)

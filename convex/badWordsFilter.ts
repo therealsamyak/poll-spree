@@ -86,8 +86,8 @@ export const validateMultipleTextInputs = (
 ): { isValid: boolean; fieldName: string } => {
   for (const [fieldName, text] of Object.entries(inputs)) {
     if (!validateTextContent(text)) {
-      return { isValid: false, fieldName }
+      return { fieldName, isValid: false }
     }
   }
-  return { isValid: true, fieldName: "" }
+  return { fieldName: "", isValid: true }
 }

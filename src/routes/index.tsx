@@ -1,10 +1,12 @@
 import { useAuth } from "@clerk/clerk-react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
-import { lazy, Suspense } from "react"
+import { Suspense, lazy } from "react"
+
 import { Loader } from "@/components/loader"
 import { PollsList } from "@/components/polls-list"
 import { SEOHead } from "@/components/seo"
+
 import { api } from "../../convex/_generated/api"
 
 const UsernameSetup = lazy(() =>
@@ -24,10 +26,10 @@ const Index = () => {
   // Show loading state while checking user
   if (isSignedIn && user === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="space-y-4 text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-primary border-b-2" />
-          <p className="animate-pulse text-base text-muted-foreground">
+          <div className="border-primary mx-auto h-12 w-12 animate-spin rounded-full border-b-2" />
+          <p className="text-muted-foreground animate-pulse text-base">
             Loading...
           </p>
         </div>
