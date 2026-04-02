@@ -8,107 +8,107 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as PollsPollIdRouteImport } from "./routes/polls.$pollId"
-import { Route as SignInRouteImport } from "./routes/sign-in"
-import { Route as SignUpRouteImport } from "./routes/sign-up"
-import { Route as SitemapXmlRouteImport } from "./routes/sitemap.xml"
-import { Route as TrendingRouteImport } from "./routes/trending"
-import { Route as UsersUsernameRouteImport } from "./routes/users.$username"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrendingRouteImport } from './routes/trending'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as UsersUsernameRouteImport } from './routes/users.$username'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
+import { Route as PollsPollIdRouteImport } from './routes/polls.$pollId'
 
 const TrendingRoute = TrendingRouteImport.update({
-  id: "/trending",
-  path: "/trending",
+  id: '/trending',
+  path: '/trending',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignUpRoute = SignUpRouteImport.update({
-  id: "/sign-up",
-  path: "/sign-up",
+  id: '/sign-up',
+  path: '/sign-up',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
-  id: "/sign-in",
-  path: "/sign-in",
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UsersUsernameRoute = UsersUsernameRouteImport.update({
-  id: "/users/$username",
-  path: "/users/$username",
+  id: '/users/$username',
+  path: '/users/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapXmlRoute = SitemapXmlRouteImport.update({
-  id: "/sitemap/xml",
-  path: "/sitemap/xml",
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PollsPollIdRoute = PollsPollIdRouteImport.update({
-  id: "/polls/$pollId",
-  path: "/polls/$pollId",
+  id: '/polls/$pollId',
+  path: '/polls/$pollId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/sign-in": typeof SignInRoute
-  "/sign-up": typeof SignUpRoute
-  "/trending": typeof TrendingRoute
-  "/polls/$pollId": typeof PollsPollIdRoute
-  "/sitemap/xml": typeof SitemapXmlRoute
-  "/users/$username": typeof UsersUsernameRoute
+  '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/trending': typeof TrendingRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
+  '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/sign-in": typeof SignInRoute
-  "/sign-up": typeof SignUpRoute
-  "/trending": typeof TrendingRoute
-  "/polls/$pollId": typeof PollsPollIdRoute
-  "/sitemap/xml": typeof SitemapXmlRoute
-  "/users/$username": typeof UsersUsernameRoute
+  '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/trending': typeof TrendingRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
+  '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/sign-in": typeof SignInRoute
-  "/sign-up": typeof SignUpRoute
-  "/trending": typeof TrendingRoute
-  "/polls/$pollId": typeof PollsPollIdRoute
-  "/sitemap/xml": typeof SitemapXmlRoute
-  "/users/$username": typeof UsersUsernameRoute
+  '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/trending': typeof TrendingRoute
+  '/polls/$pollId': typeof PollsPollIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
+  '/users/$username': typeof UsersUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/sign-in"
-    | "/sign-up"
-    | "/trending"
-    | "/polls/$pollId"
-    | "/sitemap/xml"
-    | "/users/$username"
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/sign-in"
-    | "/sign-up"
-    | "/trending"
-    | "/polls/$pollId"
-    | "/sitemap/xml"
-    | "/users/$username"
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   id:
-    | "__root__"
-    | "/"
-    | "/sign-in"
-    | "/sign-up"
-    | "/trending"
-    | "/polls/$pollId"
-    | "/sitemap/xml"
-    | "/users/$username"
+    | '__root__'
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trending'
+    | '/polls/$pollId'
+    | '/sitemap/xml'
+    | '/users/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -121,54 +121,54 @@ export interface RootRouteChildren {
   UsersUsernameRoute: typeof UsersUsernameRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/trending": {
-      id: "/trending"
-      path: "/trending"
-      fullPath: "/trending"
+    '/trending': {
+      id: '/trending'
+      path: '/trending'
+      fullPath: '/trending'
       preLoaderRoute: typeof TrendingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/sign-up": {
-      id: "/sign-up"
-      path: "/sign-up"
-      fullPath: "/sign-up"
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/sign-in": {
-      id: "/sign-in"
-      path: "/sign-in"
-      fullPath: "/sign-in"
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/users/$username": {
-      id: "/users/$username"
-      path: "/users/$username"
-      fullPath: "/users/$username"
+    '/users/$username': {
+      id: '/users/$username'
+      path: '/users/$username'
+      fullPath: '/users/$username'
       preLoaderRoute: typeof UsersUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/sitemap/xml": {
-      id: "/sitemap/xml"
-      path: "/sitemap/xml"
-      fullPath: "/sitemap/xml"
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
       preLoaderRoute: typeof SitemapXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/polls/$pollId": {
-      id: "/polls/$pollId"
-      path: "/polls/$pollId"
-      fullPath: "/polls/$pollId"
+    '/polls/$pollId': {
+      id: '/polls/$pollId'
+      path: '/polls/$pollId'
+      fullPath: '/polls/$pollId'
       preLoaderRoute: typeof PollsPollIdRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -188,9 +188,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx"
-import type { startInstance } from "./start.ts"
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>

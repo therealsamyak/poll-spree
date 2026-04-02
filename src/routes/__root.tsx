@@ -41,9 +41,46 @@ const RootComponent = () => {
   const isFetching = useRouterState({
     select: (s) => s.isLoading,
   })
+
+  return (
+    <RootDocument>
+      <ConvexProviderWithClerk client={context.convexClient} useAuth={useAuth}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <NotificationProvider>
+            <UserProfileSync />
+            <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
+              <Sidebar />
+              <main className="ml-16 flex-1 overflow-auto transition-colors md:ml-64">
+                {isFetching ? <Loader /> : <Outlet />}
+              </main>
+            </div>
+            <Toaster richColors />
+          </NotificationProvider>
+        </ThemeProvider>
+        <SEOHead />
+        <TanStackRouterDevtools position="bottom-right" />
+      </ConvexProviderWithClerk>
+    </RootDocument>
+  )
+}
+
+const RootDocument = ({ children }: { children: React.ReactNode }) => (
+  <ClerkProvider>
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  </ClerkProvider>
+)
+
+const UserProfileSync = () => {
   const { user } = useUser()
   const updateProfileImage = useMutation(api.users.updateProfileImage)
-
   const lastSyncedImageUrl = useRef<string | undefined>(undefined)
 
   useEffect(() => {
@@ -60,36 +97,7 @@ const RootComponent = () => {
     }
   }, [user?.id, user?.imageUrl, updateProfileImage])
 
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <ClerkProvider>
-          <ConvexProviderWithClerk
-            client={context.convexClient}
-            useAuth={useAuth}
-          >
-            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-              <NotificationProvider>
-                <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
-                  <Sidebar />
-                  <main className="ml-16 flex-1 overflow-auto transition-colors md:ml-64">
-                    {isFetching ? <Loader /> : <Outlet />}
-                  </main>
-                </div>
-                <Toaster richColors />
-              </NotificationProvider>
-            </ThemeProvider>
-            <SEOHead />
-            <TanStackRouterDevtools position="bottom-right" />
-          </ConvexProviderWithClerk>
-        </ClerkProvider>
-        <Scripts />
-      </body>
-    </html>
-  )
+  return null
 }
 
 export const Route = createRootRouteWithContext<{
