@@ -508,7 +508,7 @@ export const deleteClerkUser = action({
         const errorData = await response.json()
         console.error("Clerk API error:", errorData)
         throw new Error(
-          `Failed to delete Clerk user: ${errorData.message || response.statusText}`,
+          `Failed to delete Clerk user: ${(errorData as { message?: string }).message || response.statusText}`,
         )
       }
 
@@ -516,7 +516,9 @@ export const deleteClerkUser = action({
       return { success: true }
     } catch (error) {
       console.error("Error deleting user from Clerk:", error)
-      throw new Error("Failed to delete user from Clerk", { cause: error })
+      const err = new Error("Failed to delete user from Clerk")
+      err.cause = error
+      throw err
     }
   },
 })
