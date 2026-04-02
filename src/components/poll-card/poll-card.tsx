@@ -120,11 +120,17 @@ const SelectedOptionButton = ({
 interface PollCardProps {
   poll: Poll
   onPollDeleted?: () => void
-  userVote?: string | null // Optional pre-fetched user vote
+  userVote?: string | null
+  userLikeStatus?: boolean
 }
 
 export const PollCard = memo(
-  ({ poll, onPollDeleted, userVote: preFetchedUserVote }: PollCardProps) => {
+  ({
+    poll,
+    onPollDeleted,
+    userVote: preFetchedUserVote,
+    userLikeStatus = false,
+  }: PollCardProps) => {
     const [expanded, setExpanded] = useState(false)
     const [shouldMoveToTop, setShouldMoveToTop] = useState(false)
     const prevExpanded = useRef(expanded)
@@ -134,11 +140,6 @@ export const PollCard = memo(
     const vote = useMutation(api.polls.vote)
     const deletePoll = useMutation(api.polls.deletePoll)
     const toggleLike = useMutation(api.polls.toggleLike)
-
-    const likeStatus = useQuery(api.polls.getPollLikeStatus, {
-      pollId: poll.id as Id<"polls">,
-      userId: userId || "",
-    })
 
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
@@ -150,13 +151,11 @@ export const PollCard = memo(
         ? { optionId: preFetchedUserVote, pollId: poll.id }
         : fetchedUserVote
 
-    const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
-
     const isUserVoteLoading = userVote === undefined && isSignedIn
 
     const hasVoted =
       userVote?.optionId !== null && userVote?.optionId !== undefined
-    const canDelete = currentUser && poll.authorId === userId
+    const canDelete = userId && poll.authorId === userId
     const isAuthor = poll.authorId === userId
     const _showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
@@ -365,10 +364,10 @@ export const PollCard = memo(
                 type="button"
                 onClick={handleLike}
                 disabled={isLiking}
-                className={`hover:text-destructive flex items-center gap-1.5 ${likeStatus ? "text-destructive" : ""}`}
+                className={`hover:text-destructive flex items-center gap-1.5 ${userLikeStatus ? "text-destructive" : ""}`}
               >
                 <Heart
-                  className={`h-4 w-4 ${likeStatus ? "fill-current" : ""}`}
+                  className={`h-4 w-4 ${userLikeStatus ? "fill-current" : ""}`}
                 />
                 <span>{poll.likes}</span>
               </button>
@@ -378,7 +377,7 @@ export const PollCard = memo(
                 className="hover:text-primary flex items-center gap-1.5"
               >
                 <MessageCircle className="h-4 w-4" />
-                <span>Comments</span>
+                <span>{poll.commentCount || 0}</span>
               </Link>
               <div className="flex items-center gap-1.5">
                 <Eye className="h-4 w-4" />

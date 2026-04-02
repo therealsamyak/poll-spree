@@ -19,6 +19,7 @@ export interface Poll {
   createdAt: number
   views: number
   likes: number
+  commentCount?: number
   options: PollOption[]
 }
 

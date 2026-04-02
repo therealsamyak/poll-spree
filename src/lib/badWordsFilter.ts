@@ -24,15 +24,16 @@ export const isTextSafe = (text: string): boolean => {
 /**
  * Validates multiple text inputs at once
  * @param inputs - Object with field names as keys and text values
- * @returns Object with validation result and the first invalid field name if any
+ * @returns Object with validation result and all invalid field names
  */
 export const validateMultipleInputs = (
   inputs: Record<string, string>,
-): { isValid: boolean; fieldName: string } => {
+): { isValid: boolean; invalidFields: string[] } => {
+  const invalidFields: string[] = []
   for (const [fieldName, text] of Object.entries(inputs)) {
     if (!isTextSafe(text)) {
-      return { fieldName, isValid: false }
+      invalidFields.push(fieldName)
     }
   }
-  return { fieldName: "", isValid: true }
+  return { isValid: invalidFields.length === 0, invalidFields }
 }

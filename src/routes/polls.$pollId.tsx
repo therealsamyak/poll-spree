@@ -8,7 +8,7 @@ import {
   useRouter,
 } from "@tanstack/react-router"
 import { useMutation } from "convex/react"
-import { BarChart3, Calendar, Trash2 } from "lucide-react"
+import { BarChart3, Calendar, Eye, Heart, Trash2 } from "lucide-react"
 import { useEffect, useRef } from "react"
 
 import { Avatar } from "@/components/avatar"
@@ -152,6 +152,22 @@ const PollPage = () => {
                     {poll.data?.totalVotes} votes
                   </span>
                 </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
+                    <Heart className="text-primary h-3 w-3" />
+                  </div>
+                  <span className="font-medium">
+                    {poll.data?.likes || 0} likes
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
+                    <Eye className="text-primary h-3 w-3" />
+                  </div>
+                  <span className="font-medium">
+                    {poll.data?.views || 0} views
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -180,14 +196,6 @@ const PollPage = () => {
 
           {/* Voting Options */}
           <div className="space-y-4">
-            <h2 className="text-foreground text-xl font-semibold tracking-tight">
-              {!isSignedIn
-                ? "Vote on this poll:"
-                : !isUserVoteLoading && !hasVoted && !isAuthor
-                  ? "Cast your vote to see results:"
-                  : "Cast your vote:"}
-            </h2>
-
             <div className="grid gap-4">
               {getOptionsWithUserVoteFirst(
                 poll.data?.options ?? [],
@@ -250,7 +258,7 @@ const PollPage = () => {
           )}
 
           <div className="border-border/50 border-t pt-8">
-            <CommentSection pollId={pollId} />
+            <CommentSection pollId={pollId} currentUser={currentUser.data} />
           </div>
         </div>
       </div>

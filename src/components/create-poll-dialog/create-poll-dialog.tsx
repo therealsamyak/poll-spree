@@ -1,3 +1,4 @@
+import { useRouter } from "@tanstack/react-router"
 import { Plus, Sparkles, X } from "lucide-react"
 import { useEffect, useId, useRef, useState } from "react"
 
@@ -59,6 +60,10 @@ export const CreatePollDialogContent = ({
     updateOption,
     canAddOption,
     canRemoveOption,
+    fieldErrors,
+    formError,
+    clearFieldError,
+    clearFormError,
   } = useCreatePoll()
 
   const questionId = useId()
@@ -77,8 +82,13 @@ export const CreatePollDialogContent = ({
   }, [options.length])
   // --- End focus logic ---
 
+  const router = useRouter()
+
   const handleSubmit = async (e: React.FormEvent) => {
-    await handleCreatePoll(e, onClose)
+    await handleCreatePoll(e, (pollId) => {
+      onClose()
+      router.navigate({ to: "/polls/$pollId", params: { pollId } })
+    })
   }
 
   // Validation states
@@ -99,6 +109,19 @@ export const CreatePollDialogContent = ({
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {formError && (
+          <div className="border-destructive/50 bg-destructive/10 flex items-center gap-2 rounded-lg border p-3">
+            <p className="text-destructive text-sm">{formError}</p>
+            <button
+              type="button"
+              onClick={clearFormError}
+              className="text-destructive hover:text-destructive/80 ml-auto"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {/* Question */}
         <div className="space-y-2">
           <Label htmlFor={questionId} className="text-sm font-medium">
@@ -109,9 +132,13 @@ export const CreatePollDialogContent = ({
               id={questionId}
               placeholder="What would you like to ask the community?"
               value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              onChange={(e) => {
+                setQuestion(e.target.value)
+                if (fieldErrors.has("poll question"))
+                  clearFieldError("poll question")
+              }}
               className={`min-h-[80px] resize-none pr-16 ${getCharacterCountBg(question.length, 150)} ${
-                question.length > 150
+                question.length > 150 || fieldErrors.has("poll question")
                   ? "border-destructive focus-visible:ring-destructive"
                   : ""
               }`}
@@ -128,6 +155,11 @@ export const CreatePollDialogContent = ({
               Question cannot exceed 150 characters
             </p>
           )}
+          {fieldErrors.has("poll question") && (
+            <p className="text-destructive text-xs">
+              This field contains inappropriate content
+            </p>
+          )}
         </div>
 
         {/* Options */}
@@ -135,38 +167,50 @@ export const CreatePollDialogContent = ({
           <Label className="text-sm font-medium">Options *</Label>
           <div className="space-y-3">
             {options.map((option, index) => (
-              <div key={option.id} className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    ref={(el) => {
-                      optionRefs.current[index] = el
-                    }}
-                    placeholder={`Option ${index + 1}`}
-                    value={option.text}
-                    onChange={(e) => updateOption(option.id, e.target.value)}
-                    className={`pr-16 ${getCharacterCountBg(option.text.length, 50)} ${
-                      option.text.length > 50
-                        ? "border-destructive focus-visible:ring-destructive"
-                        : ""
-                    }`}
-                    required
-                  />
-                  <div
-                    className={`bg-background/80 absolute top-1/2 right-3 -translate-y-1/2 rounded px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 50)}`}
-                  >
-                    {option.text.length}/50
+              <div key={option.id}>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      ref={(el) => {
+                        optionRefs.current[index] = el
+                      }}
+                      placeholder={`Option ${index + 1}`}
+                      value={option.text}
+                      onChange={(e) => {
+                        updateOption(option.id, e.target.value)
+                        if (fieldErrors.has(`poll option ${index + 1}`))
+                          clearFieldError(`poll option ${index + 1}`)
+                      }}
+                      className={`pr-16 ${getCharacterCountBg(option.text.length, 50)} ${
+                        option.text.length > 50 ||
+                        fieldErrors.has(`poll option ${index + 1}`)
+                          ? "border-destructive focus-visible:ring-destructive"
+                          : ""
+                      }`}
+                      required
+                    />
+                    <div
+                      className={`bg-background/80 absolute top-1/2 right-3 -translate-y-1/2 rounded px-2 py-1 text-xs backdrop-blur-sm ${getCharacterCountColor(option.text.length, 50)}`}
+                    >
+                      {option.text.length}/50
+                    </div>
                   </div>
+                  {canRemoveOption && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeOption(option.id)}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
-                {canRemoveOption && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeOption(option.id)}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                {fieldErrors.has(`poll option ${index + 1}`) && (
+                  <p className="text-destructive mt-1 text-xs">
+                    This field contains inappropriate content
+                  </p>
                 )}
               </div>
             ))}
