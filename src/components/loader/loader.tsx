@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react"
 
 export const Loader = () => (
-  <div className="flex h-full items-center justify-center pt-8">
+  <div className="flex h-full items-center justify-center">
     <Loader2 className="text-primary animate-spin" />
   </div>
 )

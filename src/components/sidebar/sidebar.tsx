@@ -5,6 +5,7 @@ import {
   BarChart3,
   Edit,
   Home,
+  Loader2,
   LogOut,
   Plus,
   Settings,
@@ -158,38 +159,46 @@ const SidebarContent = () => {
 
       {/* Navigation */}
       <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
-        <Link
-          to="/"
-          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
-        >
-          <Home className="h-6 w-6" />
-          <span className="ml-2 hidden md:inline">Home</span>
-        </Link>
-        {/* <Link
-          to="/"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
-        >
-          <TrendingUp className="h-6 w-6" />
-          <span className="ml-2 hidden md:inline">Trending</span>
-        </Link> */}
-        <Link
-          to="/trending"
-          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
-          activeProps={{
-            className: "bg-primary/10 text-primary font-semibold",
-          }}
-        >
-          <TrendingUp className="h-6 w-6" />
-          <span className="ml-2 hidden md:inline">Trending</span>
-        </Link>
-        <Button
-          onClick={handleSurprise}
-          variant="ghost"
-          className="group text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
-        >
-          <Sparkles className="h-6 w-6" />
-          <span className="ml-2 hidden md:inline">Surprise!</span>
-        </Button>
+        {isSignedIn && user === undefined ? (
+          <div className="flex flex-1 items-center justify-center">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <>
+            <Link
+              to="/"
+              className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
+            >
+              <Home className="h-6 w-6" />
+              <span className="ml-2 hidden md:inline">Home</span>
+            </Link>
+            {/* <Link
+              to="/"
+              className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-muted-foreground text-sm transition-colors hover:bg-accent hover:text-accent-foreground md:w-auto md:justify-start md:px-3"
+            >
+              <TrendingUp className="h-6 w-6" />
+              <span className="ml-2 hidden md:inline">Trending</span>
+            </Link> */}
+            <Link
+              to="/trending"
+              className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
+              activeProps={{
+                className: "bg-primary/10 text-primary font-semibold",
+              }}
+            >
+              <TrendingUp className="h-6 w-6" />
+              <span className="ml-2 hidden md:inline">Trending</span>
+            </Link>
+            <Button
+              onClick={handleSurprise}
+              variant="ghost"
+              className="group text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
+            >
+              <Sparkles className="h-6 w-6" />
+              <span className="ml-2 hidden md:inline">Surprise!</span>
+            </Button>
+          </>
+        )}
       </nav>
 
       {/* Actions */}

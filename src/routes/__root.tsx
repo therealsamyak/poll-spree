@@ -48,7 +48,7 @@ const RootComponent = () => {
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <NotificationProvider>
             <UserProfileSync />
-            <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
+            <div className="bg-background flex h-screen max-w-screen overflow-hidden">
               <Sidebar />
               <main className="ml-16 flex-1 overflow-auto transition-colors md:ml-64">
                 {isFetching ? <Loader /> : <Outlet />}
