@@ -28,9 +28,11 @@ export default defineSchema({
     pollId: v.id("polls"),
     userId: v.string(),
     optionId: v.optional(v.id("pollOptions")),
+    votedAt: v.optional(v.number()),
   })
     .index("by_poll_user", ["pollId", "userId"])
-    .index("by_userId", ["userId"]),
+    .index("by_userId", ["userId"])
+    .index("by_votedAt", ["votedAt"]),
 
   polls: defineTable({
     question: v.string(),

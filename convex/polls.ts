@@ -269,6 +269,7 @@ export const vote = mutation({
         // Update user vote
         await ctx.db.patch(existingVote._id, {
           optionId: optionId,
+          votedAt: Date.now(),
         })
 
         // Increase vote count for new option
@@ -283,6 +284,7 @@ export const vote = mutation({
         optionId,
         pollId,
         userId,
+        votedAt: Date.now(),
       })
 
       // Increase vote count
@@ -914,13 +916,26 @@ export const getTrendingPolls = query({
   handler: async (ctx) => {
     const polls = await ctx.db.query("polls").collect()
 
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000
+    const recentVotes = await ctx.db
+      .query("pollUsers")
+      .withIndex("by_votedAt", (q) => q.gte("votedAt", cutoff))
+      .collect()
+
+    const recentVoteCounts = new Map<string, number>()
+    for (const vote of recentVotes) {
+      const count = recentVoteCounts.get(vote.pollId) || 0
+      recentVoteCounts.set(vote.pollId, count + 1)
+    }
+
+    // Sort by recent votes descending, tiebreak by poll _id (effectively random)
     const sortedPolls = polls
       .toSorted((a, b) => {
-        const scoreA =
-          (a.totalVotes || 0) * 2 + (a.likes || 0) + (a.views || 0) * 0.1
-        const scoreB =
-          (b.totalVotes || 0) * 2 + (b.likes || 0) + (b.views || 0) * 0.1
-        return scoreB - scoreA
+        const countA = recentVoteCounts.get(a._id) || 0
+        const countB = recentVoteCounts.get(b._id) || 0
+        if (countB !== countA) return countB - countA
+        // Tiebreak: compare _id strings (random IDs → random order)
+        return String(b._id).localeCompare(String(a._id))
       })
       .slice(0, 50)
 
