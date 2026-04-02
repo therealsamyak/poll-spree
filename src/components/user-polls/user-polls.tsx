@@ -3,10 +3,12 @@ import { useParams, useSearch } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Users } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+
 import { Avatar } from "@/components/avatar"
 import { Footer } from "@/components/footer"
 import { PollCard } from "@/components/poll-card"
 import type { Poll } from "@/types"
+
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import { UserPollsFilters } from "./user-polls-filters"
@@ -18,8 +20,8 @@ export const UserPolls = () => {
   const { userId } = useAuth()
 
   const [paginationOpts, setPaginationOpts] = useState({
-    numItems: 20,
     cursor: null as string | null,
+    numItems: 20,
   })
   const [allPolls, setAllPolls] = useState<Poll[]>([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -40,11 +42,11 @@ export const UserPolls = () => {
 
   // Get polls based on filters
   const pollsResult = useQuery(api.polls.getPollsByUser, {
-    userId: user?.userId || "",
     includeAuthored,
     includeVoted,
-    sort,
     paginationOpts,
+    sort,
+    userId: user?.userId || "",
   })
 
   // Batch fetch user votes for all visible polls
@@ -72,7 +74,7 @@ export const UserPolls = () => {
 
   // Reset pagination when filters change
   useEffect(() => {
-    setPaginationOpts({ numItems: 20, cursor: null })
+    setPaginationOpts({ cursor: null, numItems: 20 })
     setAllPolls([])
   }, [])
 
@@ -124,7 +126,7 @@ export const UserPolls = () => {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
           <p className="text-muted-foreground">Loading user...</p>
         </div>
       </div>
@@ -134,11 +136,11 @@ export const UserPolls = () => {
   if (user === null) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <div className="mx-auto w-full max-w-md border-2 border-muted-foreground/20 border-dashed text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Users className="h-8 w-8 text-muted-foreground" />
+        <div className="border-muted-foreground/20 mx-auto w-full max-w-md border-2 border-dashed text-center">
+          <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <Users className="text-muted-foreground h-8 w-8" />
           </div>
-          <h1 className="font-bold text-2xl">User not found</h1>
+          <h1 className="text-2xl font-bold">User not found</h1>
           <p className="text-base">
             The user you're looking for doesn't exist.
           </p>
@@ -153,7 +155,7 @@ export const UserPolls = () => {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
           <p className="text-muted-foreground">Loading polls...</p>
         </div>
       </div>
@@ -163,23 +165,23 @@ export const UserPolls = () => {
   // Don't return early - keep the user page layout even when no polls
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="from-background via-background to-muted/20 min-h-screen bg-gradient-to-br">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-primary/[0.02] to-background">
-        <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02]" />
+      <div className="from-primary/5 via-primary/[0.02] to-background relative overflow-hidden bg-gradient-to-br">
+        <div className="bg-grid-white/[0.02] absolute inset-0 bg-[size:50px_50px]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-primary/5">
+            <div className="bg-primary/5 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full">
               <Avatar
                 size="lg"
                 profileImageUrl={user.profileImageUrl}
-                className="h-20 w-20 border-4 border-background shadow-lg"
+                className="border-background h-20 w-20 border-4 shadow-lg"
               />
             </div>
-            <h1 className="mb-4 font-bold text-4xl tracking-tight sm:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
               @{user.username}
             </h1>
-            <div className="mx-auto mb-8 flex max-w-2xl items-center justify-center gap-8 text-muted-foreground text-sm">
+            <div className="text-muted-foreground mx-auto mb-8 flex max-w-2xl items-center justify-center gap-8 text-sm">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span>{userStats?.totalPolls || 0} polls</span>
@@ -205,10 +207,10 @@ export const UserPolls = () => {
         {allPolls.length === 0 ? (
           <div className="flex min-h-[40vh] items-center justify-center">
             <div className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                <BarChart3 className="h-8 w-8 text-muted-foreground" />
+              <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                <BarChart3 className="text-muted-foreground h-8 w-8" />
               </div>
-              <h3 className="mb-2 font-semibold text-lg">No polls found</h3>
+              <h3 className="mb-2 text-lg font-semibold">No polls found</h3>
               <p className="text-muted-foreground">
                 {filters.includes("authored") && filters.includes("voted")
                   ? "This user hasn't created or voted on any polls yet."
@@ -236,7 +238,7 @@ export const UserPolls = () => {
         {!isDone && continueCursor && (
           <div ref={loadMoreRef} className="mt-8 flex justify-center">
             {isLoadingMore && (
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Loading more polls...</span>
               </div>
@@ -246,7 +248,7 @@ export const UserPolls = () => {
 
         {/* End Message */}
         {isDone && allPolls.length > 0 && (
-          <div className="mt-8 text-center text-muted-foreground">
+          <div className="text-muted-foreground mt-8 text-center">
             <p>You've reached the end</p>
           </div>
         )}

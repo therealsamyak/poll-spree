@@ -1,11 +1,13 @@
 import { ClerkProvider } from "@clerk/clerk-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createRouter, RouterProvider } from "@tanstack/react-router"
+import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { ConvexProvider, ConvexReactClient } from "convex/react"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
+
 import { Loader } from "@/components/loader"
 import { NotificationProvider } from "@/components/ui/notification"
+
 import { routeTree } from "./routeTree.gen"
 
 // Initialize Convex client
@@ -37,32 +39,30 @@ const router = createRouter({
   defaultPendingComponent: () => <Loader />,
   // Enable client-side error boundaries
   defaultErrorComponent: ({ error }) => (
-    <div className="p-4 text-destructive">
+    <div className="text-destructive p-4">
       <h1>Error</h1>
       <pre>{error.message}</pre>
     </div>
   ),
   context: {},
   // Wrap the app with providers
-  Wrap: ({ children }: { children: React.ReactNode }) => {
-    return (
-      <ClerkProvider
-        publishableKey={publishableKey}
-        appearance={{
-          elements: {
-            rootBox: "mx-auto",
-            card: "shadow-none",
-          },
-        }}
-      >
-        <QueryClientProvider client={queryClient}>
-          <ConvexProvider client={convex}>
-            <NotificationProvider>{children}</NotificationProvider>
-          </ConvexProvider>
-        </QueryClientProvider>
-      </ClerkProvider>
-    )
-  },
+  Wrap: ({ children }: { children: React.ReactNode }) => (
+    <ClerkProvider
+      publishableKey={publishableKey}
+      appearance={{
+        elements: {
+          rootBox: "mx-auto",
+          card: "shadow-none",
+        },
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <ConvexProvider client={convex}>
+          <NotificationProvider>{children}</NotificationProvider>
+        </ConvexProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
+  ),
 })
 
 // Register router for type safety
@@ -95,6 +95,6 @@ const mountApp = () => {
 // Mount the app and handle any errors
 try {
   mountApp()
-} catch (_error) {
+} catch {
   // Silently handle mount errors
 }

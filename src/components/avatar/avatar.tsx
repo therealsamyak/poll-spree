@@ -1,5 +1,6 @@
 import { useUser } from "@clerk/clerk-react"
 import { User } from "lucide-react"
+
 import { cn } from "@/lib/utils"
 
 interface AvatarProps {
@@ -9,15 +10,15 @@ interface AvatarProps {
 }
 
 const sizeClasses = {
-  sm: "h-6 w-6",
-  md: "h-8 w-8",
   lg: "h-12 w-12",
+  md: "h-8 w-8",
+  sm: "h-6 w-6",
 } as const
 
 const iconSizes = {
-  sm: "h-3 w-3",
-  md: "h-4 w-4",
   lg: "h-6 w-6",
+  md: "h-4 w-4",
+  sm: "h-3 w-3",
 } as const
 
 export const Avatar = ({
@@ -33,7 +34,7 @@ export const Avatar = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-center overflow-hidden rounded-full bg-muted ring-2 ring-border transition-all duration-200 hover:scale-105 hover:ring-primary/50",
+        "bg-muted ring-border hover:ring-primary/50 flex items-center justify-center overflow-hidden rounded-full ring-2 transition-all duration-200 hover:scale-105",
         sizeClasses[size],
         className,
       )}

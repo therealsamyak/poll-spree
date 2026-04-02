@@ -1,5 +1,5 @@
 import { SignIn } from "@clerk/clerk-react"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 
 const searchSchema = z.object({
@@ -14,7 +14,7 @@ const SignInPage = () => {
   const decodedRedirectUrl = redirectUrl ? decodeURIComponent(redirectUrl) : "/"
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="bg-background flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
         <SignIn
           fallbackRedirectUrl={decodedRedirectUrl}
@@ -29,7 +29,7 @@ const SignInPage = () => {
                 ? { redirect_url: decodedRedirectUrl }
                 : undefined
             }
-            className="font-medium text-primary"
+            className="text-primary font-medium"
           >
             Sign up
           </Link>

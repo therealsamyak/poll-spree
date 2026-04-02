@@ -1,6 +1,7 @@
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react"
 import * as React from "react"
-import { lazy, Suspense } from "react"
+import { Suspense, lazy } from "react"
+
 import { Loader } from "@/components/loader"
 import { cn } from "@/lib/utils"
 
@@ -36,28 +37,30 @@ const Notification = ({
   }, [duration, onClose])
 
   const icons = {
-    success: <CheckCircle className="h-4 w-4" />,
     error: <XCircle className="h-4 w-4" />,
-    warning: <AlertCircle className="h-4 w-4" />,
     info: <Info className="h-4 w-4" />,
+    success: <CheckCircle className="h-4 w-4" />,
+    warning: <AlertCircle className="h-4 w-4" />,
   }
 
   const variants = {
-    success:
-      "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200",
     error:
       "bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200",
+    info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200",
+    success:
+      "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200",
     warning:
       "bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-200",
-    info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200",
   }
 
-  if (!isVisible) return null
+  if (!isVisible) {
+    return null
+  }
 
   return (
     <div
       className={cn(
-        "slide-in-from-right-full fixed top-4 right-4 z-50 max-w-sm animate-in",
+        "slide-in-from-right-full animate-in fixed top-4 right-4 z-50 max-w-sm",
         "transition-all duration-300 ease-in-out",
         isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
       )}
@@ -70,7 +73,7 @@ const Notification = ({
       >
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex-shrink-0">{icons[variant]}</div>
-          <p className="flex-1 font-medium text-sm leading-relaxed">
+          <p className="flex-1 text-sm leading-relaxed font-medium">
             {message}
           </p>
           {onClose && (
@@ -80,7 +83,7 @@ const Notification = ({
                 setIsVisible(false)
                 setTimeout(() => onClose(), 300)
               }}
-              className="flex-shrink-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="ring-offset-background focus:ring-ring flex-shrink-0 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none"
               aria-label="Close notification"
             >
               <X className="h-4 w-4" />
@@ -107,10 +110,10 @@ export const NotificationProvider = ({
   children: React.ReactNode
 }) => {
   const [notifications, setNotifications] = React.useState<
-    Array<{
+    {
       id: string
       props: Omit<NotificationProps, "onClose">
-    }>
+    }[]
   >([])
 
   const [signInModal, setSignInModal] = React.useState<{

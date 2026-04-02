@@ -1,40 +1,48 @@
 import { useAuth } from "@clerk/clerk-react"
 import {
-  createFileRoute,
   Link,
+  createFileRoute,
   notFound,
   useRouter,
 } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import { BarChart3, Calendar, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
+
 import { Avatar } from "@/components/avatar"
 import { CommentSection } from "@/components/comments/comment-section"
 import { SEOHead } from "@/components/seo"
 import { Button } from "@/components/ui/button"
 import { useNotification } from "@/components/ui/notification"
 import { generatePollSEOConfig } from "@/lib/seo"
+
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
 const formatDateTime = (timestamp: number) => {
   const date = new Date(timestamp)
   return date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
     day: "numeric",
     hour: "2-digit",
-    minute: "2-digit",
     hour12: true,
+    minute: "2-digit",
+    month: "short",
+    year: "numeric",
   })
 }
 
 const getVotePercentage = (votes: number, totalVotes: number) => {
-  if (totalVotes === 0) return 0
+  if (totalVotes === 0) {
+    return 0
+  }
   return Math.round((votes / totalVotes) * 100)
 }
 
-type PollOption = { id: string; text: string; votes: number }
+interface PollOption {
+  id: string
+  text: string
+  votes: number
+}
 
 const getOptionsWithPlaces = (
   options: PollOption[],
@@ -45,16 +53,18 @@ const getOptionsWithPlaces = (
   }
   const groups: Record<number, PollOption[]> = {}
   options.forEach((option) => {
-    if (!groups[option.votes]) groups[option.votes] = []
+    if (!groups[option.votes]) {
+      groups[option.votes] = []
+    }
     groups[option.votes].push(option)
   })
   const sortedVoteCounts = Object.keys(groups)
     .map((v) => Number(v))
-    .sort((a, b) => b - a)
+    .toSorted((a, b) => b - a)
   let place = 1
   const result: { option: PollOption; place: number }[] = []
   for (const voteCount of sortedVoteCounts) {
-    const group = groups[voteCount].sort((a, b) =>
+    const group = groups[voteCount].toSorted((a, b) =>
       a.text.localeCompare(b.text, undefined, { sensitivity: "base" }),
     )
     for (const option of group) {
@@ -94,8 +104,8 @@ const PollPage = () => {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="space-y-4 text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-primary border-b-2" />
-          <p className="animate-pulse text-muted-foreground">Loading poll...</p>
+          <div className="border-primary mx-auto h-12 w-12 animate-spin rounded-full border-b-2" />
+          <p className="text-muted-foreground animate-pulse">Loading poll...</p>
         </div>
       </div>
     )
@@ -119,15 +129,17 @@ const PollPage = () => {
       return
     }
 
-    if (!userId) return
+    if (!userId) {
+      return
+    }
 
     // If user clicks the same option, unvote
     if (userVote?.optionId === optionId) {
       setIsVoting(true)
       try {
         const result = await vote({
-          pollId: poll.id as Id<"polls">,
           optionId: optionId as Id<"pollOptions">,
+          pollId: poll.id as Id<"polls">,
           userId,
         })
 
@@ -139,7 +151,7 @@ const PollPage = () => {
             variant: "error",
           })
         }
-      } catch (_error) {
+      } catch {
         showNotification({
           message: "An unexpected error occurred. Please try again.",
           variant: "error",
@@ -154,8 +166,8 @@ const PollPage = () => {
     setIsVoting(true)
     try {
       const result = await vote({
-        pollId: poll.id as Id<"polls">,
         optionId: optionId as Id<"pollOptions">,
+        pollId: poll.id as Id<"polls">,
         userId,
       })
 
@@ -167,7 +179,7 @@ const PollPage = () => {
           variant: "error",
         })
       }
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "An unexpected error occurred. Please try again.",
         variant: "error",
@@ -178,13 +190,15 @@ const PollPage = () => {
   }
 
   const handleDelete = async () => {
-    if (!userId) return
+    if (!userId) {
+      return
+    }
 
     setIsDeleting(true)
     try {
       const result = await deletePoll({
-        pollId: poll.id as Id<"polls">,
         authorId: userId,
+        pollId: poll.id as Id<"polls">,
       })
 
       if (result.success) {
@@ -200,7 +214,7 @@ const PollPage = () => {
           variant: "error",
         })
       }
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "An unexpected error occurred. Please try again.",
         variant: "error",
@@ -220,22 +234,22 @@ const PollPage = () => {
         keywords={seoConfig.keywords}
         canonical={seoConfig.canonical}
         structuredData={{
-          type: "Poll",
           pollData: seoConfig.pollData,
+          type: "Poll",
         }}
       />
-      <div className="fade-in container mx-auto max-w-4xl animate-in p-6">
+      <div className="fade-in animate-in container mx-auto max-w-4xl p-6">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-4">
               {/* Question */}
-              <h1 className="wrap-break-word font-bold text-3xl text-foreground leading-tight tracking-tight">
+              <h1 className="text-foreground text-3xl leading-tight font-bold tracking-tight wrap-break-word">
                 {poll.question}
               </h1>
 
               {/* Metadata */}
-              <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
+              <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
                   <Link
                     to="/users/$username"
@@ -250,14 +264,14 @@ const PollPage = () => {
                   </Link>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-                    <Calendar className="h-3 w-3 text-primary" />
+                  <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
+                    <Calendar className="text-primary h-3 w-3" />
                   </div>
                   <span>{formatDateTime(poll.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-                    <BarChart3 className="h-3 w-3 text-primary" />
+                  <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
+                    <BarChart3 className="text-primary h-3 w-3" />
                   </div>
                   <span className="font-medium">{poll.totalVotes} votes</span>
                 </div>
@@ -280,7 +294,7 @@ const PollPage = () => {
 
           {/* Voting Options */}
           <div className="space-y-4">
-            <h2 className="font-semibold text-foreground text-xl tracking-tight">
+            <h2 className="text-foreground text-xl font-semibold tracking-tight">
               {!isSignedIn
                 ? "Vote on this poll:"
                 : !isUserVoteLoading && !hasVoted && !isAuthor
@@ -298,37 +312,37 @@ const PollPage = () => {
                     <Button
                       key={option.id}
                       variant={isSelected ? "default" : "outline"}
-                      className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 font-medium text-lg transition-all duration-200 ${
+                      className={`flex h-auto w-full items-center justify-between rounded-xl border p-6 text-lg font-medium transition-all duration-200 ${
                         isSelected
-                          ? "border-primary bg-primary/80 text-primary-foreground shadow-lg ring-2 ring-primary/20 hover:text-primary-foreground"
-                          : "border-border bg-card text-foreground hover:scale-[1.01] hover:bg-primary/10 hover:text-primary hover:shadow-md"
+                          ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2"
+                          : "border-border bg-card text-foreground hover:bg-primary/10 hover:text-primary hover:scale-[1.01] hover:shadow-md"
                       } hover:border-primary`}
                       onClick={() => handleVote(option.id)}
                       disabled={isVoting || isUserVoteLoading}
                       style={{
+                        borderColor: isSelected ? "var(--primary)" : undefined,
                         minHeight: 64,
                         whiteSpace: "normal",
                         wordBreak: "break-word",
-                        borderColor: isSelected ? "var(--primary)" : undefined,
                       }}
                     >
-                      <span className="flex w-full flex-col items-start gap-2 text-foreground">
+                      <span className="text-foreground flex w-full flex-col items-start gap-2">
                         <span className="flex w-full items-center">
                           {/* Show place if user has voted and is signed in */}
                           {place !== undefined && (
-                            <span className="mr-3 shrink-0 flex-nowrap font-bold text-xl">
+                            <span className="mr-3 shrink-0 flex-nowrap text-xl font-bold">
                               {place}.
                             </span>
                           )}
                           <span
-                            className="wrap-break-word whitespace-pre-line text-lg"
+                            className="text-lg wrap-break-word whitespace-pre-line"
                             style={{ wordBreak: "break-word" }}
                           >
                             {option.text}
                           </span>
                         </span>
                         {showResults && (
-                          <span className="mt-2 text-foreground text-sm">
+                          <span className="text-foreground mt-2 text-sm">
                             {getVotePercentage(option.votes, poll.totalVotes)}%
                             • {option.votes} vote
                             {option.votes === 1 ? "" : "s"}
@@ -344,7 +358,7 @@ const PollPage = () => {
 
           {/* Sign in prompt for non-signed in users */}
           {!isSignedIn && (
-            <div className="rounded-xl border border-border/50 bg-card p-4 text-center">
+            <div className="border-border/50 bg-card rounded-xl border p-4 text-center">
               <p className="text-muted-foreground">
                 Sign in to vote on this poll and see real-time results!
               </p>
@@ -353,7 +367,7 @@ const PollPage = () => {
 
           {/* Results hidden message for signed in users who haven't voted */}
           {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
-            <div className="rounded-xl border border-border/50 bg-card p-4 text-center">
+            <div className="border-border/50 bg-card rounded-xl border p-4 text-center">
               <p className="text-muted-foreground">
                 Vote to see the current results!
               </p>

@@ -1,5 +1,6 @@
 import { useNavigate, useSearch } from "@tanstack/react-router"
 import { useId } from "react"
+
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 
@@ -33,11 +34,11 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
     // Update URL params without causing a full page reload
     navigate({
       from: "/users/$username",
+      replace: true,
       search: (prev) => ({
         ...prev,
         filter: newFilters.join(","),
       }),
-      replace: true,
     })
   }
 
@@ -51,7 +52,7 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
             handleFilterChange("authored", checked as boolean)
           }
         />
-        <Label htmlFor={authoredId} className="font-medium text-sm">
+        <Label htmlFor={authoredId} className="text-sm font-medium">
           Authored
         </Label>
       </div>
@@ -63,7 +64,7 @@ export const UserPollsFilters = ({ currentFilters }: UserPollsFiltersProps) => {
             handleFilterChange("voted", checked as boolean)
           }
         />
-        <Label htmlFor={votedId} className="font-medium text-sm">
+        <Label htmlFor={votedId} className="text-sm font-medium">
           Voted On
         </Label>
       </div>

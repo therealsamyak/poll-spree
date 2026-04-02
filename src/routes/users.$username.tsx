@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
+
 import { SEOHead } from "@/components/seo"
 import { UserPolls } from "@/components/user-polls"
 import { generateUserSEOConfig } from "@/lib/seo"

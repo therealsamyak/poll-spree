@@ -2,7 +2,8 @@ import { SignInButton, useAuth } from "@clerk/clerk-react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "convex/react"
 import { Loader2, Plus, TrendingUp } from "lucide-react"
-import { lazy, Suspense, useMemo } from "react"
+import { Suspense, lazy, useMemo } from "react"
+
 import { Footer } from "@/components/footer"
 import { Loader } from "@/components/loader"
 import { PollCard } from "@/components/poll-card"
@@ -15,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 import { api } from "../../convex/_generated/api"
 import type { Id } from "../../convex/_generated/dataModel"
 
@@ -46,8 +48,8 @@ const Trending = () => {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <div className="space-y-4 text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="animate-pulse text-muted-foreground">
+          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
+          <p className="text-muted-foreground animate-pulse">
             Loading trending polls...
           </p>
         </div>
@@ -58,12 +60,12 @@ const Trending = () => {
   if (allPolls.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <Card className="mx-auto w-full max-w-md border-2 border-primary/20 border-dashed text-center">
+        <Card className="border-primary/20 mx-auto w-full max-w-md border-2 border-dashed text-center">
           <CardHeader className="pb-4">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <TrendingUp className="h-8 w-8 text-primary" />
+            <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <TrendingUp className="text-primary h-8 w-8" />
             </div>
-            <CardTitle className="font-bold text-2xl tracking-tight">
+            <CardTitle className="text-2xl font-bold tracking-tight">
               No trending polls yet
             </CardTitle>
             <CardDescription className="text-base">
@@ -77,7 +79,7 @@ const Trending = () => {
               </Suspense>
             ) : (
               <SignInButton mode="modal">
-                <Button className="gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm transition-all duration-200">
                   <Plus className="h-4 w-4" />
                   Sign in to create polls
                 </Button>
@@ -97,13 +99,13 @@ const Trending = () => {
         keywords="trending polls, popular votes, viral surveys, top opinions"
         canonical="https://pollspree.com/trending"
       />
-      <div className="relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br from-background via-background to-muted/20 md:h-screen">
+      <div className="from-background via-background to-muted/20 relative h-[calc(100vh-4rem)] w-full bg-gradient-to-br md:h-screen">
         {/* Content */}
         <div className="h-full w-full overflow-y-auto px-4 py-8 pb-20 sm:px-6 lg:px-8">
           {/* Header row: Trending Polls + Create Button */}
           <div className="mb-8 flex w-full items-center justify-center sm:justify-between">
-            <h2 className="flex items-center gap-2 font-bold text-2xl tracking-tight">
-              <TrendingUp className="h-6 w-6 text-primary" />
+            <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+              <TrendingUp className="text-primary h-6 w-6" />
               Trending Polls
             </h2>
             {isSignedIn && (
@@ -129,7 +131,7 @@ const Trending = () => {
           </div>
 
           {/* End of content indicator */}
-          <div className="mt-8 text-center text-muted-foreground text-sm">
+          <div className="text-muted-foreground mt-8 text-center text-sm">
             <p>Showing top 50 trending polls</p>
           </div>
 

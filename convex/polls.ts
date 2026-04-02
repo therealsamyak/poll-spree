@@ -1,4 +1,5 @@
 import { v } from "convex/values"
+
 import type { Id } from "./_generated/dataModel"
 import { mutation, query } from "./_generated/server"
 import {
@@ -10,8 +11,8 @@ export const getPolls = query({
   args: {
     paginationOpts: v.optional(
       v.object({
-        numItems: v.number(),
         cursor: v.optional(v.union(v.string(), v.null())),
+        numItems: v.number(),
       }),
     ),
   },
@@ -19,13 +20,13 @@ export const getPolls = query({
     const { paginationOpts } = args
 
     // Use pagination to limit the number of polls fetched
-    const defaultPagination = { numItems: 20, cursor: null }
+    const defaultPagination = { cursor: null, numItems: 20 }
     const pagination = {
-      numItems: paginationOpts?.numItems ?? defaultPagination.numItems,
       cursor:
         paginationOpts?.cursor !== undefined
           ? paginationOpts.cursor
           : defaultPagination.cursor,
+      numItems: paginationOpts?.numItems ?? defaultPagination.numItems,
     }
 
     const pollsResult = await ctx.db
@@ -67,15 +68,12 @@ export const getPolls = query({
       const author = authorsById.get(poll.authorId)
 
       return {
-        id: poll._id,
-        question: poll.question,
-        totalVotes: poll.totalVotes,
-        dev: poll.dev,
         authorId: poll.authorId,
-        authorUsername: poll.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
+        authorUsername: poll.authorUsername,
         createdAt: poll.createdAt,
-        views: poll.views || 0,
+        dev: poll.dev,
+        id: poll._id,
         likes: poll.likes || 0,
         options: options.map((option) => ({
           id: option._id,
@@ -84,13 +82,16 @@ export const getPolls = query({
           votes: option.votes,
           votedUserIds: option.votedUserIds,
         })),
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        views: poll.views || 0,
       }
     })
 
     return {
-      polls: pollsWithOptions,
-      isDone: pollsResult.isDone,
       continueCursor: pollsResult.continueCursor,
+      isDone: pollsResult.isDone,
+      polls: pollsWithOptions,
     }
   },
 })
@@ -119,14 +120,12 @@ export const getPoll = query({
       .first()
 
     return {
-      id: poll._id,
-      question: poll.question,
-      totalVotes: poll.totalVotes,
-      dev: poll.dev,
       authorId: poll.authorId,
-      authorUsername: poll.authorUsername,
       authorProfileImageUrl: author?.profileImageUrl,
+      authorUsername: poll.authorUsername,
       createdAt: poll.createdAt,
+      dev: poll.dev,
+      id: poll._id,
       options: options.map((option) => ({
         id: option._id,
         pollId: option.pollId,
@@ -134,6 +133,8 @@ export const getPoll = query({
         votes: option.votes,
         votedUserIds: option.votedUserIds,
       })),
+      question: poll.question,
+      totalVotes: poll.totalVotes,
     }
   },
 })
@@ -144,7 +145,7 @@ export const getPollsStats = query({
   handler: async (ctx) => {
     // For now, we still need to load polls to calculate total votes
     // In a real production system, you might want to add a separate stats table
-    // or use a background job to maintain these counts
+    // Or use a background job to maintain these counts
     const polls = await ctx.db.query("polls").collect()
 
     // Calculate totals efficiently
@@ -187,8 +188,8 @@ export const getUserStats = query({
 
 export const vote = mutation({
   args: {
-    pollId: v.id("polls"),
     optionId: v.id("pollOptions"),
+    pollId: v.id("polls"),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
@@ -198,8 +199,8 @@ export const vote = mutation({
     const option = await ctx.db.get(optionId)
     if (!option) {
       return {
-        success: false,
         error: "Poll option not found",
+        success: false,
       }
     }
 
@@ -219,8 +220,8 @@ export const vote = mutation({
 
         // Decrease vote count
         await ctx.db.patch(optionId, {
-          votes: Math.max(0, option.votes - 1),
           votedUserIds: option.votedUserIds.filter((id) => id !== userId),
+          votes: Math.max(0, option.votes - 1),
         })
 
         // Update poll total votes
@@ -237,10 +238,10 @@ export const vote = mutation({
           const oldOption = await ctx.db.get(oldOptionId)
           if (oldOption) {
             await ctx.db.patch(oldOptionId, {
-              votes: Math.max(0, oldOption.votes - 1),
               votedUserIds: oldOption.votedUserIds.filter(
                 (id) => id !== userId,
               ),
+              votes: Math.max(0, oldOption.votes - 1),
             })
           }
         }
@@ -252,22 +253,22 @@ export const vote = mutation({
 
         // Increase vote count for new option
         await ctx.db.patch(optionId, {
-          votes: option.votes + 1,
           votedUserIds: [...option.votedUserIds, userId],
+          votes: option.votes + 1,
         })
       }
     } else {
       // User is voting for the first time
       await ctx.db.insert("pollUsers", {
+        optionId,
         pollId,
         userId,
-        optionId,
       })
 
       // Increase vote count
       await ctx.db.patch(optionId, {
-        votes: option.votes + 1,
         votedUserIds: [...option.votedUserIds, userId],
+        votes: option.votes + 1,
       })
 
       // Update poll total votes
@@ -295,16 +296,13 @@ export const vote = mutation({
       .first()
 
     return {
-      success: true,
       poll: {
-        id: updatedPoll?._id,
-        question: updatedPoll?.question,
-        totalVotes: updatedPoll?.totalVotes,
-        dev: updatedPoll?.dev,
         authorId: updatedPoll?.authorId,
-        authorUsername: updatedPoll?.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
+        authorUsername: updatedPoll?.authorUsername,
         createdAt: updatedPoll?.createdAt,
+        dev: updatedPoll?.dev,
+        id: updatedPoll?._id,
         options: updatedOptions.map((option) => ({
           id: option._id,
           pollId: option.pollId,
@@ -312,7 +310,10 @@ export const vote = mutation({
           votes: option.votes,
           votedUserIds: option.votedUserIds,
         })),
+        question: updatedPoll?.question,
+        totalVotes: updatedPoll?.totalVotes,
       },
+      success: true,
     }
   },
 })
@@ -333,8 +334,8 @@ export const getUserVote = query({
       .first()
 
     return {
-      pollId: pollId,
       optionId: userVote?.optionId || null,
+      pollId: pollId,
     }
   },
 })
@@ -385,16 +386,16 @@ export const getUserVotesForPolls = query({
 
 export const getPollsByUser = query({
   args: {
-    userId: v.string(),
     includeAuthored: v.boolean(),
     includeVoted: v.boolean(),
-    sort: v.optional(v.string()),
     paginationOpts: v.optional(
       v.object({
         numItems: v.number(),
         cursor: v.optional(v.union(v.string(), v.null())),
       }),
     ),
+    sort: v.optional(v.string()),
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
     const {
@@ -405,7 +406,7 @@ export const getPollsByUser = query({
       sort = "recent",
     } = args
 
-    const defaultPagination = { numItems: 20, cursor: null }
+    const defaultPagination = { cursor: null, numItems: 20 }
     const pagination = paginationOpts || defaultPagination
 
     // Build a set of poll IDs to fetch
@@ -444,18 +445,20 @@ export const getPollsByUser = query({
     // If no polls found, return empty result
     if (pollIds.size === 0) {
       return {
-        polls: [],
-        isDone: true,
         continueCursor: null,
+        isDone: true,
+        polls: [],
       }
     }
 
     // Convert to array and fetch polls in batches
-    const pollIdArray = Array.from(pollIds)
+    const pollIdArray = [...pollIds]
     const allPolls = await Promise.all(
       pollIdArray.map(async (pollId) => {
         const poll = await ctx.db.get(pollId as Id<"polls">)
-        if (!poll) return null
+        if (!poll) {
+          return null
+        }
 
         // Filter out authored polls if we're only showing voted polls
         if (!includeAuthored && poll.authorId === userId) {
@@ -469,16 +472,20 @@ export const getPollsByUser = query({
     // Filter out null values and sort
     const sortedPolls = allPolls
       .filter((p): p is NonNullable<typeof p> => p !== null)
-      .sort((a, b) => {
+      .toSorted((a, b) => {
         switch (sort) {
-          case "oldest":
+          case "oldest": {
             return a.createdAt - b.createdAt
-          case "most-voted":
+          }
+          case "most-voted": {
             return (b.totalVotes || 0) - (a.totalVotes || 0)
-          case "least-voted":
+          }
+          case "least-voted": {
             return (a.totalVotes || 0) - (b.totalVotes || 0)
-          default:
+          }
+          default: {
             return b.createdAt - a.createdAt
+          }
         }
       })
 
@@ -532,15 +539,12 @@ export const getPollsByUser = query({
       const author = authorsById.get(poll.authorId)
 
       return {
-        id: poll._id,
-        question: poll.question,
-        totalVotes: poll.totalVotes,
-        dev: poll.dev,
         authorId: poll.authorId,
-        authorUsername: poll.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
+        authorUsername: poll.authorUsername,
         createdAt: poll.createdAt,
-        views: poll.views || 0,
+        dev: poll.dev,
+        id: poll._id,
         likes: poll.likes || 0,
         options: options.map((option) => ({
           id: option._id,
@@ -549,24 +553,27 @@ export const getPollsByUser = query({
           votes: option.votes,
           votedUserIds: option.votedUserIds,
         })),
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        views: poll.views || 0,
       }
     })
 
     return {
-      polls: pollsWithOptions,
-      isDone,
       continueCursor,
+      isDone,
+      polls: pollsWithOptions,
     }
   },
 })
 
 export const createPoll = mutation({
   args: {
-    question: v.string(),
-    options: v.array(v.string()),
     authorId: v.string(),
     authorUsername: v.string(),
     dev: v.optional(v.boolean()),
+    options: v.array(v.string()),
+    question: v.string(),
   },
   handler: async (ctx, args) => {
     const { question, options, authorId, authorUsername, dev = false } = args
@@ -574,23 +581,23 @@ export const createPoll = mutation({
     // Validate question length (280 characters max)
     if (question.length > 280) {
       return {
-        success: false,
         error: "Poll question cannot exceed 280 characters.",
+        success: false,
       }
     }
 
     // Validate options count (minimum 2, maximum 10)
     if (options.length < 2) {
       return {
-        success: false,
         error: "Poll must have at least 2 options.",
+        success: false,
       }
     }
 
     if (options.length > 10) {
       return {
-        success: false,
         error: "Poll cannot have more than 10 options.",
+        success: false,
       }
     }
 
@@ -598,8 +605,8 @@ export const createPoll = mutation({
     for (let i = 0; i < options.length; i++) {
       if (options[i].length > 280) {
         return {
-          success: false,
           error: `Poll option ${i + 1} cannot exceed 280 characters.`,
+          success: false,
         }
       }
     }
@@ -610,8 +617,8 @@ export const createPoll = mutation({
     )
     if (uniqueOptions.size !== options.length) {
       return {
-        success: false,
         error: "Poll cannot have duplicate options.",
+        success: false,
       }
     }
 
@@ -619,7 +626,7 @@ export const createPoll = mutation({
     const normalizedQuestion = question.trim().toLowerCase()
     const normalizedOptions = options
       .map((option) => option.trim().toLowerCase())
-      .sort()
+      .toSorted()
 
     const existingPolls = await ctx.db.query("polls").collect()
 
@@ -634,7 +641,7 @@ export const createPoll = mutation({
         .toLowerCase()
       const existingNormalizedOptions = existingOptions
         .map((option) => option.text.trim().toLowerCase())
-        .sort()
+        .toSorted()
 
       // Check if question and options match exactly (order doesn't matter for options)
       if (
@@ -643,8 +650,8 @@ export const createPoll = mutation({
           JSON.stringify(normalizedOptions)
       ) {
         return {
-          success: false,
           error: "A poll with this exact question and options already exists.",
+          success: false,
         }
       }
     }
@@ -652,9 +659,9 @@ export const createPoll = mutation({
     // Validate question content
     if (!validateTextContent(question)) {
       return {
-        success: false,
         error:
           "Poll question contains inappropriate content and cannot be used.",
+        success: false,
       }
     }
 
@@ -671,19 +678,19 @@ export const createPoll = mutation({
 
     if (!optionsValidation.isValid) {
       return {
-        success: false,
         error: `${optionsValidation.fieldName.charAt(0).toUpperCase() + optionsValidation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
+        success: false,
       }
     }
 
     // Create the poll
     const pollId = await ctx.db.insert("polls", {
-      question,
-      totalVotes: 0,
-      dev,
       authorId,
       authorUsername,
       createdAt: Date.now(),
+      dev,
+      question,
+      totalVotes: 0,
     })
 
     // Create poll options
@@ -692,23 +699,23 @@ export const createPoll = mutation({
         ctx.db.insert("pollOptions", {
           pollId,
           text: optionText,
-          votes: 0,
           votedUserIds: [],
+          votes: 0,
         }),
       ),
     )
 
     return {
-      success: true,
       error: "",
+      success: true,
     }
   },
 })
 
 export const deletePoll = mutation({
   args: {
-    pollId: v.id("polls"),
     authorId: v.string(),
+    pollId: v.id("polls"),
   },
   handler: async (ctx, args) => {
     const { pollId, authorId } = args
@@ -717,15 +724,15 @@ export const deletePoll = mutation({
     const poll = await ctx.db.get(pollId)
     if (!poll) {
       return {
-        success: false,
         error: "Poll not found",
+        success: false,
       }
     }
 
     if (poll.authorId !== authorId) {
       return {
-        success: false,
         error: "Only the poll author can delete this poll",
+        success: false,
       }
     }
 
@@ -772,7 +779,9 @@ export const viewPoll = mutation({
   args: { pollId: v.id("polls") },
   handler: async (ctx, args) => {
     const poll = await ctx.db.get(args.pollId)
-    if (!poll) return
+    if (!poll) {
+      return
+    }
     await ctx.db.patch(args.pollId, {
       views: (poll.views || 0) + 1,
     })
@@ -791,14 +800,16 @@ export const toggleLike = mutation({
       .first()
 
     const poll = await ctx.db.get(pollId)
-    if (!poll) throw new Error("Poll not found")
+    if (!poll) {
+      throw new Error("Poll not found")
+    }
 
     if (existingLike) {
       await ctx.db.delete(existingLike._id)
       await ctx.db.patch(pollId, {
         likes: Math.max(0, (poll.likes || 0) - 1),
       })
-      return false // unliked
+      return false // Unliked
     }
     await ctx.db.insert("pollLikes", {
       pollId,
@@ -807,7 +818,7 @@ export const toggleLike = mutation({
     await ctx.db.patch(pollId, {
       likes: (poll.likes || 0) + 1,
     })
-    return true // liked
+    return true // Liked
   },
 })
 
@@ -820,7 +831,7 @@ export const getPollLikeStatus = query({
         q.eq("userId", args.userId).eq("pollId", args.pollId),
       )
       .first()
-    return !!like
+    return Boolean(like)
   },
 })
 
@@ -830,7 +841,7 @@ export const getTrendingPolls = query({
     const polls = await ctx.db.query("polls").collect()
 
     const sortedPolls = polls
-      .sort((a, b) => {
+      .toSorted((a, b) => {
         const scoreA =
           (a.totalVotes || 0) * 2 + (a.likes || 0) + (a.views || 0) * 0.1
         const scoreB =
@@ -869,15 +880,12 @@ export const getTrendingPolls = query({
       const author = authorsById.get(poll.authorId)
 
       return {
-        id: poll._id,
-        question: poll.question,
-        totalVotes: poll.totalVotes,
-        dev: poll.dev,
         authorId: poll.authorId,
-        authorUsername: poll.authorUsername,
         authorProfileImageUrl: author?.profileImageUrl,
+        authorUsername: poll.authorUsername,
         createdAt: poll.createdAt,
-        views: poll.views || 0,
+        dev: poll.dev,
+        id: poll._id,
         likes: poll.likes || 0,
         options: options.map((option) => ({
           id: option._id,
@@ -886,13 +894,16 @@ export const getTrendingPolls = query({
           votes: option.votes,
           votedUserIds: option.votedUserIds,
         })),
+        question: poll.question,
+        totalVotes: poll.totalVotes,
+        views: poll.views || 0,
       }
     })
 
     return {
-      polls: pollsWithOptions,
-      isDone: true,
       continueCursor: null,
+      isDone: true,
+      polls: pollsWithOptions,
     }
   },
 })
@@ -919,14 +930,12 @@ export const getRandomPoll = query({
       .first()
 
     return {
-      id: randomPoll._id,
-      question: randomPoll.question,
-      totalVotes: randomPoll.totalVotes,
-      dev: randomPoll.dev,
       authorId: randomPoll.authorId,
-      authorUsername: randomPoll.authorUsername,
       authorProfileImageUrl: author?.profileImageUrl,
+      authorUsername: randomPoll.authorUsername,
       createdAt: randomPoll.createdAt,
+      dev: randomPoll.dev,
+      id: randomPoll._id,
       options: options.map((option) => ({
         id: option._id,
         pollId: option.pollId,
@@ -934,6 +943,8 @@ export const getRandomPoll = query({
         votes: option.votes,
         votedUserIds: option.votedUserIds,
       })),
+      question: randomPoll.question,
+      totalVotes: randomPoll.totalVotes,
     }
   },
 })

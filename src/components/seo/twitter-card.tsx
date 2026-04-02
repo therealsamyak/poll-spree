@@ -16,16 +16,14 @@ export const TwitterCard = ({
   imageAlt = "PollSpree - Social polling platform",
   creator = "@pollspree",
   site = "@pollspree",
-}: TwitterCardProps) => {
-  return (
-    <>
-      <meta name="twitter:card" content={card} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-      <meta name="twitter:image:alt" content={imageAlt} />
-      <meta name="twitter:creator" content={creator} />
-      <meta name="twitter:site" content={site} />
-    </>
-  )
-}
+}: TwitterCardProps) => (
+  <>
+    <meta name="twitter:card" content={card} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <meta name="twitter:creator" content={creator} />
+    <meta name="twitter:site" content={site} />
+  </>
+)

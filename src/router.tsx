@@ -2,9 +2,12 @@ import { ClerkProvider } from "@clerk/clerk-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createRouter } from "@tanstack/react-router"
 import { ConvexProvider, ConvexReactClient } from "convex/react"
-import { type ReactNode, useState } from "react"
+import { useState } from "react"
+import type { ReactNode } from "react"
+
 import { Loader } from "@/components/loader"
 import { NotificationProvider } from "@/components/ui/notification"
+
 import { routeTree } from "./routeTree.gen"
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -14,16 +17,6 @@ if (!publishableKey) {
 }
 
 const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  defaultPendingComponent: () => <Loader />,
-  defaultErrorComponent: ({ error }) => (
-    <div className="p-4 text-destructive">
-      <h1>Error</h1>
-      <pre>{error.message}</pre>
-    </div>
-  ),
-  context: {} as Record<string, unknown>,
   Wrap: ({ children }: { children: ReactNode }) => {
     const [queryClient] = useState(
       () =>
@@ -61,6 +54,16 @@ const router = createRouter({
       </ClerkProvider>
     )
   },
+  context: {} as Record<string, unknown>,
+  defaultErrorComponent: ({ error }) => (
+    <div className="text-destructive p-4">
+      <h1>Error</h1>
+      <pre>{error.message}</pre>
+    </div>
+  ),
+  defaultPendingComponent: () => <Loader />,
+  defaultPreload: "intent",
+  routeTree,
 })
 
 declare module "@tanstack/react-router" {

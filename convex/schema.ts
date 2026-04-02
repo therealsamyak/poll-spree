@@ -2,18 +2,20 @@ import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
 
 export default defineSchema({
-  polls: defineTable({
-    question: v.string(),
-    totalVotes: v.number(),
-    dev: v.boolean(),
-    authorId: v.string(),
-    authorUsername: v.string(),
-    views: v.optional(v.number()),
-    likes: v.optional(v.number()),
+  comments: defineTable({
+    pollId: v.id("polls"),
+    userId: v.string(),
+    username: v.string(),
+    text: v.string(),
     createdAt: v.number(),
+  }).index("by_pollId", ["pollId"]),
+
+  pollLikes: defineTable({
+    pollId: v.id("polls"),
+    userId: v.string(),
   })
-    .index("by_createdAt", ["createdAt"])
-    .index("by_authorId", ["authorId"]),
+    .index("by_pollId", ["pollId"])
+    .index("by_user_poll", ["userId", "pollId"]),
 
   pollOptions: defineTable({
     pollId: v.id("polls"),
@@ -30,20 +32,18 @@ export default defineSchema({
     .index("by_poll_user", ["pollId", "userId"])
     .index("by_userId", ["userId"]),
 
-  comments: defineTable({
-    pollId: v.id("polls"),
-    userId: v.string(),
-    username: v.string(),
-    text: v.string(),
+  polls: defineTable({
+    question: v.string(),
+    totalVotes: v.number(),
+    dev: v.boolean(),
+    authorId: v.string(),
+    authorUsername: v.string(),
+    views: v.optional(v.number()),
+    likes: v.optional(v.number()),
     createdAt: v.number(),
-  }).index("by_pollId", ["pollId"]),
-
-  pollLikes: defineTable({
-    pollId: v.id("polls"),
-    userId: v.string(),
   })
-    .index("by_pollId", ["pollId"])
-    .index("by_user_poll", ["userId", "pollId"]),
+    .index("by_createdAt", ["createdAt"])
+    .index("by_authorId", ["authorId"]),
 
   users: defineTable({
     userId: v.string(),

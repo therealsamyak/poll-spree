@@ -17,7 +17,9 @@ export interface SEOConfig {
 }
 
 export const generateSEOTitle = (title?: string, siteName = "PollSpree") => {
-  if (!title) return siteName
+  if (!title) {
+    return siteName
+  }
   return `${title} - ${siteName}`
 }
 
@@ -56,16 +58,14 @@ export const generateSEOKeywords = (
 export const generateCanonicalUrl = (
   path: string,
   baseUrl = "https://pollspree.com",
-) => {
-  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`
-}
+) => `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`
 
 export const generateStructuredData = (config: SEOConfig) => {
   const baseData = {
     "@context": "https://schema.org",
     "@type": config.type === "poll" ? "Poll" : "WebPage",
-    name: config.title,
     description: config.description,
+    name: config.title,
     url: config.canonical,
     ...(config.author && {
       author: { "@type": "Person", name: config.author },
@@ -76,6 +76,11 @@ export const generateStructuredData = (config: SEOConfig) => {
 
   if (config.type === "poll" && config.pollData) {
     Object.assign(baseData, {
+      interactionStatistic: {
+        "@type": "InteractionCounter",
+        interactionType: "https://schema.org/VoteAction",
+        userInteractionCount: config.pollData.totalVotes,
+      },
       mainEntity: {
         "@type": "Question",
         name: config.pollData.question,
@@ -83,11 +88,6 @@ export const generateStructuredData = (config: SEOConfig) => {
           "@type": "Answer",
           text: option,
         })),
-      },
-      interactionStatistic: {
-        "@type": "InteractionCounter",
-        interactionType: "https://schema.org/VoteAction",
-        userInteractionCount: config.pollData.totalVotes,
       },
     })
   }
@@ -99,22 +99,19 @@ export const generateSitemapUrl = (
   path: string,
   priority = 0.5,
   changefreq = "weekly",
-) => {
-  return {
-    loc: `https://pollspree.com${path}`,
-    lastmod: new Date().toISOString(),
-    changefreq,
-    priority,
-  }
-}
+) => ({
+  loc: `https://pollspree.com${path}`,
+  lastmod: new Date().toISOString(),
+  changefreq,
+  priority,
+})
 
-export const sanitizeForSEO = (text: string) => {
-  return text
+export const sanitizeForSEO = (text: string) =>
+  text
     .replace(/[^\w\s-]/g, "") // Remove special characters except spaces and hyphens
     .replace(/\s+/g, " ") // Replace multiple spaces with single space
     .trim()
-    .substring(0, 160) // Limit to 160 characters for meta descriptions
-}
+    .substring(0, 160)
 
 export const generatePollSEOConfig = (poll: {
   question: string
@@ -122,32 +119,28 @@ export const generatePollSEOConfig = (poll: {
   totalVotes: number
   options: { text: string }[]
   id: string
-}): SEOConfig => {
-  return {
-    title: poll.question,
-    description: generateSEODescription(undefined, {
-      question: poll.question,
-      authorUsername: poll.authorUsername,
-      totalVotes: poll.totalVotes,
-    }),
-    keywords: generateSEOKeywords([poll.authorUsername, "poll", "voting"]),
-    canonical: generateCanonicalUrl(`/polls/${poll.id}`),
-    type: "poll",
-    author: poll.authorUsername,
-    pollData: {
-      question: poll.question,
-      options: poll.options.map((opt) => opt.text),
-      totalVotes: poll.totalVotes,
-    },
-  }
-}
+}): SEOConfig => ({
+  title: poll.question,
+  description: generateSEODescription(undefined, {
+    question: poll.question,
+    authorUsername: poll.authorUsername,
+    totalVotes: poll.totalVotes,
+  }),
+  keywords: generateSEOKeywords([poll.authorUsername, "poll", "voting"]),
+  canonical: generateCanonicalUrl(`/polls/${poll.id}`),
+  type: "poll",
+  author: poll.authorUsername,
+  pollData: {
+    question: poll.question,
+    options: poll.options.map((opt) => opt.text),
+    totalVotes: poll.totalVotes,
+  },
+})
 
-export const generateUserSEOConfig = (username: string): SEOConfig => {
-  return {
-    title: `${username} - PollSpree`,
-    description: `View polls created by ${username} on PollSpree. Discover what ${username} thinks about trending topics.`,
-    keywords: generateSEOKeywords([username, "polls", "voting", "community"]),
-    canonical: generateCanonicalUrl(`/users/${encodeURIComponent(username)}`),
-    type: "website",
-  }
-}
+export const generateUserSEOConfig = (username: string): SEOConfig => ({
+  title: `${username} - PollSpree`,
+  description: `View polls created by ${username} on PollSpree. Discover what ${username} thinks about trending topics.`,
+  keywords: generateSEOKeywords([username, "polls", "voting", "community"]),
+  canonical: generateCanonicalUrl(`/users/${encodeURIComponent(username)}`),
+  type: "website",
+})

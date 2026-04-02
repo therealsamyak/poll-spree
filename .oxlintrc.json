@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "react-perf",
+    "import",
+    "jsx-a11y",
+    "promise",
+    "node",
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc"
+  ],
+  "ignorePatterns": [
+    "**/.next",
+    "**/dist",
+    "**/.turbo",
+    "**/dev-dist",
+    "**/.zed",
+    "**/.vscode",
+    "**/routeTree.gen.ts",
+    "**/src-tauri",
+    "**/.nuxt",
+    "bts.jsonc",
+    "**/_generated"
+  ]
+}

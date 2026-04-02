@@ -1,4 +1,5 @@
 import { BarChart3, UserX } from "lucide-react"
+
 import {
   Card,
   CardDescription,
@@ -25,13 +26,14 @@ export const UserPollsEmpty = ({
 
   const getEmptyStateContent = () => {
     switch (type) {
-      case "user-not-found":
+      case "user-not-found": {
         return {
           icon: UserX,
           title: "User does not exist",
           description: `The user "${username}" could not be found.`,
         }
-      case "no-polls":
+      }
+      case "no-polls": {
         return {
           icon: BarChart3,
           title: "No polls yet",
@@ -39,6 +41,7 @@ export const UserPollsEmpty = ({
             ? "You haven't created or voted on any polls yet."
             : `${username} has not created or voted on any polls.`,
         }
+      }
       case "no-results": {
         const filterLabels =
           filters?.map((f) => (f === "authored" ? "authored" : "voted on")) ||
@@ -49,11 +52,11 @@ export const UserPollsEmpty = ({
             : filterLabels.join(" or ")
 
         return {
-          icon: BarChart3,
-          title: "No results match your filters",
           description: isOwnProfile
             ? `You have no polls that you've ${filterText}.`
             : `${username} has no polls that you've ${filterText}.`,
+          icon: BarChart3,
+          title: "No results match your filters",
         }
       }
     }
@@ -64,12 +67,12 @@ export const UserPollsEmpty = ({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
-      <Card className="mx-auto w-full max-w-md border-2 border-primary/20 border-dashed text-center">
+      <Card className="border-primary/20 mx-auto w-full max-w-md border-2 border-dashed text-center">
         <CardHeader className="pb-4">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <IconComponent className="h-8 w-8 text-primary" />
+          <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <IconComponent className="text-primary h-8 w-8" />
           </div>
-          <CardTitle className="font-bold text-2xl">{content.title}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{content.title}</CardTitle>
           <CardDescription className="text-base">
             {content.description}
           </CardDescription>

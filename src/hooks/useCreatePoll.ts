@@ -1,8 +1,10 @@
 import { useAuth } from "@clerk/clerk-react"
 import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
+
 import { useNotification } from "@/components/ui/notification"
 import { validateMultipleInputs } from "@/lib/badWordsFilter"
+
 import { api } from "../../convex/_generated/api"
 
 interface PollOption {
@@ -52,7 +54,9 @@ export const useCreatePoll = () => {
     onSuccess?: () => void,
   ) => {
     e.preventDefault()
-    if (!userId || !user) return
+    if (!userId || !user) {
+      return
+    }
 
     setIsCreating(true)
 
@@ -84,11 +88,11 @@ export const useCreatePoll = () => {
       }
 
       const result = await createPoll({
-        question: question.trim(),
-        options: validOptions,
         authorId: userId,
         authorUsername: user.username || "Anonymous",
         dev: isDev,
+        options: validOptions,
+        question: question.trim(),
       })
 
       if (result?.success) {
@@ -121,17 +125,17 @@ export const useCreatePoll = () => {
   }
 
   return {
-    question,
-    setQuestion,
-    options,
-    isDev,
-    setIsDev,
-    isCreating,
-    handleCreatePoll,
     addOption,
-    removeOption,
-    updateOption,
     canAddOption,
     canRemoveOption,
+    handleCreatePoll,
+    isCreating,
+    isDev,
+    options,
+    question,
+    removeOption,
+    setIsDev,
+    setQuestion,
+    updateOption,
   }
 }

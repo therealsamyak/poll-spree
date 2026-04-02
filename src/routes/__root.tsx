@@ -1,14 +1,15 @@
 import { useUser } from "@clerk/clerk-react"
 import {
-  createRootRoute,
   HeadContent,
   Outlet,
   Scripts,
+  createRootRoute,
   useRouterState,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import { useMutation } from "convex/react"
 import { useEffect, useState } from "react"
+
 import { Loader } from "@/components/loader"
 import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
@@ -17,7 +18,9 @@ import { Sidebar } from "@/components/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthState } from "@/lib/clerk"
+
 import { api } from "../../convex/_generated/api"
+
 import indexCss from "../index.css?url"
 
 const RootComponent = () => {
@@ -37,8 +40,8 @@ const RootComponent = () => {
   useEffect(() => {
     if (user?.id && user?.imageUrl !== undefined) {
       updateProfileImage({
-        userId: user.id,
         profileImageUrl: user.imageUrl || "",
+        userId: user.id,
       }).catch((_error) => {
         // Silently handle profile image sync errors
       })
@@ -57,13 +60,13 @@ const RootComponent = () => {
           <>
             <SEOHead />
             <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-              <div className="flex max-h-screen max-w-screen overflow-hidden bg-background">
+              <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
                 <Sidebar />
                 <main className="ml-16 flex-1 overflow-auto transition-colors duration-300 md:ml-64">
                   {isFetching ? (
                     <Loader />
                   ) : (
-                    <div className="min-h-full animate-in">
+                    <div className="animate-in min-h-full">
                       <Outlet />
                     </div>
                   )}
@@ -82,7 +85,6 @@ const RootComponent = () => {
 
 export const Route = createRootRoute({
   component: RootComponent,
-  notFoundComponent: NotFound,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -99,4 +101,5 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  notFoundComponent: NotFound,
 })

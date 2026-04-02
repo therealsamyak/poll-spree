@@ -1,4 +1,5 @@
 import { v } from "convex/values"
+
 import { action, mutation, query } from "./_generated/server"
 import { validateTextContent } from "./badWordsFilter"
 
@@ -13,34 +14,34 @@ const validateUsername = (
 
   // Check if empty after trimming
   if (!trimmed) {
-    return { isValid: false, error: "Username cannot be empty" }
+    return { error: "Username cannot be empty", isValid: false }
   }
 
   // Check length (3-20 characters)
   if (trimmed.length < 3) {
     return {
-      isValid: false,
       error: "Username must be at least 3 characters long",
+      isValid: false,
     }
   }
 
   if (trimmed.length > 20) {
-    return { isValid: false, error: "Username must be 20 characters or less" }
+    return { error: "Username must be 20 characters or less", isValid: false }
   }
 
   // Check for leading/trailing whitespace (shouldn't happen after trim, but double-check)
   if (username !== trimmed) {
     return {
-      isValid: false,
       error: "Username cannot have leading or trailing spaces",
+      isValid: false,
     }
   }
 
   // Check for multiple consecutive spaces
   if (/\s{2,}/.test(username)) {
     return {
-      isValid: false,
       error: "Username cannot have multiple consecutive spaces",
+      isValid: false,
     }
   }
 
@@ -48,30 +49,30 @@ const validateUsername = (
   // This prevents Unicode control characters, bidirectional text, and other problematic characters
   if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
     return {
-      isValid: false,
       error:
         "Username can only contain English letters, numbers, underscores, and hyphens",
+      isValid: false,
     }
   }
 
   // Prevent usernames that start with numbers (optional, but common practice)
   if (/^\d/.test(trimmed)) {
-    return { isValid: false, error: "Username cannot start with a number" }
+    return { error: "Username cannot start with a number", isValid: false }
   }
 
   // Prevent usernames that end with hyphens or underscores (optional, but cleaner)
   if (/[-_]$/.test(trimmed)) {
     return {
-      isValid: false,
       error: "Username cannot end with a hyphen or underscore",
+      isValid: false,
     }
   }
 
   // Prevent consecutive hyphens or underscores (optional, but cleaner)
   if (/[-_]{2,}/.test(trimmed)) {
     return {
-      isValid: false,
       error: "Username cannot have consecutive hyphens or underscores",
+      isValid: false,
     }
   }
 
@@ -178,9 +179,9 @@ const isReservedUsername = (username: string): boolean => {
 
 export const createUser = mutation({
   args: {
+    profileImageUrl: v.optional(v.string()),
     userId: v.string(),
     username: v.string(),
-    profileImageUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { userId, username, profileImageUrl } = args
@@ -189,23 +190,23 @@ export const createUser = mutation({
     const validation = validateUsername(username)
     if (!validation.isValid) {
       return {
-        success: false,
         error: validation.error || "Invalid username",
+        success: false,
       }
     }
 
     // Check for inappropriate content in username
     if (!validateTextContent(username)) {
       return {
-        success: false,
         error: "Username contains inappropriate content and cannot be used.",
+        success: false,
       }
     }
 
     if (isReservedUsername(username)) {
       return {
-        success: false,
         error: "This username is reserved and cannot be used.",
+        success: false,
       }
     }
 
@@ -218,8 +219,8 @@ export const createUser = mutation({
     if (existingUserById) {
       // User exists, update their username and profile image
       await ctx.db.patch(existingUserById._id, {
-        username,
         profileImageUrl,
+        username,
       })
 
       // Update all polls by this user to use the new username
@@ -234,7 +235,7 @@ export const createUser = mutation({
         })
       }
 
-      return { success: true, userId: existingUserById._id, updated: true }
+      return { success: true, updated: true, userId: existingUserById._id }
     }
 
     // Check if username is already taken by another user
@@ -245,20 +246,20 @@ export const createUser = mutation({
 
     if (existingUserByUsername) {
       return {
-        success: false,
         error: "Username already taken",
+        success: false,
       }
     }
 
     // Create the user
     const user = await ctx.db.insert("users", {
+      createdAt: Date.now(),
+      profileImageUrl,
       userId,
       username,
-      profileImageUrl,
-      createdAt: Date.now(),
     })
 
-    return { success: true, userId: user, updated: false }
+    return { success: true, updated: false, userId: user }
   },
 })
 
@@ -274,23 +275,23 @@ export const updateUsername = mutation({
     const validation = validateUsername(username)
     if (!validation.isValid) {
       return {
-        success: false,
         error: validation.error || "Invalid username",
+        success: false,
       }
     }
 
     // Check for inappropriate content in username
     if (!validateTextContent(username)) {
       return {
-        success: false,
         error: "Username contains inappropriate content and cannot be used.",
+        success: false,
       }
     }
 
     if (isReservedUsername(username)) {
       return {
-        success: false,
         error: "This username is reserved and cannot be used.",
+        success: false,
       }
     }
 
@@ -302,8 +303,8 @@ export const updateUsername = mutation({
 
     if (existingUser && existingUser.userId !== userId) {
       return {
-        success: false,
         error: "Username already taken",
+        success: false,
       }
     }
 
@@ -315,8 +316,8 @@ export const updateUsername = mutation({
 
     if (!currentUser) {
       return {
-        success: false,
         error: "User not found",
+        success: false,
       }
     }
 
@@ -343,8 +344,8 @@ export const updateUsername = mutation({
 
 export const updateProfileImage = mutation({
   args: {
-    userId: v.string(),
     profileImageUrl: v.string(),
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
     const { userId, profileImageUrl } = args
@@ -358,7 +359,7 @@ export const updateProfileImage = mutation({
     if (!currentUser) {
       // User doesn't exist yet, skip the update
       // The profile image will be set when the user is created during username setup
-      return { success: true, skipped: true }
+      return { skipped: true, success: true }
     }
 
     // Update the profile image URL in the users table
@@ -367,10 +368,10 @@ export const updateProfileImage = mutation({
     })
 
     // Note: We don't need to update the polls table because we always query
-    // the users table for the latest profile image URL in getPolls and vote functions.
+    // The users table for the latest profile image URL in getPolls and vote functions.
     // This ensures that profile image changes are immediately reflected in all polls.
 
-    return { success: true, skipped: false }
+    return { skipped: false, success: true }
   },
 })
 
@@ -494,11 +495,11 @@ export const deleteClerkUser = action({
 
     try {
       const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
-        method: "DELETE",
         headers: {
           Authorization: `Bearer ${clerkSecretKey}`,
           "Content-Type": "application/json",
         },
+        method: "DELETE",
       })
 
       console.log("Clerk API response status:", response.status)
@@ -515,7 +516,7 @@ export const deleteClerkUser = action({
       return { success: true }
     } catch (error) {
       console.error("Error deleting user from Clerk:", error)
-      throw new Error("Failed to delete user from Clerk")
+      throw new Error("Failed to delete user from Clerk", { cause: error })
     }
   },
 })
@@ -542,8 +543,8 @@ export const getAllUsers = query({
     const users = await ctx.db.query("users").collect()
 
     return users.map((user) => ({
-      username: user.username,
       createdAt: user.createdAt,
+      username: user.username,
     }))
   },
 })

@@ -12,7 +12,8 @@ import {
   TrendingUp,
   User,
 } from "lucide-react"
-import { lazy, Suspense, useId, useState } from "react"
+import { Suspense, lazy, useId, useState } from "react"
+
 import { Avatar } from "@/components/avatar"
 
 const CreatePollDialogContent = lazy(() =>
@@ -48,17 +49,16 @@ import { Label } from "@/components/ui/label"
 import { useNotification } from "@/components/ui/notification"
 import { Separator } from "@/components/ui/separator"
 import { isReservedUsername, validateUsername } from "@/lib/utils"
+
 import { api } from "../../../convex/_generated/api"
 
-const createPollIcon = <Plus className="h-5 w-5 text-primary" />
+const createPollIcon = <Plus className="text-primary h-5 w-5" />
 
-export const Sidebar = () => {
-  return (
-    <aside className="fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r bg-background transition-colors duration-300 md:w-64">
-      <SidebarContent />
-    </aside>
-  )
-}
+export const Sidebar = () => (
+  <aside className="bg-background fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r transition-colors duration-300 md:w-64">
+    <SidebarContent />
+  </aside>
+)
 
 const SidebarContent = () => {
   const { isSignedIn, userId } = useAuth()
@@ -77,12 +77,14 @@ const SidebarContent = () => {
 
   const handleSurprise = () => {
     if (randomPoll?.id) {
-      navigate({ to: "/polls/$pollId", params: { pollId: randomPoll.id } })
+      navigate({ params: { pollId: randomPoll.id }, to: "/polls/$pollId" })
     }
   }
 
   const handleUpdateUsername = async () => {
-    if (!newUsername.trim() || !userId) return
+    if (!newUsername.trim() || !userId) {
+      return
+    }
 
     // Validate username using comprehensive validation
     const validation = validateUsername(newUsername)
@@ -122,7 +124,7 @@ const SidebarContent = () => {
           variant: "error",
         })
       }
-    } catch (_error) {
+    } catch {
       showNotification({
         message: "An unexpected error occurred. Please try again.",
         variant: "error",
@@ -138,17 +140,17 @@ const SidebarContent = () => {
   }
 
   return (
-    <div className="flex h-full max-h-screen flex-col overflow-hidden border-r bg-background transition-colors duration-300">
+    <div className="bg-background flex h-full max-h-screen flex-col overflow-hidden border-r transition-colors duration-300">
       {/* Logo and Brand */}
       <div className="flex h-16 min-h-16 items-center justify-center border-b px-0 md:px-6">
         <Link
           to="/"
           className="flex h-16 w-16 items-center justify-center transition-opacity hover:opacity-80 md:h-auto md:w-auto md:space-x-3"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg">
             <BarChart3 className="h-5 w-5" />
           </div>
-          <span className="hidden font-bold text-lg tracking-tight md:inline">
+          <span className="hidden text-lg font-bold tracking-tight md:inline">
             PollSpree
           </span>
         </Link>
@@ -158,7 +160,7 @@ const SidebarContent = () => {
       <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
         <Link
           to="/"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
         >
           <Home className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Home</span>
@@ -172,7 +174,7 @@ const SidebarContent = () => {
         </Link> */}
         <Link
           to="/trending"
-          className="flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
           activeProps={{
             className: "bg-primary/10 text-primary font-semibold",
           }}
@@ -183,7 +185,7 @@ const SidebarContent = () => {
         <Button
           onClick={handleSurprise}
           variant="ghost"
-          className="group flex h-12 w-12 items-center justify-center rounded-lg font-medium text-foreground/90 text-sm transition-colors hover:scale-[1.02] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="group text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
         >
           <Sparkles className="h-6 w-6 group-hover:animate-spin" />
           <span className="ml-2 hidden md:inline">Surprise!</span>
@@ -197,7 +199,7 @@ const SidebarContent = () => {
             <>
               <Button
                 onClick={() => setIsCreatePollOpen(true)}
-                className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md md:w-auto md:justify-start md:px-3"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-9 items-center justify-center rounded-lg shadow-sm transition-all duration-200 hover:shadow-md md:w-auto md:justify-start md:px-3"
               >
                 <Plus className="h-6 w-6" />
                 <span className="hidden md:inline">Create Poll</span>
@@ -206,7 +208,7 @@ const SidebarContent = () => {
             </>
           )}
           <div className="flex items-center justify-between">
-            <span className="hidden font-medium text-muted-foreground text-sm md:block">
+            <span className="text-muted-foreground hidden text-sm font-medium md:block">
               Theme
             </span>
             <ModeToggle />
@@ -218,12 +220,12 @@ const SidebarContent = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="justify-center text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground md:h-auto md:w-full md:justify-between md:p-2 dark:hover:bg-accent dark:hover:text-accent-foreground"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent dark:hover:text-accent-foreground justify-center transition-all duration-200 md:h-auto md:w-full md:justify-between md:p-2"
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <Avatar size="sm" />
                     <div className="hidden min-w-0 flex-1 md:block">
-                      <p className="ml-3 text-center font-medium text-sm">
+                      <p className="ml-3 text-center text-sm font-medium">
                         {`@${user?.username || "User"}`}
                       </p>
                     </div>
@@ -266,7 +268,7 @@ const SidebarContent = () => {
             </DropdownMenu>
           ) : (
             <SignInButton mode="modal">
-              <Button className="w-full gap-2 bg-primary text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full gap-2 shadow-sm transition-all duration-200">
                 Sign In
               </Button>
             </SignInButton>
