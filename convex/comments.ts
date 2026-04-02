@@ -43,6 +43,21 @@ export const create = mutation({
     username: v.string(),
   },
   handler: async (ctx, args) => {
+    const existingComments = await ctx.db
+      .query("comments")
+      .withIndex("by_pollId", (q) => q.eq("pollId", args.pollId))
+      .collect()
+
+    const alreadyCommented = existingComments.some(
+      (c) => c.userId === args.userId,
+    )
+    if (alreadyCommented) {
+      throw new Error("You have already commented on this poll")
+    }
+
+    if (args.text.length > 300) {
+      throw new Error("Comment cannot exceed 300 characters")
+    }
     if (!validateTextContent(args.text)) {
       throw new Error("Comment contains inappropriate content")
     }

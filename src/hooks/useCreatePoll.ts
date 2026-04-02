@@ -25,6 +25,18 @@ export const useCreatePoll = () => {
   ])
   const [isDev, setIsDev] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set())
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const clearFieldError = (fieldName: string) => {
+    setFieldErrors((prev) => {
+      const next = new Set(prev)
+      next.delete(fieldName)
+      return next
+    })
+  }
+  const clearAllFieldErrors = () => setFieldErrors(new Set())
+  const clearFormError = () => setFormError(null)
 
   const addOption = () => {
     if (options.length < 10) {
@@ -51,13 +63,15 @@ export const useCreatePoll = () => {
 
   const handleCreatePoll = async (
     e: React.FormEvent,
-    onSuccess?: () => void,
+    onSuccess?: (pollId: string) => void,
   ) => {
     e.preventDefault()
     if (!userId || !user) {
       return
     }
 
+    setFieldErrors(new Set())
+    setFormError(null)
     setIsCreating(true)
 
     try {
@@ -80,10 +94,7 @@ export const useCreatePoll = () => {
 
       const validation = validateMultipleInputs(inputsToValidate)
       if (!validation.isValid) {
-        showNotification({
-          message: `${validation.fieldName.charAt(0).toUpperCase() + validation.fieldName.slice(1)} contains inappropriate content and cannot be used.`,
-          variant: "error",
-        })
+        setFieldErrors(new Set(validation.invalidFields))
         return
       }
 
@@ -106,19 +117,13 @@ export const useCreatePoll = () => {
           { id: "2", text: "" },
         ])
         setIsDev(false)
-        onSuccess?.()
+        onSuccess?.(result.pollId as string)
       } else {
-        showNotification({
-          message: result?.error || "Failed to create poll",
-          variant: "error",
-        })
+        setFormError(result?.error || "Failed to create poll")
       }
     } catch (error) {
       console.error("Error creating poll:", error)
-      showNotification({
-        message: "An unexpected error occurred",
-        variant: "error",
-      })
+      setFormError("An unexpected error occurred")
     } finally {
       setIsCreating(false)
     }
@@ -128,6 +133,11 @@ export const useCreatePoll = () => {
     addOption,
     canAddOption,
     canRemoveOption,
+    clearFieldError,
+    clearAllFieldErrors,
+    clearFormError,
+    fieldErrors,
+    formError,
     handleCreatePoll,
     isCreating,
     isDev,

@@ -15,12 +15,21 @@ import type { Id } from "../../../convex/_generated/dataModel"
 
 interface CommentSectionProps {
   pollId: string
+  currentUser?: {
+    userId: string
+    username: string
+    profileImageUrl?: string
+  } | null
 }
 
-export const CommentSection = ({ pollId }: CommentSectionProps) => {
+export const CommentSection = ({
+  pollId,
+  currentUser,
+}: CommentSectionProps) => {
   const { userId, isSignedIn } = useAuth()
   const [text, setText] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { showNotification } = useNotification()
 
   const comments = useQuery(api.comments.list, {
@@ -28,20 +37,21 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
   })
   const createComment = useMutation(api.comments.create)
   const deleteComment = useMutation(api.comments.deleteComment)
-  const user = useQuery(api.users.getUser, { userId: userId || "" })
+
+  const hasAlreadyCommented =
+    currentUser && comments?.some((c) => c.userId === currentUser.userId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!text.trim() || !user) {
+    if (!text.trim() || !currentUser) {
       return
     }
 
+    setError(null)
+
     // Validate comment for inappropriate content
     if (!isTextSafe(text)) {
-      showNotification({
-        message: "Comment contains inappropriate content",
-        variant: "error",
-      })
+      setError("Comment contains inappropriate content")
       return
     }
 
@@ -50,13 +60,13 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
       await createComment({
         pollId: pollId as Id<"polls">,
         text: text.trim(),
-        userId: user.userId,
-        username: user.username,
+        userId: currentUser.userId,
+        username: currentUser.username,
       })
       setText("")
       showNotification({ message: "Comment posted!", variant: "success" })
     } catch {
-      showNotification({ message: "Failed to post comment", variant: "error" })
+      setError("Failed to post comment. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -84,37 +94,43 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
         Comments ({comments.length})
       </h3>
 
-      {isSignedIn && (
-        <form onSubmit={handleSubmit} className="flex gap-4">
-          <Avatar size="md" profileImageUrl={user?.profileImageUrl} />
+      {isSignedIn && !hasAlreadyCommented && (
+        <div className="flex gap-4">
+          <Avatar size="md" profileImageUrl={currentUser?.profileImageUrl} />
           <div className="flex flex-1 flex-col gap-2">
-            <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Write a comment..."
-              className="min-h-[80px] resize-none"
-              maxLength={500}
-            />
-            <div className="flex justify-end">
-              <Button type="submit" disabled={!text.trim() || isSubmitting}>
-                {isSubmitting ? (
-                  "Posting..."
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" /> Post
-                  </>
-                )}
-              </Button>
-            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+              <Textarea
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value)
+                  if (error) setError(null)
+                }}
+                placeholder="Write a comment..."
+                className={`min-h-[80px] resize-none ${error ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                maxLength={300}
+              />
+              {error && <p className="text-destructive text-xs">{error}</p>}
+              <div className="flex justify-end">
+                <Button type="submit" disabled={!text.trim() || isSubmitting}>
+                  {isSubmitting ? (
+                    "Posting..."
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" /> Post
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       )}
 
       <div className="space-y-4">
         {comments.map((comment) => (
           <div
             key={comment._id}
-            className="group bg-muted/30 flex gap-4 rounded-xl p-4"
+            className="group border-border flex gap-4 rounded-xl border-t-2 p-4"
           >
             <Avatar size="sm" profileImageUrl={comment.authorProfileImageUrl} />
             <div className="flex-1 space-y-1">
@@ -131,7 +147,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-destructive h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="text-destructive h-8 w-8"
                     onClick={() => handleDelete(comment._id)}
                   >
                     <Trash2 className="h-4 w-4" />

@@ -80,6 +80,12 @@ export const PollsList = () => {
       userId: userId || "",
     }),
   )
+  const { data: userLikes } = useQuery(
+    convexQuery(api.polls.getUserLikesForPolls, {
+      pollIds,
+      userId: userId || "",
+    }),
+  )
 
   // Update allPolls when new data comes in
   useEffect(() => {
@@ -222,7 +228,11 @@ export const PollsList = () => {
       <div className="flex flex-col gap-6 p-4 pb-24 md:hidden">
         {allPolls.map((poll, _index) => (
           <div key={poll.id} className="w-full">
-            <FeedPollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
+            <FeedPollCard
+              poll={poll}
+              userVote={userVotes?.[poll.id] || null}
+              userLikeStatus={userLikes?.[poll.id] || false}
+            />
           </div>
         ))}
 
@@ -280,6 +290,7 @@ export const PollsList = () => {
               <FeedPollCard
                 poll={poll}
                 userVote={userVotes?.[poll.id] || null}
+                userLikeStatus={userLikes?.[poll.id] || false}
               />
             </div>
           </div>

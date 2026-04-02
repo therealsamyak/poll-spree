@@ -49,6 +49,13 @@ const Trending = () => {
     }),
     enabled: pollIds.length > 0,
   })
+  const userLikes = useQuery({
+    ...convexQuery(api.polls.getUserLikesForPolls, {
+      pollIds,
+      userId: userId || "",
+    }),
+    enabled: pollIds.length > 0,
+  })
 
   if (allPolls.length === 0) {
     return (
@@ -117,6 +124,7 @@ const Trending = () => {
                 <PollCard
                   poll={poll}
                   userVote={userVotes.data?.[poll.id] || null}
+                  userLikeStatus={userLikes.data?.[poll.id] || false}
                 />
               </div>
             ))}

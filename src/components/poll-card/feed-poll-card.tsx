@@ -10,7 +10,7 @@ import {
   Share2,
   Trash2,
 } from "lucide-react"
-import { memo, useState } from "react"
+import { memo } from "react"
 
 import { Avatar } from "@/components/avatar"
 import { Button } from "@/components/ui/button"
@@ -36,7 +36,8 @@ import type { Poll } from "../../types"
 interface FeedPollCardProps {
   poll: Poll
   onPollDeleted?: () => void
-  userVote?: string | null // Optional pre-fetched user vote
+  userVote?: string | null
+  userLikeStatus?: boolean
 }
 
 export const FeedPollCard = memo(
@@ -44,17 +45,13 @@ export const FeedPollCard = memo(
     poll,
     onPollDeleted,
     userVote: preFetchedUserVote,
+    userLikeStatus = false,
   }: FeedPollCardProps) => {
     const { userId, isSignedIn } = useAuth()
     const { showNotification, showSignInNotification } = useNotification()
     const vote = useMutation(api.polls.vote)
     const deletePoll = useMutation(api.polls.deletePoll)
     const toggleLike = useMutation(api.polls.toggleLike)
-
-    const likeStatus = useQuery(api.polls.getPollLikeStatus, {
-      pollId: poll.id as Id<"polls">,
-      userId: userId || "",
-    })
 
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
@@ -66,13 +63,11 @@ export const FeedPollCard = memo(
         ? { optionId: preFetchedUserVote, pollId: poll.id }
         : fetchedUserVote
 
-    const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
-
     const isUserVoteLoading = userVote === undefined && isSignedIn
 
     const hasVoted =
       userVote?.optionId !== null && userVote?.optionId !== undefined
-    const canDelete = currentUser && poll.authorId === userId
+    const canDelete = userId && poll.authorId === userId
     const isAuthor = poll.authorId === userId
     const showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
@@ -211,13 +206,13 @@ export const FeedPollCard = memo(
                 type="button"
                 onClick={handleLike}
                 disabled={isLiking}
-                className={`hover:text-destructive flex items-center gap-2 ${likeStatus ? "text-destructive" : ""}`}
+                className={`hover:text-destructive flex items-center gap-2 ${userLikeStatus ? "text-destructive" : ""}`}
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${likeStatus ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${userLikeStatus ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
                 >
                   <Heart
-                    className={`h-5 w-5 ${likeStatus ? "fill-current" : ""}`}
+                    className={`h-5 w-5 ${userLikeStatus ? "fill-current" : ""}`}
                   />
                 </div>
                 <span className="text-base font-medium">{poll.likes}</span>
@@ -230,7 +225,9 @@ export const FeedPollCard = memo(
                 <div className="bg-muted/50 hover:bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full transition-colors">
                   <MessageCircle className="h-5 w-5" />
                 </div>
-                <span className="text-base font-medium">Comments</span>
+                <span className="text-base font-medium">
+                  {poll.commentCount || 0}
+                </span>
               </Link>
               <div className="flex items-center gap-2">
                 <div className="bg-muted/50 flex h-10 w-10 items-center justify-center rounded-full">
