@@ -135,7 +135,7 @@ export const UsernameSetup = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting || !username.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-full gap-2 shadow-sm transition-all duration-200"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 w-full gap-2 shadow-sm"
               >
                 {isSubmitting ? (
                   "Setting username..."

@@ -114,7 +114,7 @@ export const CommentSection = ({ pollId }: CommentSectionProps) => {
         {comments.map((comment) => (
           <div
             key={comment._id}
-            className="group bg-muted/30 flex gap-4 rounded-xl p-4 transition-all duration-200"
+            className="group bg-muted/30 flex gap-4 rounded-xl p-4"
           >
             <Avatar size="sm" profileImageUrl={comment.authorProfileImageUrl} />
             <div className="flex-1 space-y-1">

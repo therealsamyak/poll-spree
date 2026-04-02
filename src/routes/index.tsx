@@ -1,6 +1,7 @@
-import { useAuth } from "@clerk/clerk-react"
+import { useAuth } from "@clerk/tanstack-react-start"
+import { convexQuery } from "@convex-dev/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
 import { Suspense, lazy } from "react"
 
 import { Loader } from "@/components/loader"
@@ -21,24 +22,12 @@ const structuredData = {
 
 const Index = () => {
   const { userId, isSignedIn } = useAuth()
-  const user = useQuery(api.users.getUser, { userId: userId || "" })
-
-  // Show loading state while checking user
-  if (isSignedIn && user === undefined) {
-    return (
-      <div className="bg-background flex min-h-screen items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="border-primary mx-auto h-12 w-12 animate-spin rounded-full border-b-2" />
-          <p className="text-muted-foreground animate-pulse text-base">
-            Loading...
-          </p>
-        </div>
-      </div>
-    )
-  }
+  const user = useQuery(
+    convexQuery(api.users.getUser, { userId: userId || "" }),
+  )
 
   // Show username setup for signed-in users without usernames
-  if (isSignedIn && !user) {
+  if (isSignedIn && user !== undefined && !user) {
     return (
       <Suspense fallback={<Loader />}>
         <UsernameSetup />

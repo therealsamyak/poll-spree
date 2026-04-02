@@ -22,32 +22,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useNotification } from "@/components/ui/notification"
+import { usePollActions } from "@/hooks/usePollActions"
+import {
+  formatDateTime,
+  getOptionsWithPlaces,
+  getVotePercentage,
+} from "@/lib/poll-utils"
 
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
 import type { Poll } from "../../types"
-
-const formatDateTime = (timestamp: number) => {
-  const date = new Date(timestamp)
-  return date.toLocaleString("en-US", {
-    day: "numeric",
-    hour: "2-digit",
-    hour12: true,
-    minute: "2-digit",
-    month: "short",
-    year: "numeric",
-  })
-}
-
-const getVotePercentage = (votes: number, totalVotes: number) => {
-  if (totalVotes === 0) {
-    return 0
-  }
-  return Math.round((votes / totalVotes) * 100)
-}
-
-const getOptionsWithPlaces = (options: Poll["options"]) =>
-  options.map((option) => ({ option, place: undefined }))
 
 interface FeedPollCardProps {
   poll: Poll
@@ -61,8 +45,6 @@ export const FeedPollCard = memo(
     onPollDeleted,
     userVote: preFetchedUserVote,
   }: FeedPollCardProps) => {
-    const [isVoting, setIsVoting] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
     const { userId, isSignedIn } = useAuth()
     const { showNotification, showSignInNotification } = useNotification()
     const vote = useMutation(api.polls.vote)
@@ -73,15 +55,15 @@ export const FeedPollCard = memo(
       userId: userId || "",
     })
 
-    const [isLiked, setIsLiked] = useState(false)
+    const [isLiked, setIsLiked] = useState<boolean | null>(null)
 
-    // Use pre-fetched user vote if available, otherwise fetch it
+    const displayIsLiked = isLiked ?? likeStatus ?? false
+
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
       userId: userId || "",
     })
 
-    // Use pre-fetched vote if available, otherwise use fetched vote
     const userVote =
       preFetchedUserVote !== undefined
         ? { optionId: preFetchedUserVote, pollId: poll.id }
@@ -89,7 +71,6 @@ export const FeedPollCard = memo(
 
     const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
 
-    // Add loading state check to prevent flash
     const isUserVoteLoading = userVote === undefined && isSignedIn
 
     const hasVoted =
@@ -99,125 +80,21 @@ export const FeedPollCard = memo(
     const showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
 
-    const handleVote = async (optionId: string) => {
-      if (!isSignedIn) {
-        showSignInNotification()
-        return
-      }
-
-      if (!userId) {
-        return
-      }
-
-      // If user clicks the same option, unvote
-      if (userVote?.optionId === optionId) {
-        setIsVoting(true)
-        try {
-          const result = await vote({
-            optionId: optionId as Id<"pollOptions">,
-            pollId: poll.id as Id<"polls">,
-            userId,
-          })
-
-          if (result.success) {
-            // Vote removed successfully
-          } else {
-            showNotification({
-              message: result.error || "Failed to remove vote",
-              variant: "error",
-            })
-          }
-        } catch {
-          showNotification({
-            message: "An unexpected error occurred. Please try again.",
-            variant: "error",
-          })
-        } finally {
-          setIsVoting(false)
-        }
-        return
-      }
-
-      // Otherwise, change vote or vote for the first time
-      setIsVoting(true)
-      try {
-        const result = await vote({
-          optionId: optionId as Id<"pollOptions">,
-          pollId: poll.id as Id<"polls">,
-          userId,
-        })
-
-        if (result.success) {
-          // Vote recorded successfully
-        } else {
-          showNotification({
-            message: result.error || "Failed to vote",
-            variant: "error",
-          })
-        }
-      } catch {
-        showNotification({
-          message: "An unexpected error occurred. Please try again.",
-          variant: "error",
-        })
-      } finally {
-        setIsVoting(false)
-      }
-    }
-
-    const handleDelete = async () => {
-      if (!userId) {
-        return
-      }
-
-      setIsDeleting(true)
-      try {
-        const result = await deletePoll({
-          authorId: userId,
-          pollId: poll.id as Id<"polls">,
-        })
-
-        if (result.success) {
-          showNotification({
-            message: "Poll deleted successfully!",
-            variant: "success",
-          })
-          onPollDeleted?.()
-        } else {
-          showNotification({
-            message: result.error || "Failed to delete poll",
-            variant: "error",
-          })
-        }
-      } catch {
-        showNotification({
-          message: "An unexpected error occurred. Please try again.",
-          variant: "error",
-        })
-      } finally {
-        setIsDeleting(false)
-      }
-    }
-
-    const handleLike = async () => {
-      if (!isSignedIn) {
-        showSignInNotification()
-        return
-      }
-      if (!userId) {
-        return
-      }
-
-      // Optimistic update
-      setIsLiked(!isLiked)
-
-      try {
-        await toggleLike({ pollId: poll.id as Id<"polls">, userId })
-      } catch {
-        setIsLiked(!isLiked) // Revert
-        showNotification({ message: "Failed to like poll", variant: "error" })
-      }
-    }
+    const { handleVote, handleDelete, handleLike, isVoting, isDeleting } =
+      usePollActions({
+        pollId: poll.id,
+        userId,
+        isSignedIn,
+        userVote,
+        vote,
+        deletePoll,
+        toggleLike,
+        onPollDeleted,
+        showNotification,
+        showSignInNotification,
+        setIsLiked,
+        showVoteNotifications: false,
+      })
 
     const handleShare = () => {
       const url = `${window.location.origin}/polls/${poll.id}`
@@ -229,7 +106,7 @@ export const FeedPollCard = memo(
     }
 
     return (
-      <Card className="flex h-full w-full max-w-2xl flex-col justify-center border-none bg-transparent shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      <Card className="flex h-full w-full max-w-2xl flex-col justify-center border-none bg-transparent shadow-none">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-3">
@@ -249,7 +126,7 @@ export const FeedPollCard = memo(
                 <Link
                   to="/users/$username"
                   params={{ username: poll.authorUsername }}
-                  className="flex items-center gap-2 transition-all duration-200 hover:underline hover:opacity-80"
+                  className="flex items-center gap-2 hover:underline hover:opacity-80"
                 >
                   <Avatar
                     size="sm"
@@ -295,10 +172,10 @@ export const FeedPollCard = memo(
                 <Button
                   key={option.id}
                   variant={isSelected ? "default" : "outline"}
-                  className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-6 text-lg font-medium transition-all duration-200 ${
+                  className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-6 text-lg font-medium ${
                     isSelected
                       ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2"
-                      : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 hover:scale-[1.01] hover:shadow-md"
+                      : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20"
                   } hover:border-primary`}
                   onClick={() => handleVote(option.id)}
                   disabled={isVoting || isUserVoteLoading}
@@ -331,20 +208,20 @@ export const FeedPollCard = memo(
               <button
                 type="button"
                 onClick={handleLike}
-                className={`hover:text-destructive flex items-center gap-2 transition-all duration-200 ${isLiked ? "text-destructive" : ""}`}
+                className={`hover:text-destructive flex items-center gap-2 ${displayIsLiked ? "text-destructive" : ""}`}
               >
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${isLiked ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${displayIsLiked ? "bg-destructive/10" : "bg-muted/50 hover:bg-destructive/10"}`}
                 >
                   <Heart
-                    className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`}
+                    className={`h-5 w-5 ${displayIsLiked ? "fill-current" : ""}`}
                   />
                 </div>
                 <span className="text-base font-medium">
                   {poll.likes +
-                    (isLiked && !likeStatus
+                    (displayIsLiked && !likeStatus
                       ? 1
-                      : !isLiked && likeStatus
+                      : !displayIsLiked && likeStatus
                         ? -1
                         : 0)}
                 </span>
@@ -352,7 +229,7 @@ export const FeedPollCard = memo(
               <Link
                 to="/polls/$pollId"
                 params={{ pollId: poll.id }}
-                className="hover:text-primary flex items-center gap-2 transition-all duration-200"
+                className="hover:text-primary flex items-center gap-2"
               >
                 <div className="bg-muted/50 hover:bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full transition-colors">
                   <MessageCircle className="h-5 w-5" />
@@ -369,7 +246,7 @@ export const FeedPollCard = memo(
             <button
               type="button"
               onClick={handleShare}
-              className="hover:text-foreground flex items-center gap-2 transition-all duration-200"
+              className="hover:text-foreground flex items-center gap-2"
             >
               <div className="bg-muted/50 hover:bg-foreground/10 flex h-10 w-10 items-center justify-center rounded-full transition-colors">
                 <Share2 className="h-5 w-5" />

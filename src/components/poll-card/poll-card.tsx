@@ -28,6 +28,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useNotification } from "@/components/ui/notification"
+import { usePollActions } from "@/hooks/usePollActions"
+import {
+  formatDateTime,
+  getOptionsWithPlaces,
+  getVotePercentage,
+} from "@/lib/poll-utils"
 
 import { api } from "../../../convex/_generated/api"
 import type { Id } from "../../../convex/_generated/dataModel"
@@ -49,28 +55,6 @@ const getQuestionFontSize = (length: number) => {
   } // Long
   return "text-sm sm:text-xs lg:text-sm" // Very long
 }
-
-const formatDateTime = (timestamp: number) => {
-  const date = new Date(timestamp)
-  return date.toLocaleString("en-US", {
-    day: "numeric",
-    hour: "2-digit",
-    hour12: true,
-    minute: "2-digit",
-    month: "short",
-    year: "numeric",
-  })
-}
-
-const getVotePercentage = (votes: number, totalVotes: number) => {
-  if (totalVotes === 0) {
-    return 0
-  }
-  return Math.round((votes / totalVotes) * 100)
-}
-
-const getOptionsWithPlaces = (options: Poll["options"]) =>
-  options.map((option) => ({ option, place: undefined }))
 
 const PollQuestionTitle = ({ question }: { question: string }) => {
   const displayText =
@@ -106,7 +90,7 @@ const SelectedOptionButton = ({
   return (
     <Button
       variant="default"
-      className="border-primary bg-primary/80 text-foreground ring-primary/20 hover:text-primary-foreground flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium shadow-lg ring-2 transition-all duration-200"
+      className="border-primary bg-primary/80 text-foreground ring-primary/20 hover:text-primary-foreground flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium shadow-lg ring-2"
       onClick={() => setExpanded(true)}
       style={{
         borderColor: "var(--primary)",
@@ -141,18 +125,16 @@ interface PollCardProps {
 
 export const PollCard = memo(
   ({ poll, onPollDeleted, userVote: preFetchedUserVote }: PollCardProps) => {
-    const [isVoting, setIsVoting] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const { userId, isSignedIn } = useAuth()
     const [expanded, setExpanded] = useState(false)
     const [shouldMoveToTop, setShouldMoveToTop] = useState(false)
     const prevExpanded = useRef(expanded)
+    const { userId, isSignedIn } = useAuth()
     const { showNotification, showSignInNotification } = useNotification()
 
     const vote = useMutation(api.polls.vote)
     const deletePoll = useMutation(api.polls.deletePoll)
     const toggleLike = useMutation(api.polls.toggleLike)
-    const [isLiked, setIsLiked] = useState<boolean | null>(null) // Null = use server value
+    const [isLiked, setIsLiked] = useState<boolean | null>(null)
 
     const likeStatus = useQuery(api.polls.getPollLikeStatus, {
       pollId: poll.id as Id<"polls">,
@@ -161,13 +143,11 @@ export const PollCard = memo(
 
     const displayIsLiked = isLiked ?? likeStatus ?? false
 
-    // Use pre-fetched user vote if available, otherwise fetch it
     const fetchedUserVote = useQuery(api.polls.getUserVote, {
       pollId: poll.id as Id<"polls">,
       userId: userId || "",
     })
 
-    // Use pre-fetched vote if available, otherwise use fetched vote
     const userVote =
       preFetchedUserVote !== undefined
         ? { optionId: preFetchedUserVote, pollId: poll.id }
@@ -175,7 +155,6 @@ export const PollCard = memo(
 
     const currentUser = useQuery(api.users.getUser, { userId: userId || "" })
 
-    // Add loading state check to prevent flash
     const isUserVoteLoading = userVote === undefined && isSignedIn
 
     const hasVoted =
@@ -184,6 +163,21 @@ export const PollCard = memo(
     const isAuthor = poll.authorId === userId
     const _showResults =
       !isUserVoteLoading && isSignedIn && (hasVoted || isAuthor)
+
+    const { handleVote, handleDelete, handleLike, isVoting, isDeleting } =
+      usePollActions({
+        pollId: poll.id,
+        userId,
+        isSignedIn,
+        userVote,
+        vote,
+        deletePoll,
+        toggleLike,
+        onPollDeleted,
+        showNotification,
+        showSignInNotification,
+        setIsLiked,
+      })
 
     // Only move the selected option to the top if:
     // - The user has selected an option (userVote?.optionId)
@@ -220,126 +214,6 @@ export const PollCard = memo(
     const _collapsedOptions = sortedOptions.slice(0, 2)
     const _hasMoreThanTwo = poll.options.length > 2
 
-    const handleVote = async (optionId: string) => {
-      if (!isSignedIn) {
-        showSignInNotification()
-        return
-      }
-
-      if (!userId) {
-        return
-      }
-
-      // If user clicks the same option, unvote
-      if (userVote?.optionId === optionId) {
-        setIsVoting(true)
-        try {
-          const result = await vote({
-            optionId: optionId as Id<"pollOptions">,
-            pollId: poll.id as Id<"polls">,
-            userId,
-          })
-
-          if (result.success) {
-            showNotification({ message: "Vote removed!", variant: "success" })
-          } else {
-            showNotification({
-              message: result.error || "Failed to remove vote",
-              variant: "error",
-            })
-          }
-        } catch {
-          showNotification({
-            message: "An unexpected error occurred. Please try again.",
-            variant: "error",
-          })
-        } finally {
-          setIsVoting(false)
-        }
-        return
-      }
-
-      // Otherwise, change vote or vote for the first time
-      setIsVoting(true)
-      try {
-        const result = await vote({
-          optionId: optionId as Id<"pollOptions">,
-          pollId: poll.id as Id<"polls">,
-          userId,
-        })
-
-        if (result.success) {
-          showNotification({ message: "Vote recorded!", variant: "success" })
-        } else {
-          showNotification({
-            message: result.error || "Failed to vote",
-            variant: "error",
-          })
-        }
-      } catch {
-        showNotification({
-          message: "An unexpected error occurred. Please try again.",
-          variant: "error",
-        })
-      } finally {
-        setIsVoting(false)
-      }
-    }
-
-    const handleDelete = async () => {
-      if (!userId) {
-        return
-      }
-
-      setIsDeleting(true)
-      try {
-        const result = await deletePoll({
-          authorId: userId,
-          pollId: poll.id as Id<"polls">,
-        })
-
-        if (result.success) {
-          showNotification({
-            message: "Poll deleted successfully!",
-            variant: "success",
-          })
-          onPollDeleted?.()
-        } else {
-          showNotification({
-            message: result.error || "Failed to delete poll",
-            variant: "error",
-          })
-        }
-      } catch {
-        showNotification({
-          message: "An unexpected error occurred. Please try again.",
-          variant: "error",
-        })
-      } finally {
-        setIsDeleting(false)
-      }
-    }
-
-    const handleLike = async () => {
-      if (!isSignedIn) {
-        showSignInNotification()
-        return
-      }
-      if (!userId) {
-        return
-      }
-
-      const prev = displayIsLiked
-      setIsLiked(!prev)
-
-      try {
-        await toggleLike({ pollId: poll.id as Id<"polls">, userId })
-      } catch {
-        setIsLiked(prev)
-        showNotification({ message: "Failed to like poll", variant: "error" })
-      }
-    }
-
     const handleShare = () => {
       const url = `${window.location.origin}/polls/${poll.id}`
       navigator.clipboard.writeText(url)
@@ -350,7 +224,7 @@ export const PollCard = memo(
     }
 
     return (
-      <Card className="group border-muted bg-card focus-visible:ring-primary/20 dark:from-card dark:to-card/50 flex h-full flex-col border shadow-md backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:ring-2 dark:bg-gradient-to-br">
+      <Card className="group border-muted bg-card focus-visible:ring-primary/20 dark:from-card dark:to-card/50 flex h-full flex-col border shadow-md backdrop-blur-sm focus-visible:ring-2 dark:bg-gradient-to-br">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1 space-y-3">
@@ -369,7 +243,7 @@ export const PollCard = memo(
                   <Link
                     to="/users/$username"
                     params={{ username: poll.authorUsername }}
-                    className="flex items-center gap-1.5 transition-all hover:underline hover:opacity-80"
+                    className="flex items-center gap-1.5 hover:underline hover:opacity-80"
                   >
                     <Avatar
                       size="sm"
@@ -412,7 +286,7 @@ export const PollCard = memo(
             {!isUserVoteLoading && !userVote?.optionId && (
               <Button
                 variant="outline"
-                className="border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40 w-full rounded-xl border p-4 text-base font-medium transition-all duration-200 hover:scale-[1.01] hover:shadow-md"
+                className="border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40 w-full rounded-xl border p-4 text-base font-medium"
                 onClick={() => {
                   if (!isSignedIn) {
                     showSignInNotification()
@@ -450,7 +324,7 @@ export const PollCard = memo(
                   <Button
                     key={option.id}
                     variant={isSelected ? "default" : "outline"}
-                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium transition-all duration-200 ${isSelected ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2" : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40 hover:shadow-md"} hover:border-[var(--primary)]`}
+                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium ${isSelected ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2" : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
                     onClick={() => handleVote(option.id)}
                     disabled={isVoting || isUserVoteLoading}
                     style={{
@@ -488,7 +362,7 @@ export const PollCard = memo(
               <button
                 type="button"
                 onClick={handleLike}
-                className={`hover:text-destructive flex items-center gap-1.5 transition-all duration-200 ${displayIsLiked ? "text-destructive" : ""}`}
+                className={`hover:text-destructive flex items-center gap-1.5 ${displayIsLiked ? "text-destructive" : ""}`}
               >
                 <Heart
                   className={`h-4 w-4 ${displayIsLiked ? "fill-current" : ""}`}
@@ -505,7 +379,7 @@ export const PollCard = memo(
               <Link
                 to="/polls/$pollId"
                 params={{ pollId: poll.id }}
-                className="hover:text-primary flex items-center gap-1.5 transition-all duration-200"
+                className="hover:text-primary flex items-center gap-1.5"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>Comments</span>
@@ -518,7 +392,7 @@ export const PollCard = memo(
             <button
               type="button"
               onClick={handleShare}
-              className="hover:text-foreground flex items-center gap-1.5 transition-all duration-200"
+              className="hover:text-foreground flex items-center gap-1.5"
             >
               <Share2 className="h-4 w-4" />
             </button>

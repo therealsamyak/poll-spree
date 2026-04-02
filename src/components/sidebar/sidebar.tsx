@@ -55,7 +55,7 @@ import { api } from "../../../convex/_generated/api"
 const createPollIcon = <Plus className="text-primary h-5 w-5" />
 
 export const Sidebar = () => (
-  <aside className="bg-background fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r transition-colors duration-300 md:w-64">
+  <aside className="bg-background fixed inset-y-0 z-50 flex max-h-screen w-16 flex-col border-r transition-colors md:w-64">
     <SidebarContent />
   </aside>
 )
@@ -140,7 +140,7 @@ const SidebarContent = () => {
   }
 
   return (
-    <div className="bg-background flex h-full max-h-screen flex-col overflow-hidden border-r transition-colors duration-300">
+    <div className="bg-background flex h-full max-h-screen flex-col overflow-hidden border-r transition-colors">
       {/* Logo and Brand */}
       <div className="flex h-16 min-h-16 items-center justify-center border-b px-0 md:px-6">
         <Link
@@ -160,7 +160,7 @@ const SidebarContent = () => {
       <nav className="flex flex-1 flex-col items-center gap-2 overflow-y-auto py-6 md:items-stretch md:gap-2 md:px-4">
         <Link
           to="/"
-          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
         >
           <Home className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Home</span>
@@ -174,7 +174,7 @@ const SidebarContent = () => {
         </Link> */}
         <Link
           to="/trending"
-          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
           activeProps={{
             className: "bg-primary/10 text-primary font-semibold",
           }}
@@ -185,9 +185,9 @@ const SidebarContent = () => {
         <Button
           onClick={handleSurprise}
           variant="ghost"
-          className="group text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors hover:scale-[1.02] active:scale-[0.98] md:w-auto md:justify-start md:px-3"
+          className="group text-foreground/90 hover:bg-accent hover:text-accent-foreground flex h-12 w-12 items-center justify-center rounded-lg text-sm font-medium transition-colors md:w-auto md:justify-start md:px-3"
         >
-          <Sparkles className="h-6 w-6 group-hover:animate-spin" />
+          <Sparkles className="h-6 w-6" />
           <span className="ml-2 hidden md:inline">Surprise!</span>
         </Button>
       </nav>
@@ -199,7 +199,7 @@ const SidebarContent = () => {
             <>
               <Button
                 onClick={() => setIsCreatePollOpen(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-9 items-center justify-center rounded-lg shadow-sm transition-all duration-200 hover:shadow-md md:w-auto md:justify-start md:px-3"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-9 items-center justify-center rounded-lg shadow-sm md:w-auto md:justify-start md:px-3"
               >
                 <Plus className="h-6 w-6" />
                 <span className="hidden md:inline">Create Poll</span>
@@ -220,7 +220,7 @@ const SidebarContent = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent dark:hover:text-accent-foreground justify-center transition-all duration-200 md:h-auto md:w-full md:justify-between md:p-2"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent dark:hover:text-accent-foreground justify-center md:h-auto md:w-full md:justify-between md:p-2"
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <Avatar size="sm" />
@@ -268,7 +268,7 @@ const SidebarContent = () => {
             </DropdownMenu>
           ) : (
             <SignInButton mode="modal">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full gap-2 shadow-sm transition-all duration-200">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full gap-2 shadow-sm">
                 Sign In
               </Button>
             </SignInButton>

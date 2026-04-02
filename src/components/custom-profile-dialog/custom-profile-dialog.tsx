@@ -37,7 +37,6 @@ export const CustomProfileDialog = ({
 
   const deleteUserData = useMutation(api.users.deleteAccount)
   const deleteClerkUser = useAction(api.users.deleteClerkUser)
-  const updateProfileImage = useMutation(api.users.updateProfileImage)
 
   const handleSignOut = async () => {
     try {
@@ -113,19 +112,6 @@ export const CustomProfileDialog = ({
       // Use Clerk's setProfileImage method
       await user.setProfileImage({ file })
 
-      // Also update our Convex users table with the new profile image URL
-      // We need to wait a moment for Clerk to update the imageUrl
-      setTimeout(async () => {
-        try {
-          await updateProfileImage({
-            profileImageUrl: user.imageUrl || "",
-            userId: user.id,
-          })
-        } catch {
-          // Don't show error to user as the main operation succeeded
-        }
-      }, 1000)
-
       showNotification({
         message: "Profile picture updated successfully!",
         variant: "success",
@@ -153,19 +139,6 @@ export const CustomProfileDialog = ({
     try {
       // Use Clerk's setProfileImage method with null to remove
       await user.setProfileImage({ file: null })
-
-      // Also update our Convex users table to remove the profile image URL
-      // We need to wait a moment for Clerk to update the imageUrl
-      setTimeout(async () => {
-        try {
-          await updateProfileImage({
-            profileImageUrl: "",
-            userId: user.id,
-          })
-        } catch {
-          // Don't show error to user as the main operation succeeded
-        }
-      }, 1000)
 
       showNotification({
         message: "Profile picture removed successfully!",

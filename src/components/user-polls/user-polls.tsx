@@ -1,6 +1,7 @@
-import { useAuth } from "@clerk/clerk-react"
+import { useAuth } from "@clerk/tanstack-react-start"
+import { convexQuery } from "@convex-dev/react-query"
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query"
 import { useParams, useSearch } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
 import { BarChart3, Loader2, Users } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
@@ -28,10 +29,14 @@ export const UserPolls = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
   // Get user data
-  const user = useQuery(api.users.getUserByUsername, { username })
-  const userStats = useQuery(api.polls.getUserStats, {
-    userId: user?.userId || "",
-  })
+  const { data: user } = useSuspenseQuery(
+    convexQuery(api.users.getUserByUsername, { username }),
+  )
+  const { data: userStats } = useQuery(
+    convexQuery(api.polls.getUserStats, {
+      userId: user?.userId || "",
+    }),
+  )
 
   // Parse filter and sort from URL params
   const filter = search.filter || "authored,voted"
@@ -41,23 +46,27 @@ export const UserPolls = () => {
   const includeVoted = filters.includes("voted")
 
   // Get polls based on filters
-  const pollsResult = useQuery(api.polls.getPollsByUser, {
-    includeAuthored,
-    includeVoted,
-    paginationOpts,
-    sort,
-    userId: user?.userId || "",
-  })
+  const { data: pollsResult } = useQuery(
+    convexQuery(api.polls.getPollsByUser, {
+      includeAuthored,
+      includeVoted,
+      paginationOpts,
+      sort,
+      userId: user?.userId || "",
+    }),
+  )
 
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(
     () => allPolls.map((poll) => poll.id as Id<"polls">),
     [allPolls],
   )
-  const userVotes = useQuery(api.polls.getUserVotesForPolls, {
-    pollIds,
-    userId: userId || "",
-  })
+  const { data: userVotes } = useQuery(
+    convexQuery(api.polls.getUserVotesForPolls, {
+      pollIds,
+      userId: userId || "",
+    }),
+  )
 
   // Update allPolls when new data comes in
   useEffect(() => {
@@ -69,6 +78,7 @@ export const UserPolls = () => {
         // Subsequent loads - append new polls
         setAllPolls((prev) => [...prev, ...pollsResult.polls])
       }
+      setIsLoadingMore(false)
     }
   }, [pollsResult?.polls, paginationOpts.cursor])
 
@@ -76,7 +86,7 @@ export const UserPolls = () => {
   useEffect(() => {
     setPaginationOpts({ cursor: null, numItems: 20 })
     setAllPolls([])
-  }, [])
+  }, [filter, sort])
 
   // Infinite scroll logic
   const loadMore = useCallback(() => {
@@ -114,24 +124,6 @@ export const UserPolls = () => {
 
     return () => observer.disconnect()
   }, [loadMore, pollsResult?.continueCursor, pollsResult?.isDone])
-
-  // Reset loading state when new data arrives
-  useEffect(() => {
-    if (pollsResult) {
-      setIsLoadingMore(false)
-    }
-  }, [pollsResult])
-
-  if (user === undefined) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="space-y-4 text-center">
-          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
-          <p className="text-muted-foreground">Loading user...</p>
-        </div>
-      </div>
-    )
-  }
 
   if (user === null) {
     return (
@@ -222,12 +214,8 @@ export const UserPolls = () => {
           </div>
         ) : (
           <div className="mx-auto grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {allPolls.map((poll, index) => (
-              <div
-                key={poll.id}
-                className="slide-in-from-bottom-4 animate-in transition-all duration-300 duration-500 hover:shadow-xl"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+            {allPolls.map((poll) => (
+              <div key={poll.id}>
                 <PollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
               </div>
             ))}

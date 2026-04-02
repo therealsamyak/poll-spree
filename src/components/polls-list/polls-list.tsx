@@ -1,5 +1,6 @@
-import { SignInButton, useAuth } from "@clerk/clerk-react"
-import { useQuery } from "convex/react"
+import { SignInButton, useAuth } from "@clerk/tanstack-react-start"
+import { convexQuery } from "@convex-dev/react-query"
+import { useQuery } from "@tanstack/react-query"
 import {
   BarChart3,
   ChevronLeft,
@@ -50,8 +51,9 @@ export const PollsList = () => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const pollsResult = useQuery(api.polls.getPolls, { paginationOpts })
-  const _stats = useQuery(api.polls.getPollsStats)
+  const { data: pollsResult } = useQuery(
+    convexQuery(api.polls.getPolls, { paginationOpts }),
+  )
 
   // Scroll handlers
   const scrollLeft = useCallback(() => {
@@ -73,10 +75,12 @@ export const PollsList = () => {
     () => allPolls.map((poll) => poll.id as Id<"polls">),
     [allPolls],
   )
-  const userVotes = useQuery(api.polls.getUserVotesForPolls, {
-    pollIds,
-    userId: userId || "",
-  })
+  const { data: userVotes } = useQuery(
+    convexQuery(api.polls.getUserVotesForPolls, {
+      pollIds,
+      userId: userId || "",
+    }),
+  )
 
   // Update allPolls when new data comes in
   useEffect(() => {
@@ -88,6 +92,7 @@ export const PollsList = () => {
         // Subsequent loads - append new polls
         setAllPolls((prev) => [...prev, ...pollsResult.polls])
       }
+      setIsLoadingMore(false)
     }
   }, [pollsResult?.polls, paginationOpts.cursor])
 
@@ -128,13 +133,6 @@ export const PollsList = () => {
 
     return () => observer.disconnect()
   }, [loadMore, pollsResult?.continueCursor, pollsResult?.isDone])
-
-  // Reset loading state when new data arrives
-  useEffect(() => {
-    if (pollsResult) {
-      setIsLoadingMore(false)
-    }
-  }, [pollsResult])
 
   // Keyboard navigation (desktop only)
   useEffect(() => {
@@ -206,7 +204,7 @@ export const PollsList = () => {
       <button
         type="button"
         onClick={scrollLeft}
-        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 left-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:shadow-xl md:flex"
+        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 left-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm md:flex"
         aria-label="Previous poll"
       >
         <ChevronLeft className="h-8 w-8" />
@@ -215,7 +213,7 @@ export const PollsList = () => {
       <button
         type="button"
         onClick={scrollRight}
-        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 right-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:shadow-xl md:flex"
+        className="border-border/50 bg-background/50 text-foreground/80 hover:bg-background hover:text-foreground absolute top-1/2 right-4 z-40 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border shadow-lg backdrop-blur-sm md:flex"
         aria-label="Next poll"
       >
         <ChevronRight className="h-8 w-8" />
