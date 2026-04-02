@@ -32,7 +32,7 @@ interface UsePollActionsParams {
   showVoteNotifications?: boolean
 }
 
-export function usePollActions({
+export const usePollActions = ({
   pollId,
   userId,
   isSignedIn,
@@ -45,7 +45,7 @@ export function usePollActions({
   showSignInNotification,
   setIsLiked,
   showVoteNotifications = true,
-}: UsePollActionsParams) {
+}: UsePollActionsParams) => {
   const [isVoting, setIsVoting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
