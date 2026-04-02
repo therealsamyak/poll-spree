@@ -9,7 +9,7 @@ import { Loader } from "@/components/loader"
 
 import { routeTree } from "./routeTree.gen"
 
-export function getRouter() {
+export const getRouter = () => {
   const CONVEX_URL = import.meta.env.VITE_CONVEX_URL as string
   if (!CONVEX_URL) {
     throw new Error("missing VITE_CONVEX_URL envar")

@@ -36,42 +36,7 @@ const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
   return { userId, token }
 })
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
-  convexClient: ConvexReactClient
-  convexQueryClient: ConvexQueryClient
-}>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { name: "theme-color", content: "#CB4839" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-    links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "stylesheet", href: indexCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap",
-        crossOrigin: "",
-      },
-    ],
-  }),
-  beforeLoad: async (ctx) => {
-    const { userId, token } = await fetchClerkAuth()
-    if (token) {
-      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token)
-    }
-    return { userId, token }
-  },
-  notFoundComponent: NotFound,
-  component: RootComponent,
-})
-
-function RootComponent() {
+const RootComponent = () => {
   const context = useRouteContext({ from: Route.id })
   const isFetching = useRouterState({
     select: (s) => s.isLoading,
@@ -126,3 +91,38 @@ function RootComponent() {
     </html>
   )
 }
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+  convexClient: ConvexReactClient
+  convexQueryClient: ConvexQueryClient
+}>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+      { name: "theme-color", content: "#CB4839" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+    links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "stylesheet", href: indexCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap",
+        crossOrigin: "",
+      },
+    ],
+  }),
+  beforeLoad: async (ctx) => {
+    const { userId, token } = await fetchClerkAuth()
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token)
+    }
+    return { userId, token }
+  },
+  notFoundComponent: NotFound,
+  component: RootComponent,
+})
