@@ -34,7 +34,7 @@ export const Avatar = ({
   return (
     <div
       className={cn(
-        "bg-muted ring-border hover:ring-primary/50 flex items-center justify-center overflow-hidden rounded-full ring-2 transition-all duration-200 hover:scale-105",
+        "bg-muted ring-border hover:ring-primary/50 flex items-center justify-center overflow-hidden rounded-full ring-2",
         sizeClasses[size],
         className,
       )}

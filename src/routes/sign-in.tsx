@@ -1,4 +1,4 @@
-import { SignIn } from "@clerk/clerk-react"
+import { SignIn } from "@clerk/tanstack-react-start"
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 

@@ -1,79 +1,62 @@
-import { ClerkProvider } from "@clerk/clerk-react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createRouter } from "@tanstack/react-router"
+import { ConvexQueryClient } from "@convex-dev/react-query"
+import { QueryClient } from "@tanstack/react-query"
+import { createRouter as createTanStackRouter } from "@tanstack/react-router"
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query"
 import { ConvexProvider, ConvexReactClient } from "convex/react"
-import { useState } from "react"
 import type { ReactNode } from "react"
 
 import { Loader } from "@/components/loader"
-import { NotificationProvider } from "@/components/ui/notification"
 
 import { routeTree } from "./routeTree.gen"
 
-const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+export function getRouter() {
+  const CONVEX_URL = import.meta.env.VITE_CONVEX_URL as string
+  if (!CONVEX_URL) {
+    throw new Error("missing VITE_CONVEX_URL envar")
+  }
+  const convex = new ConvexReactClient(CONVEX_URL)
+  const convexQueryClient = new ConvexQueryClient(convex)
 
-if (!publishableKey) {
-  throw new Error("Missing Publishable Key")
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+        retry: 1,
+        refetchOnWindowFocus: false,
+        queryKeyHashFn: convexQueryClient.hashFn(),
+        queryFn: convexQueryClient.queryFn(),
+      },
+    },
+  })
+  convexQueryClient.connect(queryClient)
+
+  const router = createTanStackRouter({
+    routeTree,
+    defaultPreload: "intent",
+    defaultErrorComponent: ({ error }) => (
+      <div className="text-destructive p-4">
+        <h1>Error</h1>
+        <pre>{error.message}</pre>
+      </div>
+    ),
+    defaultPendingComponent: () => <Loader />,
+    context: { queryClient, convexClient: convex, convexQueryClient },
+    Wrap: ({ children }: { children: ReactNode }) => (
+      <ConvexProvider client={convexQueryClient.convexClient}>
+        {children}
+      </ConvexProvider>
+    ),
+  })
+  setupRouterSsrQueryIntegration({ router, queryClient })
+
+  return router
 }
-
-const router = createRouter({
-  Wrap: ({ children }: { children: ReactNode }) => {
-    const [queryClient] = useState(
-      () =>
-        new QueryClient({
-          defaultOptions: {
-            queries: {
-              staleTime: 1000 * 60 * 5,
-              gcTime: 1000 * 60 * 10,
-              retry: 1,
-              refetchOnWindowFocus: false,
-            },
-          },
-        }),
-    )
-
-    const [convex] = useState(
-      () => new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string),
-    )
-
-    return (
-      <ClerkProvider
-        publishableKey={publishableKey}
-        appearance={{
-          elements: {
-            rootBox: "mx-auto",
-            card: "shadow-none",
-          },
-        }}
-      >
-        <QueryClientProvider client={queryClient}>
-          <ConvexProvider client={convex}>
-            <NotificationProvider>{children}</NotificationProvider>
-          </ConvexProvider>
-        </QueryClientProvider>
-      </ClerkProvider>
-    )
-  },
-  context: {} as Record<string, unknown>,
-  defaultErrorComponent: ({ error }) => (
-    <div className="text-destructive p-4">
-      <h1>Error</h1>
-      <pre>{error.message}</pre>
-    </div>
-  ),
-  defaultPendingComponent: () => <Loader />,
-  defaultPreload: "intent",
-  routeTree,
-})
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router
+    router: ReturnType<typeof getRouter>
   }
 }
 
-export default router
-
-export function getRouter() {
-  return router
-}
+export default getRouter()

@@ -9,7 +9,7 @@ export const Footer = () => (
           href="https://github.com/therealsamyak/poll-spree"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-primary transition-colors duration-200"
+          className="text-muted-foreground hover:text-primary transition-colors"
         >
           <SiGithub className="h-5 w-5" />
         </a>
@@ -17,7 +17,7 @@ export const Footer = () => (
           href="https://x.com/samheart564"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-primary transition-colors duration-200"
+          className="text-muted-foreground hover:text-primary transition-colors"
         >
           <SiX className="h-5 w-5" />
         </a>

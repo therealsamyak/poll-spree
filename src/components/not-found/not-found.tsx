@@ -15,7 +15,7 @@ export const NotFound = () => (
       </p>
       <a
         href="/"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium transition-colors duration-200"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium transition-colors"
       >
         Go home
       </a>

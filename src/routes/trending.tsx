@@ -1,7 +1,8 @@
-import { SignInButton, useAuth } from "@clerk/clerk-react"
+import { SignInButton, useAuth } from "@clerk/tanstack-react-start"
+import { convexQuery } from "@convex-dev/react-query"
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { useQuery } from "convex/react"
-import { Loader2, Plus, TrendingUp } from "lucide-react"
+import { Plus, TrendingUp } from "lucide-react"
 import { Suspense, lazy, useMemo } from "react"
 
 import { Footer } from "@/components/footer"
@@ -29,33 +30,26 @@ const CreatePollDialog = lazy(() =>
 const Trending = () => {
   const { isSignedIn, userId } = useAuth()
 
-  const pollsResult = useQuery(api.polls.getTrendingPolls)
+  const pollsResult = useSuspenseQuery(convexQuery(api.polls.getTrendingPolls))
 
   // Trending polls are already sorted and limited by backend, so we don't need infinite scroll logic for now
-  const allPolls = useMemo(() => pollsResult?.polls || [], [pollsResult?.polls])
+  const allPolls = useMemo(
+    () => pollsResult.data?.polls || [],
+    [pollsResult.data?.polls],
+  )
 
   // Batch fetch user votes for all visible polls
   const pollIds = useMemo(
     () => allPolls.map((poll) => poll.id as Id<"polls">),
     [allPolls],
   )
-  const userVotes = useQuery(api.polls.getUserVotesForPolls, {
-    pollIds,
-    userId: userId || "",
+  const userVotes = useQuery({
+    ...convexQuery(api.polls.getUserVotesForPolls, {
+      pollIds,
+      userId: userId || "",
+    }),
+    enabled: pollIds.length > 0,
   })
-
-  if (pollsResult === undefined) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="space-y-4 text-center">
-          <Loader2 className="text-primary mx-auto h-12 w-12 animate-spin" />
-          <p className="text-muted-foreground animate-pulse">
-            Loading trending polls...
-          </p>
-        </div>
-      </div>
-    )
-  }
 
   if (allPolls.length === 0) {
     return (
@@ -79,7 +73,7 @@ const Trending = () => {
               </Suspense>
             ) : (
               <SignInButton mode="modal">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm transition-all duration-200">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 shadow-sm">
                   <Plus className="h-4 w-4" />
                   Sign in to create polls
                 </Button>
@@ -119,13 +113,12 @@ const Trending = () => {
 
           {/* Polls Grid */}
           <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {allPolls.map((poll, index) => (
-              <div
-                key={poll.id}
-                className="slide-in-from-bottom-4 animate-in duration-500"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <PollCard poll={poll} userVote={userVotes?.[poll.id] || null} />
+            {allPolls.map((poll) => (
+              <div key={poll.id}>
+                <PollCard
+                  poll={poll}
+                  userVote={userVotes.data?.[poll.id] || null}
+                />
               </div>
             ))}
           </div>
@@ -144,5 +137,10 @@ const Trending = () => {
 }
 
 export const Route = createFileRoute("/trending")({
+  loader: async (opts) => {
+    await opts.context.queryClient.ensureQueryData(
+      convexQuery(api.polls.getTrendingPolls),
+    )
+  },
   component: Trending,
 })

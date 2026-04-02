@@ -1,9 +1,12 @@
+import { convexQuery } from "@convex-dev/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 
 import { SEOHead } from "@/components/seo"
 import { UserPolls } from "@/components/user-polls"
 import { generateUserSEOConfig } from "@/lib/seo"
+
+import { api } from "../../convex/_generated/api"
 
 const searchSchema = z.object({
   filter: z.string().optional(),
@@ -31,6 +34,12 @@ const UserProfilePage = () => {
 }
 
 export const Route = createFileRoute("/users/$username")({
+  loader: async (opts) => {
+    const { username } = opts.params
+    await opts.context.queryClient.ensureQueryData(
+      convexQuery(api.users.getUserByUsername, { username }),
+    )
+  },
   component: UserProfilePage,
   validateSearch: searchSchema,
 })

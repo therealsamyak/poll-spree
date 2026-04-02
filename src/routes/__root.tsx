@@ -1,90 +1,46 @@
-import { useUser } from "@clerk/clerk-react"
+import { ClerkProvider } from "@clerk/tanstack-react-start"
+import { useAuth, useUser } from "@clerk/tanstack-react-start"
+import { auth } from "@clerk/tanstack-react-start/server"
+import { ConvexQueryClient } from "@convex-dev/react-query"
+import { QueryClient } from "@tanstack/react-query"
 import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
+  useRouteContext,
   useRouterState,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
+import { createServerFn } from "@tanstack/react-start"
 import { useMutation } from "convex/react"
-import { useEffect, useState } from "react"
+import { ConvexReactClient } from "convex/react"
+import { ConvexProviderWithClerk } from "convex/react-clerk"
+import { useEffect, useRef } from "react"
 
 import { Loader } from "@/components/loader"
-import { Loading } from "@/components/loading"
 import { NotFound } from "@/components/not-found"
 import { SEOHead } from "@/components/seo"
 import { Sidebar } from "@/components/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
+import { NotificationProvider } from "@/components/ui/notification"
 import { Toaster } from "@/components/ui/sonner"
-import { useAuthState } from "@/lib/clerk"
 
 import { api } from "../../convex/_generated/api"
 
 import indexCss from "../index.css?url"
 
-const RootComponent = () => {
-  const isFetching = useRouterState({
-    select: (s) => s.isLoading,
-  })
+const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
+  const { userId, getToken } = await auth()
+  const token = await getToken()
+  return { userId, token }
+})
 
-  const { isLoaded } = useAuthState()
-  const { user } = useUser()
-  const [isClient, setIsClient] = useState(false)
-  const updateProfileImage = useMutation(api.users.updateProfileImage)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (user?.id && user?.imageUrl !== undefined) {
-      updateProfileImage({
-        profileImageUrl: user.imageUrl || "",
-        userId: user.id,
-      }).catch((_error) => {
-        // Silently handle profile image sync errors
-      })
-    }
-  }, [user?.id, user?.imageUrl, updateProfileImage])
-
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {!isLoaded || !isClient ? (
-          <Loading />
-        ) : (
-          <>
-            <SEOHead />
-            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-              <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
-                <Sidebar />
-                <main className="ml-16 flex-1 overflow-auto transition-colors duration-300 md:ml-64">
-                  {isFetching ? (
-                    <Loader />
-                  ) : (
-                    <div className="animate-in min-h-full">
-                      <Outlet />
-                    </div>
-                  )}
-                </main>
-              </div>
-              <Toaster richColors />
-            </ThemeProvider>
-            <TanStackRouterDevtools position="bottom-right" />
-          </>
-        )}
-        <Scripts />
-      </body>
-    </html>
-  )
-}
-
-export const Route = createRootRoute({
-  component: RootComponent,
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+  convexClient: ConvexReactClient
+  convexQueryClient: ConvexQueryClient
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -95,11 +51,78 @@ export const Route = createRootRoute({
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "stylesheet", href: indexCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap",
+        crossOrigin: "",
       },
     ],
   }),
+  beforeLoad: async (ctx) => {
+    const { userId, token } = await fetchClerkAuth()
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token)
+    }
+    return { userId, token }
+  },
   notFoundComponent: NotFound,
+  component: RootComponent,
 })
+
+function RootComponent() {
+  const context = useRouteContext({ from: Route.id })
+  const isFetching = useRouterState({
+    select: (s) => s.isLoading,
+  })
+  const { user } = useUser()
+  const updateProfileImage = useMutation(api.users.updateProfileImage)
+
+  const lastSyncedImageUrl = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    if (
+      user?.id &&
+      user?.imageUrl !== undefined &&
+      user.imageUrl !== lastSyncedImageUrl.current
+    ) {
+      lastSyncedImageUrl.current = user.imageUrl
+      updateProfileImage({
+        profileImageUrl: user.imageUrl || "",
+        userId: user.id,
+      }).catch(() => {})
+    }
+  }, [user?.id, user?.imageUrl, updateProfileImage])
+
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <ClerkProvider>
+          <ConvexProviderWithClerk
+            client={context.convexClient}
+            useAuth={useAuth}
+          >
+            <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+              <NotificationProvider>
+                <div className="bg-background flex max-h-screen max-w-screen overflow-hidden">
+                  <Sidebar />
+                  <main className="ml-16 flex-1 overflow-auto transition-colors md:ml-64">
+                    {isFetching ? <Loader /> : <Outlet />}
+                  </main>
+                </div>
+                <Toaster richColors />
+              </NotificationProvider>
+            </ThemeProvider>
+            <SEOHead />
+            <TanStackRouterDevtools position="bottom-right" />
+          </ConvexProviderWithClerk>
+        </ClerkProvider>
+        <Scripts />
+      </body>
+    </html>
+  )
+}

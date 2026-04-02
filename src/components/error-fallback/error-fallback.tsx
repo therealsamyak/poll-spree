@@ -19,7 +19,7 @@ export const ErrorFallback = ({ error }: ErrorFallbackProps) => (
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium transition-colors duration-200"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 font-medium transition-colors"
       >
         Try again
       </button>
