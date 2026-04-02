@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react"
+import { useUser } from "@clerk/tanstack-react-start"
 import { User } from "lucide-react"
 
 import { cn } from "@/lib/utils"
