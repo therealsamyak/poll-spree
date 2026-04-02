@@ -1,4 +1,4 @@
-import { SignInButton } from "@clerk/clerk-react"
+import { SignInButton } from "@clerk/tanstack-react-start"
 import { LogIn } from "lucide-react"
 
 import { Button } from "@/components/ui/button"

@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/clerk-react"
+import { useAuth } from "@clerk/tanstack-react-start"
 import { useMutation, useQuery } from "convex/react"
 import { formatDistanceToNow } from "date-fns"
 import { Send, Trash2 } from "lucide-react"

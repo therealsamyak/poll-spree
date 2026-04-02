@@ -1,4 +1,4 @@
-import { useAuth, useUser } from "@clerk/clerk-react"
+import { useAuth, useUser } from "@clerk/tanstack-react-start"
 import { useMutation } from "convex/react"
 import { ArrowRight, Sparkles, User } from "lucide-react"
 import { useId, useState } from "react"

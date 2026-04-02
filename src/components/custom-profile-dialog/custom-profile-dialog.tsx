@@ -1,4 +1,4 @@
-import { useClerk, useUser } from "@clerk/clerk-react"
+import { useClerk, useUser } from "@clerk/tanstack-react-start"
 import { useAction, useMutation } from "convex/react"
 import { AlertTriangle, Camera, LogOut, Trash2, User } from "lucide-react"
 import { useRef, useState } from "react"

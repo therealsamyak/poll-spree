@@ -1,4 +1,4 @@
-import { SignInButton, useAuth, useClerk } from "@clerk/clerk-react"
+import { SignInButton, useAuth, useClerk } from "@clerk/tanstack-react-start"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useMutation, useQuery } from "convex/react"
 import {
