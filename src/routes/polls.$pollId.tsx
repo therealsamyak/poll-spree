@@ -169,6 +169,15 @@ const PollPage = () => {
             )}
           </div>
 
+          {/* Sign in prompt for non-signed in users */}
+          {!isSignedIn && (
+            <div className="border-border/50 bg-card rounded-xl border p-4 text-center">
+              <p className="text-muted-foreground">
+                Sign in to vote on this poll and see real-time results!
+              </p>
+            </div>
+          )}
+
           {/* Voting Options */}
           <div className="space-y-4">
             <h2 className="text-foreground text-xl font-semibold tracking-tight">
@@ -230,15 +239,6 @@ const PollPage = () => {
               })}
             </div>
           </div>
-
-          {/* Sign in prompt for non-signed in users */}
-          {!isSignedIn && (
-            <div className="border-border/50 bg-card rounded-xl border p-4 text-center">
-              <p className="text-muted-foreground">
-                Sign in to vote on this poll and see real-time results!
-              </p>
-            </div>
-          )}
 
           {/* Results hidden message for signed in users who haven't voted */}
           {isSignedIn && !isUserVoteLoading && !hasVoted && !isAuthor && (
