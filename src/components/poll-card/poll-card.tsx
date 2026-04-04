@@ -90,7 +90,7 @@ const SelectedOptionButton = ({
   return (
     <Button
       variant="default"
-      className="border-primary bg-primary/80 text-foreground ring-primary/20 hover:text-primary-foreground flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium shadow-lg ring-2"
+      className="border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium shadow-lg ring-2"
       onClick={() => setExpanded(true)}
       style={{
         borderColor: "var(--primary)",
@@ -107,7 +107,7 @@ const SelectedOptionButton = ({
         >
           {selected.text}
         </span>
-        <span className="text-foreground mt-1 text-xs">
+        <span className="text-foreground mt-2 text-sm">
           {getVotePercentage(selected.votes, poll.totalVotes)}% •{" "}
           {selected.votes} vote
           {selected.votes === 1 ? "" : "s"}
@@ -287,7 +287,7 @@ export const PollCard = memo(
             {!isUserVoteLoading && !userVote?.optionId && (
               <Button
                 variant="outline"
-                className="border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40 w-full rounded-xl border p-4 text-base font-medium"
+                className="border-border bg-card text-foreground hover:bg-primary/10 hover:text-primary w-full rounded-xl border p-4 text-base font-medium"
                 onClick={() => {
                   if (!isSignedIn) {
                     showSignInNotification()
@@ -325,7 +325,7 @@ export const PollCard = memo(
                   <Button
                     key={option.id}
                     variant={isSelected ? "default" : "outline"}
-                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium ${isSelected ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2" : "border-muted bg-card text-foreground hover:bg-primary/10 hover:text-primary focus-visible:bg-muted/80 dark:border-foreground/20 dark:focus-visible:bg-foreground/5 dark:hover:border-foreground/40"} hover:border-[var(--primary)]`}
+                    className={`flex h-auto w-full items-center justify-between rounded-xl border p-4 text-base font-medium ${isSelected ? "border-primary bg-primary/80 text-primary-foreground ring-primary/20 hover:text-primary-foreground shadow-lg ring-2" : "border-border bg-card text-foreground hover:bg-primary/10 hover:text-primary"} hover:border-primary`}
                     onClick={() => handleVote(option.id)}
                     disabled={isVoting || isUserVoteLoading}
                     style={{
@@ -344,7 +344,7 @@ export const PollCard = memo(
                         {option.text}
                       </span>
                       {showResults && (
-                        <span className="text-foreground mt-1 text-xs">
+                        <span className="text-foreground mt-2 text-sm">
                           {getVotePercentage(option.votes, poll.totalVotes)}% •{" "}
                           {option.votes} vote
                           {option.votes === 1 ? "" : "s"}
