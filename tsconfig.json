@@ -17,5 +17,6 @@
       "@/lib/*": ["./src/lib/*"],
       "@/routes/*": ["./src/routes/*"]
     }
-  }
+  },
+  "exclude": ["opensrc"]
 }
