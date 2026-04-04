@@ -23,6 +23,7 @@
     "**/src-tauri",
     "**/.nuxt",
     "bts.jsonc",
-    "**/_generated"
+    "**/_generated",
+    "**/opensrc"
   ]
 }
